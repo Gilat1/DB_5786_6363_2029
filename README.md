@@ -51,6 +51,8 @@ The purpose of the system is to enable efficient, organized, and data-driven man
 ## System Screens (AI)
 
 The system was characterized using a Top-Down approach with the help of AI tools for generating initial screens.
+The prototype of the system was developed using Google AI Studio as part of the Top-Down characterization process.  
+It can be accessed here: https://ai.studio/apps/cd7c04a5-8c88-45ec-b967-1ed674755d64
 
 ### Navigation Menu
 
