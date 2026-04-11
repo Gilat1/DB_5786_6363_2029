@@ -16,13 +16,14 @@ Guided Tour Management
 ---
 
 ## Table of Contents
-1. Introduction  
-2. System Screens (AI)  
-3. ERD Diagram  
-4. DSD Diagram  
-5. Design Decisions  
-6. Data Insertion  
-7. Backup and Restore  
+- [Phase 1: Design and Build the Database](#phase-1-design-and-build-the-database)
+  - [Introduction](#introduction)
+  - [System Screens (AI)](#system-screens-ai)
+  - [ERD Diagram](#erd-diagram)
+  - [DSD Diagram](#dsd-diagram)
+  - [Design Decisions](#design-decisions)
+  - [Data Insertion](#data-insertion)
+  - [Backup and Restore](#backup-and-restore)
 
 ---
 
