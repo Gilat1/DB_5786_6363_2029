@@ -249,10 +249,32 @@ Data insertion into the system was carried out using three methods:
 ##  Backup and Restore
 
 ## 🔹 Backup File
-<img width="1913" height="953" alt="צילום מסך 2026-03-22 002051" src="https://github.com/user-attachments/assets/65431765-ce45-4ad7-a71f-2b0ce3dfbaff" />
+A backup of the database "DBsecret" was created using pgAdmin.
+
+The backup file was saved as:
+backup_12_04_2026.sql
+
+The backup was created in Plain format.
+<img width="1914" height="1079" alt="image" src="https://github.com/user-attachments/assets/dd89766b-5b51-4fb6-9bea-d6dddf4b261f" />
+
 
 ## 🔹 Restore
-<img width="1532" height="337" alt="צילום מסך 2026-03-22 002903" src="https://github.com/user-attachments/assets/5c609770-f66d-435c-94e1-c2739d27ded9" />
+
+To verify the backup file, a restore process was performed.
+
+A new database named "DBsecret_restore" was created on another machine.
+
+The backup file was executed using the pgAdmin Query Tool.
+
+After execution:
+- All tables were recreated successfully
+- All data was restored
+
+Verification was performed by running SELECT queries and checking:
+- 500 rows in regular tables
+- 20,000 rows in large tables (REGISTRATION, PAYMENT)
+
+This confirms that the backup file is valid and working correctly.
 
 ##  Summary
 
