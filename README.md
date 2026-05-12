@@ -37,6 +37,20 @@ Guided Tour Management
   - [Transactions: COMMIT and ROLLBACK](#transactions-commit-and-rollback)
   - [Indexes and Performance Analysis](#indexes-and-performance-analysis)
   - [Backup File (Phase 2)](#backup-file-phase-2)
+- [Phase 3: Integration and Views](#phase-3-integration-and-views)
+  - [Introduction](#introduction-2)
+  - [DSD Diagram – Received Department](#1-dsd-diagram--received-department)
+  - [ERD Diagram – Received Department](#2-erd-diagram--received-department)
+  - [ERD Diagram – Unified Database (Post-Integration)](#3-erd-diagram--unified-database-post-integration)
+  - [DSD Diagram – After Integration](#4-dsd-diagram--after-integration)
+  - [Integration Decisions and Explanations](#5-integration-decisions-and-explanations)
+  - [Explanation of SQL Commands](#6-explanation-of-sql-commands)
+  - [Views and Queries](#7-views-and-queries)
+    - [View 1 – vw_full_guided_tour_details](#view-1--vw_full_guided_tour_details)
+    - [View 2 – vw_customer_registration_details](#view-2--vw_customer_registration_details)
+    - [View 3 – vw_payment_summary_details](#view-3--vw_payment_summary_details)
+  - [Updated Backup File](#8-updated-backup-file)
+  - [Summary](#summary-1)
 
 ---
 
@@ -1560,10 +1574,7 @@ This query analyzes the total number of payments and total revenue grouped by ro
 A full backup of the database after completing Phase 3 is included.
 
 📁 Backup File:
-
-```text
-backup3.sql
-```
+<img width="1915" height="1008" alt="image" src="https://github.com/user-attachments/assets/587320b7-0c5d-430b-85a8-670bc89e9fd1" />
 
 The backup contains:
 
