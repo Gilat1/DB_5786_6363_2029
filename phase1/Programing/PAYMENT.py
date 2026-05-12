@@ -3,7 +3,7 @@ from faker import Faker
 
 fake = Faker()
 
-NUM_RECORDS = 20000
+NUM_RECORDS = 20100
 
 def generate_payment_inserts():
     """
@@ -14,13 +14,13 @@ def generate_payment_inserts():
     
     payment_methods = ['Credit Card', 'Bank Transfer', 'PayPal', 'Cash', 'Check']
     
-    MAX_REGISTRATION_ID = 20000 
+    MAX_REGISTRATION_ID = 20100
     MAX_STATUS_ID = 5
 
     with open('insert_payments.sql', mode='w', encoding='utf-8') as file:
         file.write("-- PAYMENT INSERTS\n")
         
-        for pay_id in range(1, NUM_RECORDS + 1):
+        for pay_id in range(20001, NUM_RECORDS + 1):
             pay_date = fake.date_between(start_date='-2y', end_date='today').strftime('%Y-%m-%d')
             
             amount = round(random.uniform(10.0, 9999.99), 2)
