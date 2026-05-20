@@ -1260,7 +1260,8 @@ The following DSD diagram was received from the second project before the integr
 The following ERD diagram represents the original structure of the received system before integration.
 
 📸
-<img width="4704" height="1908" alt="new_erd" src="https://github.com/user-attachments/assets/cede93a3-77e5-457c-aa1f-88e465586366" />
+<img width="3744" height="1365" alt="new_erd" src="https://github.com/user-attachments/assets/fc018e7e-b20f-4cbf-bb2d-0547d51bb28d" />
+
 
 
 ---
