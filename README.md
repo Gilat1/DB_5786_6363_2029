@@ -1251,7 +1251,8 @@ The integration focused mainly on route management, locations, guided tours, and
 The following DSD diagram was received from the second project before the integration process.
 
 📸
-<img width="3744" height="1365" alt="new_dsd" src="https://github.com/user-attachments/assets/4bceb491-40d9-4d48-b952-90928bbfb0e0" />
+<img width="3744" height="1365" alt="new_dsd" src="https://github.com/user-attachments/assets/bd1a1f31-9106-431a-85b7-5f5a32850ce9" />
+
 
 ---
 
