@@ -5,7 +5,7 @@
 
 **Submitted by:**  
 Gilat Malka – 213196363  
-Shirel Ankawa – 209692029  
+Shirel Nkaoua – 209692029  
 
 **System Name:**  
 Tour Guide Management System  
@@ -1251,7 +1251,8 @@ The integration focused mainly on route management, locations, guided tours, and
 The following DSD diagram was received from the second project before the integration process.
 
 📸
-<img width="3744" height="1365" alt="new_dsd" src="https://github.com/user-attachments/assets/4bceb491-40d9-4d48-b952-90928bbfb0e0" />
+<img width="3744" height="1365" alt="new_dsd" src="https://github.com/user-attachments/assets/bd1a1f31-9106-431a-85b7-5f5a32850ce9" />
+
 
 ---
 
@@ -1260,7 +1261,8 @@ The following DSD diagram was received from the second project before the integr
 The following ERD diagram represents the original structure of the received system before integration.
 
 📸
-<img width="4704" height="1908" alt="new_erd" src="https://github.com/user-attachments/assets/cede93a3-77e5-457c-aa1f-88e465586366" />
+<img width="3744" height="1365" alt="new_erd" src="https://github.com/user-attachments/assets/fc018e7e-b20f-4cbf-bb2d-0547d51bb28d" />
+
 
 
 ---
