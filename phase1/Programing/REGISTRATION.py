@@ -3,7 +3,7 @@ from faker import Faker
 
 fake = Faker()
 
-NUM_RECORDS = 20000
+NUM_RECORDS = 20500
 
 def generate_registration_inserts():
     print(f"Generating {NUM_RECORDS} inserts for REGISTRATION table...")
@@ -15,7 +15,7 @@ def generate_registration_inserts():
     with open('insert_registration.sql', mode='w', encoding='utf-8') as file:
         file.write("-- REGISTRATION INSERTS\n")
         
-        for reg_id in range(1, NUM_RECORDS + 1):
+        for reg_id in range(20001, NUM_RECORDS + 1):
             reg_date = fake.date_between(start_date='-3y', end_date='today').strftime('%Y-%m-%d')
             
             amount = round(random.uniform(50.0, 5000.0), 2)
