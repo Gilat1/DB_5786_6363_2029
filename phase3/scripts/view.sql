@@ -1,15 +1,15 @@
-from pathlib import Path
-
-sql = """-- Views.sql
+-- Views.sql
 -- Stage 3 - Integration Views
 -- Tour Guide Management System + Route Management System
 
 -- ============================================================
--- View 1: Full guided tour details
--- Combines guided tours with routes, guides, difficulty levels, and locations.
+-- View 1: Original Department View
+-- Tour Guide Management System point of view
+-- Shows guided tours with guide, route, location, difficulty,
+-- and number of registrations.
 -- ============================================================
 
-CREATE OR REPLACE VIEW vw_full_guided_tour_details AS
+CREATE OR REPLACE VIEW vw_tour_guide_department_view AS
 SELECT
     gt.TourID,
     gt.StartDate,
@@ -20,6 +20,70 @@ SELECT
     gt.Price,
     gt.MaxParticipants,
     gt.Notes AS TourNotes,
+    g.GuideID,
+    g.FirstName AS GuideFirstName,
+    g.LastName AS GuideLastName,
+    g.Phone AS GuidePhone,
+    g.Email AS GuideEmail,
+    r.RouteID,
+    r.Name AS RouteName,
+    dl.DifficultyName,
+    l.LocationName,
+    COUNT(reg.RegistrationID) AS NumberOfRegistrations
+FROM GUIDEDTOUR gt
+JOIN GUIDE g ON gt.GuideID = g.GuideID
+JOIN ROUTE r ON gt.RouteID = r.RouteID
+JOIN DIFFICULTYLEVEL dl ON r.DifficultyID = dl.DifficultyID
+LEFT JOIN LOCATED_IN li ON r.RouteID = li.RouteID
+LEFT JOIN LOCATION l ON li.LocationID = l.LocationID
+LEFT JOIN REGISTRATION reg ON gt.TourID = reg.TourID
+GROUP BY
+    gt.TourID,
+    gt.StartDate,
+    gt.EndDate,
+    gt.StartTime,
+    gt.EndTime,
+    gt.MeetingPoint,
+    gt.Price,
+    gt.MaxParticipants,
+    gt.Notes,
+    g.GuideID,
+    g.FirstName,
+    g.LastName,
+    g.Phone,
+    g.Email,
+    r.RouteID,
+    r.Name,
+    dl.DifficultyName,
+    l.LocationName;
+
+-- Query 1.1
+SELECT *
+FROM vw_tour_guide_department_view
+LIMIT 10;
+
+-- Query 1.2
+SELECT
+    TourID,
+    RouteName,
+    GuideFirstName,
+    GuideLastName,
+    StartDate,
+    Price,
+    NumberOfRegistrations
+FROM vw_tour_guide_department_view
+ORDER BY NumberOfRegistrations DESC;
+
+
+-- ============================================================
+-- View 2: Received Department View
+-- Route Management System point of view
+-- Shows routes with difficulty, locations,
+-- number of guided tours, and average tour price.
+-- ============================================================
+
+CREATE OR REPLACE VIEW vw_route_management_department_view AS
+SELECT
     r.RouteID,
     r.Name AS RouteName,
     r.Description AS RouteDescription,
@@ -29,130 +93,35 @@ SELECT
     l.LocationID,
     l.LocationName,
     l.Category AS LocationCategory,
-    g.GuideID,
-    g.FirstName AS GuideFirstName,
-    g.LastName AS GuideLastName,
-    g.Phone AS GuidePhone,
-    g.Email AS GuideEmail,
-    g.Expertise
-FROM GUIDEDTOUR gt
-JOIN ROUTE r ON gt.RouteID = r.RouteID
+    COUNT(gt.TourID) AS NumberOfGuidedTours,
+    AVG(gt.Price) AS AverageTourPrice
+FROM ROUTE r
 JOIN DIFFICULTYLEVEL dl ON r.DifficultyID = dl.DifficultyID
-JOIN GUIDE g ON gt.GuideID = g.GuideID
 LEFT JOIN LOCATED_IN li ON r.RouteID = li.RouteID
-LEFT JOIN LOCATION l ON li.LocationID = l.LocationID;
+LEFT JOIN LOCATION l ON li.LocationID = l.LocationID
+LEFT JOIN GUIDEDTOUR gt ON r.RouteID = gt.RouteID
+GROUP BY
+    r.RouteID,
+    r.Name,
+    r.Description,
+    r.EstimatedLength,
+    r.EstimatedDuration,
+    dl.DifficultyName,
+    l.LocationID,
+    l.LocationName,
+    l.Category;
 
--- Query 1 for View 1
+-- Query 2.1
 SELECT *
-FROM vw_full_guided_tour_details
+FROM vw_route_management_department_view
 LIMIT 10;
 
--- Query 2 for View 1
+-- Query 2.2
 SELECT
-    TourID,
     RouteName,
-    LocationName,
     DifficultyName,
-    GuideFirstName,
-    GuideLastName,
-    StartDate,
-    Price
-FROM vw_full_guided_tour_details
-WHERE DifficultyName = 'Easy'
-ORDER BY StartDate;
-
-
--- ============================================================
--- View 2: Customer registration details
--- Combines customers, registrations, guided tours, routes, and registration status.
--- ============================================================
-
-CREATE OR REPLACE VIEW vw_customer_registration_details AS
-SELECT
-    c.CustomerID,
-    c.FullName AS CustomerName,
-    c.Phone AS CustomerPhone,
-    c.Email AS CustomerEmail,
-    reg.RegistrationID,
-    reg.RegistrationDate,
-    reg.AmountToPay,
-    reg.Notes AS RegistrationNotes,
-    rs.StatusName AS RegistrationStatus,
-    gt.TourID,
-    gt.StartDate,
-    gt.StartTime,
-    r.RouteID,
-    r.Name AS RouteName,
-    l.LocationName
-FROM REGISTRATION reg
-JOIN CUSTOMER c ON reg.CustomerID = c.CustomerID
-JOIN GUIDEDTOUR gt ON reg.TourID = gt.TourID
-JOIN ROUTE r ON gt.RouteID = r.RouteID
-JOIN REGISTRATIONSTATUS rs ON reg.RegistrationStatusID = rs.RegistrationStatusID
-LEFT JOIN LOCATED_IN li ON r.RouteID = li.RouteID
-LEFT JOIN LOCATION l ON li.LocationID = l.LocationID;
-
--- Query 1 for View 2
-SELECT *
-FROM vw_customer_registration_details
-LIMIT 10;
-
--- Query 2 for View 2
-SELECT
-    CustomerName,
-    RouteName,
     LocationName,
-    RegistrationDate,
-    RegistrationStatus,
-    AmountToPay
-FROM vw_customer_registration_details
-WHERE RegistrationStatus = 'Confirmed'
-ORDER BY RegistrationDate DESC;
-
-
--- ============================================================
--- View 3: Payment summary details
--- Combines payments, registrations, customers, tours, routes, and payment status.
--- ============================================================
-
-CREATE OR REPLACE VIEW vw_payment_summary_details AS
-SELECT
-    p.PaymentID,
-    p.PaymentDate,
-    p.Amount,
-    p.PaymentMethod,
-    p.ReferenceNumber,
-    ps.StatusName AS PaymentStatus,
-    reg.RegistrationID,
-    c.CustomerID,
-    c.FullName AS CustomerName,
-    gt.TourID,
-    r.RouteID,
-    r.Name AS RouteName,
-    gt.StartDate AS TourStartDate
-FROM PAYMENT p
-JOIN PAYMENTSTATUS ps ON p.PaymentStatusID = ps.PaymentStatusID
-JOIN REGISTRATION reg ON p.RegistrationID = reg.RegistrationID
-JOIN CUSTOMER c ON reg.CustomerID = c.CustomerID
-JOIN GUIDEDTOUR gt ON reg.TourID = gt.TourID
-JOIN ROUTE r ON gt.RouteID = r.RouteID;
-
--- Query 1 for View 3
-SELECT *
-FROM vw_payment_summary_details
-LIMIT 10;
-
--- Query 2 for View 3
-SELECT
-    RouteName,
-    PaymentStatus,
-    COUNT(PaymentID) AS NumberOfPayments,
-    SUM(Amount) AS TotalAmount
-FROM vw_payment_summary_details
-GROUP BY RouteName, PaymentStatus
-ORDER BY TotalAmount DESC;
-"""
-
-path = Path("/mnt/data/Views.sql")
-path.write_text(sql, encoding="utf-8")
-path.as_posix()
+    NumberOfGuidedTours,
+    ROUND(AverageTourPrice, 2) AS AverageTourPrice
+FROM vw_route_management_department_view
+ORDER BY NumberOfGuidedTours DESC;
