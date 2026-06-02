@@ -1,137 +1,36 @@
-CREATE TABLE GUIDE
-(
-  GuideID INT NOT NULL,
-  FirstName VARCHAR(50) NOT NULL,
-  LastName VARCHAR(50) NOT NULL,
-  Phone VARCHAR(20) NOT NULL,
-  Email VARCHAR(100) NOT NULL,
-  BirthDate DATE NOT NULL,
-  JoinDate DATE NOT NULL,
-  DailyRate NUMERIC(10,2) NOT NULL,
-  ExperienceYears INT NOT NULL,
-  Rating NUMERIC(3,2) NOT NULL,
-  Address VARCHAR(150) NOT NULL,
-  Notes VARCHAR(500),
-  Expertise VARCHAR(100) NOT NULL,
-  PRIMARY KEY (GuideID)
-);
+-- Integrate.sql
+-- Stage 3 - Integration between Tour Guide Management System and Route Management System
 
-CREATE TABLE DIFFICULTYLEVEL
-(
-  DifficultyID INT NOT NULL,
-  DifficultyName VARCHAR(50) NOT NULL,
-  PRIMARY KEY (DifficultyID)
-);
+-- ============================================================
+-- Add new field from the received system into GUIDE
+-- ============================================================
 
-CREATE TABLE ROUTE
-(
-  RouteID INT NOT NULL,
-  Name VARCHAR(100) NOT NULL,
-  EstimatedLength NUMERIC(6,2) NOT NULL,
-  EstimatedDuration INT NOT NULL,
-  Description VARCHAR(500),
-  DifficultyID INT NOT NULL,
-  PRIMARY KEY (RouteID),
-  FOREIGN KEY (DifficultyID) REFERENCES DIFFICULTYLEVEL(DifficultyID)
-);
+ALTER TABLE GUIDE
+ADD COLUMN Expertise VARCHAR(100);
 
-CREATE TABLE TOURSTATUS
-(
-  TourStatusID INT NOT NULL,
-  StatusName VARCHAR(50) NOT NULL,
-  PRIMARY KEY (TourStatusID)
-);
 
-CREATE TABLE GUIDEDTOUR
-(
-  TourID INT NOT NULL,
-  StartDate DATE NOT NULL,
-  EndDate DATE NOT NULL,
-  StartTime TIME NOT NULL,
-  EndTime TIME NOT NULL,
-  MeetingPoint VARCHAR(150) NOT NULL,
-  Price NUMERIC(10,2) NOT NULL,
-  MaxParticipants INT NOT NULL,
-  Notes VARCHAR(500),
-  TourStatus VARCHAR(50),
-  RouteID INT NOT NULL,
-  GuideID INT NOT NULL,
-  TourStatusID INT NOT NULL,
-  PRIMARY KEY (TourID),
-  FOREIGN KEY (GuideID) REFERENCES GUIDE(GuideID),
-  FOREIGN KEY (RouteID) REFERENCES ROUTE(RouteID),
-  FOREIGN KEY (TourStatusID) REFERENCES TOURSTATUS(TourStatusID)
-);
-
-CREATE TABLE CUSTOMER
-(
-  CustomerID INT NOT NULL,
-  FullName VARCHAR(100) NOT NULL,
-  Phone VARCHAR(20) NOT NULL,
-  Email VARCHAR(100) NOT NULL,
-  JoinDate DATE NOT NULL,
-  PRIMARY KEY (CustomerID)
-);
-
-CREATE TABLE REGISTRATIONSTATUS
-(
-  RegistrationStatusID INT NOT NULL,
-  StatusName VARCHAR(50) NOT NULL,
-  PRIMARY KEY (RegistrationStatusID)
-);
-
-CREATE TABLE REGISTRATION
-(
-  RegistrationID INT NOT NULL,
-  RegistrationDate DATE NOT NULL,
-  AmountToPay NUMERIC(10,2) NOT NULL,
-  Notes VARCHAR(500),
-  RegistrationStatus VARCHAR(50),
-  CustomerID INT NOT NULL,
-  TourID INT NOT NULL,
-  RegistrationStatusID INT NOT NULL,
-  PRIMARY KEY (RegistrationID),
-  FOREIGN KEY (CustomerID) REFERENCES CUSTOMER(CustomerID),
-  FOREIGN KEY (TourID) REFERENCES GUIDEDTOUR(TourID),
-  FOREIGN KEY (RegistrationStatusID) REFERENCES REGISTRATIONSTATUS(RegistrationStatusID)
-);
-
-CREATE TABLE PAYMENTSTATUS
-(
-  PaymentStatusID INT NOT NULL,
-  StatusName VARCHAR(50) NOT NULL,
-  PRIMARY KEY (PaymentStatusID)
-);
-
-CREATE TABLE PAYMENT
-(
-  PaymentID INT NOT NULL,
-  PaymentDate DATE NOT NULL,
-  Amount NUMERIC(10,2) NOT NULL,
-  Notes VARCHAR(500),
-  PaymentMethod VARCHAR(50) NOT NULL,
-  ReferenceNumber VARCHAR(50),
-  PaymentStatus VARCHAR(50),
-  RegistrationID INT NOT NULL,
-  PaymentStatusID INT NOT NULL,
-  PRIMARY KEY (PaymentID),
-  FOREIGN KEY (RegistrationID) REFERENCES REGISTRATION(RegistrationID),
-  FOREIGN KEY (PaymentStatusID) REFERENCES PAYMENTSTATUS(PaymentStatusID)
-);
+-- ============================================================
+-- Create LOCATION table from the received Route Management System
+-- ============================================================
 
 CREATE TABLE LOCATION
 (
-  LocationID INT NOT NULL,
-  LocationName VARCHAR(100) NOT NULL,
-  Category VARCHAR(50) NOT NULL,
-  PRIMARY KEY (LocationID)
+    LocationID INT NOT NULL,
+    LocationName VARCHAR(100) NOT NULL,
+    Category VARCHAR(50) NOT NULL,
+    PRIMARY KEY (LocationID)
 );
+
+
+-- ============================================================
+-- Create LOCATED_IN table to connect routes and locations
+-- ============================================================
 
 CREATE TABLE LOCATED_IN
 (
-  RouteID INT NOT NULL,
-  LocationID INT NOT NULL,
-  PRIMARY KEY (RouteID, LocationID),
-  FOREIGN KEY (RouteID) REFERENCES ROUTE(RouteID),
-  FOREIGN KEY (LocationID) REFERENCES LOCATION(LocationID)
+    RouteID INT NOT NULL,
+    LocationID INT NOT NULL,
+    PRIMARY KEY (RouteID, LocationID),
+    FOREIGN KEY (RouteID) REFERENCES ROUTE(RouteID),
+    FOREIGN KEY (LocationID) REFERENCES LOCATION(LocationID)
 );
