@@ -1233,7 +1233,7 @@ This backup allows full restoration of the database state after Phase 2.
 
 ---
 
-## Introduction
+# Introduction
 
 In this phase, we performed integration between two different database systems:
 
@@ -1250,9 +1250,8 @@ The integration focused mainly on route management, locations, guided tours, and
 
 The following DSD diagram was received from the second project before the integration process.
 
-📸
-<img width="3744" height="1365" alt="new_erd" src="https://github.com/user-attachments/assets/8125e8c4-344a-498f-85d0-852cf83b48fc" />
-
+📸 
+<img width="3744" height="1365" alt="image" src="https://github.com/user-attachments/assets/7021bd09-c442-4f67-b502-a807a1b9d775" />
 
 
 ---
@@ -1261,10 +1260,8 @@ The following DSD diagram was received from the second project before the integr
 
 The following ERD diagram represents the original structure of the received system before integration.
 
-📸
-<img width="3744" height="1365" alt="new_dsd" src="https://github.com/user-attachments/assets/ebd07a18-d11b-4acf-91eb-ae269a93e035" />
-
-
+📸  
+<img width="1024" height="373" alt="image" src="https://github.com/user-attachments/assets/25a4b267-bec8-483f-8250-fde6a48fae3f" />
 
 
 ---
@@ -1273,8 +1270,8 @@ The following ERD diagram represents the original structure of the received syst
 
 This ERD diagram presents the final unified structure after combining both systems.
 
-📸
-<img width="3720" height="1476" alt="integrated_erd" src="https://github.com/user-attachments/assets/a34433d6-ac92-41ac-94b6-184eeadd7c3e" />
+📸  
+<img width="3720" height="1476" alt="image" src="https://github.com/user-attachments/assets/a89b572e-f26b-41dc-96ed-efebd6dd4a0e" />
 
 
 ---
@@ -1283,8 +1280,9 @@ This ERD diagram presents the final unified structure after combining both syste
 
 The following DSD diagram presents the final database structure after all integration changes were completed.
 
-📸
-<img width="3720" height="1476" alt="integrated_dsd" src="https://github.com/user-attachments/assets/3d10aea5-1ae2-4106-90c6-d7d2a181a7c6" />
+📸  
+<img width="3720" height="1476" alt="image" src="https://github.com/user-attachments/assets/ccee5f00-cea6-4ede-a2f3-b595e5af19f2" />
+
 
 ---
 
@@ -1292,89 +1290,74 @@ The following DSD diagram presents the final database structure after all integr
 
 ## Integration Strategy
 
-The integration process combined the route-related entities from the received project with the existing tour management system.
+The integration process combined the route-related entities from the received project with the existing Tour Guide Management System.
 
 The main entities integrated into the unified system were:
 
 - ROUTE
 - LOCATION
+- LOCATED_IN
 - DIFFICULTYLEVEL
 
 These entities were connected to the existing GUIDEDTOUR system using foreign keys and relational constraints.
 
 ---
 
-## Main Design Decisions
+# Main Design Decisions
 
-### A. Separation Between ROUTE and GUIDEDTOUR
+## A. Separation Between ROUTE and GUIDEDTOUR
 
 We preserved the distinction between:
 
 - ROUTE → represents the static route definition
 - GUIDEDTOUR → represents a scheduled occurrence of a route
 
-This separation prevents data duplication and allows multiple tours to use the same route.
+This separation prevents data duplication and allows multiple guided tours to use the same route.
 
 ---
 
-### B. Using RouteID as a Foreign Key in GUIDEDTOUR
+## B. Integration of LOCATION Management
 
-A foreign key relationship was added between GUIDEDTOUR and ROUTE:
+The received system included route location management.
+
+We integrated this functionality using:
 
 ```sql
-FOREIGN KEY (RouteID) REFERENCES ROUTE(RouteID)
+LOCATION
 ```
 
-This ensures that every guided tour is connected to an existing route.
-
----
-
-### C. Integration of Difficulty Levels
-
-The received project included a difficulty classification system.
-
-Instead of storing difficulty as plain text, we integrated the separate table:
+and
 
 ```sql
-DIFFICULTYLEVEL
+LOCATED_IN
 ```
 
-This improves normalization and ensures consistent difficulty values.
+The LOCATED_IN table creates a many-to-many relationship between routes and locations.
+
+This design allows:
+
+- One route to pass through multiple locations
+- One location to belong to multiple routes
+
+This structure is more flexible and normalized.
 
 ---
 
-### D. Route and Location Relationship
+## C. Expansion of GUIDE Entity
 
-The integration included location management using:
+The GUIDE table was extended with a new field from the received system:
 
-- LOCATION table
-- LocationID foreign key inside ROUTE
+```sql
+Expertise
+```
 
-This design supports a one-to-many relationship:
-
-- One location may contain multiple routes
-- Each route belongs to one main location
-
-This simplifies the database structure and removes unnecessary junction tables.
+This field improves the business capabilities of the system and allows advanced guide classification.
 
 ---
 
-### E. Expansion of GUIDE Entity
+## D. Preservation of Referential Integrity
 
-The GUIDE table was extended with additional fields from the integrated system:
-
-- Expertise
-- ExperienceYears
-- Rating
-- DailyRate
-
-These additions improve the business capabilities of the system and support advanced analytics.
-
----
-
-### F. Preservation of Referential Integrity
-
-All integrations were implemented using FOREIGN KEY constraints in order to preserve consistency and prevent invalid references between tables.
+All integration changes were implemented using FOREIGN KEY constraints in order to preserve consistency and prevent invalid references between tables.
 
 ---
 
@@ -1386,199 +1369,319 @@ The file `Integrate.sql` contains all integration-related schema modifications.
 
 Main operations included:
 
-- Removing LOCATED_IN table
-- Adding LocationID foreign key into ROUTE
-- Removing RouteID from REGISTRATION
-- Using TourID inside REGISTRATION
-- Creating foreign key relationships
-- Updating relational structure after integration
+- Adding Expertise field into GUIDE
+- Creating LOCATION table
+- Creating LOCATED_IN relationship table
+- Inserting default LOCATION data
+- Connecting ROUTE and LOCATION entities
+- Updating GUIDE expertise values
+- Creating foreign key constraints
 
 All commands in the file are documented with SQL comments explaining their purpose.
 
 ---
 
-# 7. Views and Queries
+# 7. Integration Execution Screenshots
+
+## Step 1 – Adding Expertise Column to GUIDE
+
+```sql
+ALTER TABLE GUIDE
+ADD COLUMN IF NOT EXISTS Expertise VARCHAR(100);
+```
+
+📸  
+<img width="1325" height="885" alt="צילום מסך 2026-06-06 224832" src="https://github.com/user-attachments/assets/b035c37f-7334-4222-99a2-da273c7a8ace" />
+
+---
+
+## Step 2 – Updating Existing GUIDE Records
+
+```sql
+UPDATE GUIDE
+SET Expertise =
+    CASE
+        WHEN ExperienceYears >= 8 THEN 'Senior Tour Guide'
+        WHEN ExperienceYears >= 4 THEN 'Professional Tour Guide'
+        WHEN ExperienceYears >= 1 THEN 'General Tour Guide'
+        ELSE 'Junior Tour Guide'
+    END
+WHERE Expertise IS NULL;
+```
+
+📸  
+<img width="1329" height="837" alt="צילום מסך 2026-06-06 224616" src="https://github.com/user-attachments/assets/31b1ca75-640c-4c6d-bfa8-1a24c55b7dd5" />
+
+---
+
+## Step 3 – Creating LOCATION Table
+
+```sql
+CREATE TABLE IF NOT EXISTS LOCATION
+```
+
+📸  
+<img width="1324" height="892" alt="צילום מסך 2026-06-06 224640" src="https://github.com/user-attachments/assets/c6ddff85-8487-4ad6-922d-ddc822eca31f" />
+
+---
+
+## Step 4 – Inserting LOCATION Data
+
+```sql
+INSERT INTO LOCATION
+```
+
+📸  
+<img width="1334" height="889" alt="צילום מסך 2026-06-06 224655" src="https://github.com/user-attachments/assets/a2b9ca56-c5ed-4a70-9dd0-154d361c7c4c" />
+
+---
+
+## Step 5 – Creating LOCATED_IN Table
+
+```sql
+CREATE TABLE IF NOT EXISTS LOCATED_IN
+```
+
+📸  
+<img width="1339" height="885" alt="צילום מסך 2026-06-06 224710" src="https://github.com/user-attachments/assets/38f347cf-96e5-49d7-93f4-1775b48a8405" />
+
+---
+
+## Step 6 – Connecting ROUTES to LOCATIONS
+
+```sql
+INSERT INTO LOCATED_IN
+```
+
+📸  
+<img width="1347" height="884" alt="צילום מסך 2026-06-06 224724" src="https://github.com/user-attachments/assets/a6b94897-b74f-44fb-ade0-52b1fb7071d4" />
+
+---
+
+## Step 7 – Verifying Integration Data
+
+The following query verifies that routes and locations were connected successfully.
+
+```sql
+SELECT
+    r.RouteID,
+    r.Name AS RouteName,
+    l.LocationID,
+    l.LocationName,
+    l.Category
+FROM ROUTE r
+JOIN LOCATED_IN li ON r.RouteID = li.RouteID
+JOIN LOCATION l ON li.LocationID = l.LocationID
+ORDER BY r.RouteID
+LIMIT 20;
+```
+
+📸  
+<img width="1347" height="911" alt="צילום מסך 2026-06-06 224803" src="https://github.com/user-attachments/assets/14e8cb07-a596-4e1f-b746-b5ac3183ba5d" />
+
+---
+
+## Step 8 – Verifying GUIDE Expertise Integration
+
+The following query verifies that the new Expertise field was successfully updated.
+
+```sql
+SELECT
+    gt.TourID,
+    gt.StartDate,
+    r.Name AS RouteName,
+    l.LocationName,
+    g.FirstName AS GuideFirstName,
+    g.LastName AS GuideLastName,
+    g.Expertise
+FROM GUIDEDTOUR gt
+JOIN ROUTE r ON gt.RouteID = r.RouteID
+JOIN LOCATED_IN li ON r.RouteID = li.RouteID
+JOIN LOCATION l ON li.LocationID = l.LocationID
+JOIN GUIDE g ON gt.GuideID = g.GuideID
+ORDER BY gt.TourID
+LIMIT 20;
+```
+
+📸  
+<img width="1338" height="893" alt="צילום מסך 2026-06-06 224818" src="https://github.com/user-attachments/assets/6c5feedd-eed7-4a85-a1c6-a192fe55b800" />
+
+---
+
+# 8. Views and Queries
 
 The integration phase included creating analytical views that combine information from both systems.
 
 Each view combines data from multiple tables and supports business analysis and operational management.
 
+The implementation follows the assignment requirements:
+
+- Two views were created
+- One view represents our original department
+- One view represents the received department
+- Each view combines multiple tables
+- Two meaningful queries were written for each view
+
 ---
 
-# View 1 – vw_full_guided_tour_details
+# View 1 – vw_tour_guide_department_view
 
 ## Description
 
-This view combines:
+This view represents the original Tour Guide Management System point of view.
 
-- Guided tours
-- Routes
-- Difficulty levels
-- Guides
-- Locations
+The view combines:
 
-The purpose of the view is to present complete operational information about each guided tour.
+- GUIDEDTOUR
+- GUIDE
+- ROUTE
+- LOCATION
+- DIFFICULTYLEVEL
+- REGISTRATION
 
-### Query 1.1 – Display Full Guided Tour Information
-
-```sql
-SELECT *
-FROM vw_full_guided_tour_details
-LIMIT 10;
-```
-
-### Explanation
-
-This query displays the first 10 records from the integrated guided tour view.
-
-📸
-<img width="1317" height="691" alt="query1 1" src="https://github.com/user-attachments/assets/b7557eef-9c41-452e-9e94-4f2bf694a6af" />
+The purpose of the view is to provide operational and business information about guided tours.
 
 ---
 
-### Query 1.2 – Easy Tours Report
+## View Creation
+
+📸  
+<img width="1346" height="899" alt="צילום מסך 2026-06-06 225125" src="https://github.com/user-attachments/assets/25173a00-44f8-40ef-baf6-fc3c8d66dd17" />
+
+---
+
+## Query 1.1 – Tours With Available Seats
 
 ```sql
 SELECT
     TourID,
     RouteName,
     LocationName,
-    DifficultyName,
     GuideFirstName,
     GuideLastName,
     StartDate,
-    Price
-FROM vw_full_guided_tour_details
-WHERE DifficultyName = 'Easy'
-ORDER BY StartDate;
+    MaxParticipants,
+    NumberOfRegistrations,
+    (MaxParticipants - NumberOfRegistrations) AS AvailableSeats
+FROM vw_tour_guide_department_view
+WHERE NumberOfRegistrations < MaxParticipants
+ORDER BY AvailableSeats DESC;
 ```
 
 ### Explanation
 
-This query displays guided tours with an easy difficulty level ordered by the tour start date.
+This query displays tours that still have available seats for additional customers.
 
-📸
-<img width="1331" height="570" alt="query1 2" src="https://github.com/user-attachments/assets/34920b20-3e54-4d0a-9616-6bc5bd700e7e" />
-
----
-
-# View 2 – vw_customer_registration_details
-
-## Description
-
-This view combines:
-
-- Customers
-- Registrations
-- Guided tours
-- Routes
-- Registration statuses
-- Locations
-
-The view provides a complete picture of customer participation in tours.
-
-### Query 2.1 – Display Customer Registration Information
-
-```sql
-SELECT *
-FROM vw_customer_registration_details
-LIMIT 10;
-```
-
-### Explanation
-
-This query displays the first 10 customer registration records from the integrated system.
-
-📸
-<img width="1332" height="746" alt="query2 1" src="https://github.com/user-attachments/assets/05539a9e-3ac0-4968-8a1b-47a72fecd0c9" />
+📸  
+<img width="1331" height="844" alt="צילום מסך 2026-06-06 225141" src="https://github.com/user-attachments/assets/9bf6c6a7-05da-4b4a-b8af-8d97476f29b0" />
 
 ---
 
-### Query 2.2 – Confirmed Registrations Report
+## Query 1.2 – Most Popular Guided Tours
 
 ```sql
 SELECT
-    CustomerName,
+    TourID,
+    RouteName,
+    DifficultyName,
+    LocationName,
+    StartDate,
+    Price,
+    NumberOfRegistrations
+FROM vw_tour_guide_department_view
+WHERE NumberOfRegistrations > 0
+ORDER BY NumberOfRegistrations DESC, StartDate;
+```
+
+### Explanation
+
+This query displays the most popular tours according to the number of registrations.
+
+📸  
+<img width="1333" height="890" alt="צילום מסך 2026-06-06 225158" src="https://github.com/user-attachments/assets/8243f544-6309-45c8-bd62-84025f5fbbb9" />
+
+---
+
+# View 2 – vw_route_management_department_view
+
+## Description
+
+This view represents the received Route Management System point of view.
+
+The view combines:
+
+- ROUTE
+- DIFFICULTYLEVEL
+- LOCATION
+- LOCATED_IN
+- GUIDEDTOUR
+
+The purpose of the view is to support route analysis and operational planning.
+
+---
+
+## View Creation
+
+📸  
+<img width="1332" height="905" alt="צילום מסך 2026-06-06 225214" src="https://github.com/user-attachments/assets/05c52402-e89c-4b69-8150-995044dbedff" />
+
+---
+
+## Query 2.1 – Most Active Routes
+
+```sql
+SELECT
+    RouteID,
     RouteName,
     LocationName,
-    RegistrationDate,
-    RegistrationStatus,
-    AmountToPay
-FROM vw_customer_registration_details
-WHERE RegistrationStatus = 'Confirmed'
-ORDER BY RegistrationDate DESC;
+    DifficultyName,
+    NumberOfGuidedTours
+FROM vw_route_management_department_view
+WHERE NumberOfGuidedTours > 0
+ORDER BY NumberOfGuidedTours DESC, RouteName;
 ```
 
 ### Explanation
 
-This query displays customers with confirmed registrations ordered by registration date.
+This query displays the routes with the highest number of guided tours.
 
-📸
-<img width="1329" height="711" alt="query2 2" src="https://github.com/user-attachments/assets/e4d85572-f990-4028-91b3-cd9c0d1ee4c6" />
-
----
-
-# View 3 – vw_payment_summary_details
-
-## Description
-
-This view combines:
-
-- Payments
-- Payment statuses
-- Customers
-- Registrations
-- Guided tours
-- Routes
-
-The purpose of the view is to support financial analysis and payment tracking.
-
-### Query 3.1 – Display Payment Summary Records
-
-```sql
-SELECT *
-FROM vw_payment_summary_details
-LIMIT 10;
-```
-
-### Explanation
-
-This query displays the first 10 payment summary records.
-
-📸
-<img width="1320" height="761" alt="query3 1" src="https://github.com/user-attachments/assets/aa37cfba-ddc8-43c3-8d64-2e9a252155d5" />
+📸  
+<img width="1333" height="878" alt="צילום מסך 2026-06-06 225229" src="https://github.com/user-attachments/assets/2a067bf4-b5c9-4a38-b099-1fdfc42d4626" />
 
 ---
 
-### Query 3.2 – Revenue Analysis by Route and Payment Status
+## Query 2.2 – Long or Expensive Routes
 
 ```sql
 SELECT
+    RouteID,
     RouteName,
-    PaymentStatus,
-    COUNT(PaymentID) AS NumberOfPayments,
-    SUM(Amount) AS TotalAmount
-FROM vw_payment_summary_details
-GROUP BY RouteName, PaymentStatus
-ORDER BY TotalAmount DESC;
+    LocationName,
+    DifficultyName,
+    EstimatedLength,
+    EstimatedDuration,
+    ROUND(AverageTourPrice, 2) AS AverageTourPrice
+FROM vw_route_management_department_view
+WHERE EstimatedLength >= 5
+   OR AverageTourPrice >= 150
+ORDER BY EstimatedLength DESC, AverageTourPrice DESC;
 ```
 
 ### Explanation
 
-This query analyzes the total number of payments and total revenue grouped by route and payment status.
+This query displays long or expensive routes for operational and pricing analysis.
 
-📸
-<img width="1337" height="739" alt="query3 2" src="https://github.com/user-attachments/assets/5d7846e4-53b5-4137-8a8d-77f277e56ccf" />
-
+📸  
+<img width="1345" height="903" alt="צילום מסך 2026-06-06 225242" src="https://github.com/user-attachments/assets/9f417b0a-9b73-45c7-bb95-504c126a7179" />
 
 ---
 
-# 8. Updated Backup File
+# 9. Updated Backup File
 
 A full backup of the database after completing Phase 3 is included.
 
-📁 Backup File:
-<img width="1915" height="1008" alt="image" src="https://github.com/user-attachments/assets/587320b7-0c5d-430b-85a8-670bc89e9fd1" />
+📸  
+<img width="1339" height="954" alt="image" src="https://github.com/user-attachments/assets/79f92f40-5563-4b35-acc0-94b18babcbcc" />
 
 The backup contains:
 
@@ -1600,7 +1703,7 @@ In this phase, the following tasks were completed:
 - Integration of route and location management
 - Addition of foreign key constraints
 - Creation of analytical views
-- Writing advanced SQL queries based on integrated data
+- Writing meaningful SQL queries based on the integrated data
 - Creation of an updated backup file
 
 The integration process improved the scalability, normalization, and analytical capabilities of the system while preserving referential integrity and reducing data redundancy.
