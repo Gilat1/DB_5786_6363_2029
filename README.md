@@ -76,6 +76,38 @@ Guided Tour Management
   - [9. Updated Backup File](#9-updated-backup-file)
   - [Summary](#summary)
 
+  - [Phase 4: Programming with PL/pgSQL](#phase-4-programming-with-plpgsql)
+  - [1. Function: fn_calculate_customer_payment_status](#1-function-fn_calculate_customer_payment_status)
+    - [Description](#description)
+    - [Features used](#features-used)
+  - [2. Function: fn_get_route_tour_details_by_difficulty](#2-function-fn_get_route_tour_details_by_difficulty)
+    - [Description](#description-1)
+    - [Features used](#features-used-1)
+  - [3. Procedure: pr_assign_optimal_guide_to_tour](#3-procedure-pr_assign_optimal_guide_to_tour)
+    - [Description](#description-2)
+    - [Features used](#features-used-2)
+  - [4. Procedure: pr_apply_discount_to_tour_participants](#4-procedure-pr_apply_discount_to_tour_participants)
+    - [Description](#description-3)
+    - [Features used](#features-used-3)
+  - [5. Trigger: trg_update_registration_payment_status](#5-trigger-trg_update_registration_payment_status)
+    - [Description](#description-4)
+    - [Features used](#features-used-4)
+  - [6. Trigger: trg_audit_tour_changes](#6-trigger-trg_audit_tour_changes)
+    - [Description](#description-5)
+    - [Features used](#features-used-5)
+  - [7. Main Block 1: financials_and_discounts](#7-main-block-1-financials_and_discounts)
+    - [Description](#description-6)
+    - [Invokes](#invokes)
+  - [8. Main Block 2: mainProgram2](#8-main-block-2-mainprogram2)
+    - [Description](#description-7)
+    - [Invokes](#invokes-1)
+  - [9. Alter Table / Additional Table](#9-alter-table--additional-table)
+    - [Description](#description-8)
+  - [Backup File (Phase 4)](#backup-file-phase-4)
+    - [Contents](#contents)
+    - [Purpose](#purpose)
+  - [Summary](#summary-1)
+
 ---
 
 ##  Introduction
@@ -1731,3 +1763,542 @@ In this phase, the following tasks were completed:
 - Creation of an updated backup file
 
 The integration process improved the scalability, normalization, and analytical capabilities of the system while preserving referential integrity and reducing data redundancy.
+
+---
+
+# Phase 4: Programming with PL/pgSQL
+
+This phase focuses on writing PL/pgSQL functions, procedures, triggers, and main programs based on the integrated tour guide and route management database.
+
+The goal is to demonstrate advanced server-side programming logic using:
+
+- Explicit and implicit cursors
+- Returning refcursors
+- DML operations
+- Conditionals
+- Loops
+- Exception handling
+- Records
+
+We implemented:
+
+- 2 Functions
+- 2 Procedures
+- 2 Triggers
+- 2 Main test blocks, each invoking one function and one procedure
+- 1 Additional table for audit tracking
+
+---
+
+# 1. Function: fn_calculate_customer_payment_status
+
+## Description
+
+Calculates the financial payment status of a specific customer.
+
+The function receives a customer ID and returns the customer name, total registered amount, total paid amount, remaining debt, and a textual status description.
+
+It checks whether the customer exists, calculates the total cost of all registrations, calculates the total paid amount, and classifies the customer as fully paid, partially paid, critical debt, no activity, or error.
+
+## Features used
+
+- OUT parameters
+- SELECT INTO
+- RECORD
+- Aggregate calculations
+- Conditionals
+- Exception handling
+- RAISE NOTICE
+
+```sql
+CREATE OR REPLACE FUNCTION fn_calculate_customer_payment_status(
+    p_customer_id INT,
+    OUT o_customer_name VARCHAR,
+    OUT o_total_registered NUMERIC(10,2),
+    OUT o_total_paid NUMERIC(10,2),
+    OUT o_debt NUMERIC(10,2),
+    OUT o_status_description VARCHAR
+)
+AS $$
+DECLARE
+    v_financials RECORD;
+    v_phone VARCHAR;
+BEGIN
+    RAISE NOTICE '--- Starting fn_calculate_customer_payment_status for Customer ID: % ---', p_customer_id;
+
+    SELECT FullName, Phone INTO o_customer_name, v_phone
+    FROM CUSTOMER
+    WHERE CustomerID = p_customer_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Error: Customer ID % not found!', p_customer_id
+            USING ERRCODE = 'no_data_found';
+    END IF;
+
+    SELECT 
+        COALESCE(SUM(reg.AmountToPay), 0.00) AS total_fees,
+        COALESCE(SUM(
+            (SELECT SUM(p.Amount) 
+             FROM PAYMENT p 
+             JOIN PAYMENTSTATUS ps ON p.PaymentStatusID = ps.PaymentStatusID
+             WHERE p.RegistrationID = reg.RegistrationID 
+               AND ps.StatusName = 'Paid In Full')
+        ), 0.00) AS total_payments
+    INTO v_financials
+    FROM REGISTRATION reg
+    WHERE reg.CustomerID = p_customer_id;
+
+    o_total_registered := v_financials.total_fees;
+    o_total_paid := v_financials.total_payments;
+    o_debt := o_total_registered - o_total_paid;
+
+    IF o_total_registered = 0.00 THEN
+        o_status_description := 'NO ACTIVITY (No registered tours found)';
+    ELSIF o_debt <= 0.00 THEN
+        o_status_description := 'SETTLED (Fully paid)';
+    ELSIF o_debt > 1000.00 THEN
+        o_status_description := 'CRITICAL DEBT (High debt detected! Contact customer immediately at ' || v_phone || ')';
+    ELSIF o_debt > 0.00 AND o_debt <= 1000.00 THEN
+        o_status_description := 'PARTIALLY PAID (Outstanding minor debt remaining)';
+    ELSE
+        o_status_description := 'REVIEW REQUIRED';
+    END IF;
+
+    RAISE NOTICE 'Customer Name: %, Phone: %', o_customer_name, v_phone;
+    RAISE NOTICE 'Total Cost: %, Total Paid: %, Debt Remaining: %', o_total_registered, o_total_paid, o_debt;
+
+EXCEPTION
+    WHEN no_data_found THEN
+        RAISE NOTICE 'Exception: Customer ID does not exist in the database.';
+        o_customer_name := 'N/A';
+        o_total_registered := 0.00;
+        o_total_paid := 0.00;
+        o_debt := 0.00;
+        o_status_description := 'ERROR: CUSTOMER NOT FOUND';
+    WHEN OTHERS THEN
+        RAISE NOTICE 'General exception caught in customer function: % (SQLSTATE: %)', SQLERRM, SQLSTATE;
+        RAISE;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+Screenshot of result:
+<img width="345" height="91" alt="image" src="https://github.com/user-attachments/assets/447a7c64-1cf5-4c63-afa7-3e29abff3a90" />
+
+
+---
+
+# 2. Function: fn_get_route_tour_details_by_difficulty
+
+## Description
+
+Returns a refcursor with guided tour details according to a given difficulty level.
+
+The function first validates that the difficulty exists, then uses cursors to calculate summary information such as total tours, average price, and maximum revenue potential. Finally, it returns a refcursor containing the matching tours.
+
+## Features used
+
+- Explicit cursor
+- Refcursor
+- RECORD
+- LOOP
+- Conditionals
+- Exception handling
+- RAISE NOTICE
+
+```sql
+CREATE OR REPLACE FUNCTION fn_get_route_tour_details_by_difficulty(
+    p_difficulty_name VARCHAR
+)
+RETURNS refcursor AS $$
+DECLARE
+    ref_result refcursor := 'tours_cursor';
+    
+    cur_difficulty CURSOR FOR 
+        SELECT DifficultyID 
+        FROM DIFFICULTYLEVEL 
+        WHERE LOWER(DifficultyName) = LOWER(p_difficulty_name);
+        
+    cur_tour_summary CURSOR FOR
+        SELECT gt.Price, gt.MaxParticipants
+        FROM GUIDEDTOUR gt
+        JOIN ROUTE r ON gt.RouteID = r.RouteID
+        JOIN DIFFICULTYLEVEL dl ON r.DifficultyID = dl.DifficultyID
+        WHERE LOWER(dl.DifficultyName) = LOWER(p_difficulty_name);
+        
+    v_difficulty_id INT;
+    v_tour_record RECORD;
+    v_tour_count INT := 0;
+    v_total_price NUMERIC(12,2) := 0.00;
+    v_avg_price NUMERIC(10,2) := 0.00;
+    v_max_revenue_potential NUMERIC(12,2) := 0.00;
+BEGIN
+    RAISE NOTICE '--- Starting fn_get_route_tour_details_by_difficulty for: % ---', p_difficulty_name;
+
+    OPEN cur_difficulty;
+    FETCH cur_difficulty INTO v_difficulty_id;
+    
+    IF NOT FOUND THEN
+        CLOSE cur_difficulty;
+        RAISE EXCEPTION 'Error: Difficulty level (%) not found!', p_difficulty_name
+            USING ERRCODE = 'invalid_parameter_value';
+    END IF;
+    CLOSE cur_difficulty;
+
+    OPEN cur_tour_summary;
+    LOOP
+        FETCH cur_tour_summary INTO v_tour_record;
+        EXIT WHEN NOT FOUND;
+        
+        v_tour_count := v_tour_count + 1;
+        v_total_price := v_total_price + v_tour_record.Price;
+        v_max_revenue_potential := v_max_revenue_potential + (v_tour_record.Price * v_tour_record.MaxParticipants);
+    END LOOP;
+    CLOSE cur_tour_summary;
+
+    IF v_tour_count > 0 THEN
+        v_avg_price := v_total_price / v_tour_count;
+    ELSE
+        v_avg_price := 0.00;
+    END IF;
+
+    RAISE NOTICE 'Difficulty Name: % (ID: %)', p_difficulty_name, v_difficulty_id;
+    RAISE NOTICE 'Total Tours Found: %', v_tour_count;
+    RAISE NOTICE 'Average Tour Price: %', v_avg_price;
+    RAISE NOTICE 'Max Revenue Potential: %', v_max_revenue_potential;
+
+    OPEN ref_result FOR
+        SELECT 
+            gt.TourID,
+            r.Name AS RouteName,
+            gt.StartDate,
+            gt.MeetingPoint,
+            gt.Price,
+            gt.MaxParticipants,
+            g.FirstName || ' ' || g.LastName AS AssignedGuide
+        FROM GUIDEDTOUR gt
+        JOIN ROUTE r ON gt.RouteID = r.RouteID
+        JOIN DIFFICULTYLEVEL dl ON r.DifficultyID = dl.DifficultyID
+        JOIN GUIDE g ON gt.GuideID = g.GuideID
+        WHERE LOWER(dl.DifficultyName) = LOWER(p_difficulty_name)
+        ORDER BY gt.StartDate;
+        
+    RETURN ref_result;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE NOTICE 'Exception caught in fn_get_route_tour_details_by_difficulty: % (SQLSTATE: %)', SQLERRM, SQLSTATE;
+        RAISE;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+Screenshot of result:
+<img width="343" height="76" alt="image" src="https://github.com/user-attachments/assets/4335a56b-7e35-4d38-abab-83de8da486d4" />
+
+---
+
+# 3. Procedure: pr_assign_optimal_guide_to_tour
+
+## Description
+
+Automatically assigns the best available guide to a tour according to the requested expertise.
+
+The procedure checks the tour dates, searches for available guides with the correct expertise and rating of at least 4.0, and assigns the best guide based on rating and experience.
+
+## Features used
+
+- Explicit cursor with parameters
+- RECORD
+- Conditionals
+- UPDATE statement
+- NOT EXISTS
+- Exception handling
+- RAISE NOTICE
+
+```sql
+-- Code is located in:
+-- phase4/scripts/procedures/auto_assign_guide.sql
+```
+
+Screenshot of result:
+<img width="317" height="77" alt="image" src="https://github.com/user-attachments/assets/da70037c-c5b2-4228-b674-7ea79402cab7" />
+
+---
+
+# 4. Procedure: pr_apply_discount_to_tour_participants
+
+## Description
+
+Applies a discount to all registrations of a specific guided tour.
+
+The procedure receives a tour ID and a discount percentage. It validates the discount value, checks that the tour exists, loops over all registrations of the tour, updates the amount to pay, and appends a note describing the discount.
+
+## Features used
+
+- Explicit cursor
+- LOOP
+- RECORD
+- UPDATE statement
+- Conditionals
+- Exception handling
+- RAISE NOTICE
+
+```sql
+-- Code is located in:
+-- phase4/scripts/procedures/set_tour_discount.sql
+```
+
+Screenshot of result:
+<img width="305" height="83" alt="image" src="https://github.com/user-attachments/assets/eb54156b-d367-4f5f-b2ca-af5a14c432c7" />
+
+---
+
+# 5. Trigger: trg_update_registration_payment_status
+
+## Description
+
+Automatically updates the registration status whenever a payment is inserted or updated.
+
+The trigger calculates the total paid amount for the registration and updates the registration status according to the payment situation.
+
+This trigger runs after INSERT or UPDATE on the PAYMENT table.
+
+## Features used
+
+- AFTER INSERT trigger
+- AFTER UPDATE trigger
+- DML operation
+- Conditionals
+- Trigger function
+- Automatic status update
+
+```sql
+CREATE OR REPLACE FUNCTION fn_trg_update_registration_payment_status()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_amount_to_pay NUMERIC(10,2);
+    v_total_paid NUMERIC(10,2) := 0.00;
+    v_new_status_id INT;
+BEGIN
+    SELECT AmountToPay INTO v_amount_to_pay
+    FROM REGISTRATION
+    WHERE RegistrationID = NEW.RegistrationID;
+    
+    IF NOT FOUND THEN
+        RETURN NEW;
+    END IF;
+
+    SELECT COALESCE(SUM(Amount), 0.00) INTO v_total_paid
+    FROM PAYMENT
+    WHERE RegistrationID = NEW.RegistrationID
+      AND PaymentStatusID = 3;
+
+    IF v_total_paid >= v_amount_to_pay AND v_amount_to_pay > 0.00 THEN
+        v_new_status_id := 2;
+    ELSIF v_total_paid > 0.00 AND v_total_paid < v_amount_to_pay THEN
+        v_new_status_id := 8;
+    ELSE
+        v_new_status_id := 7;
+    END IF;
+
+    UPDATE REGISTRATION
+    SET RegistrationStatusID = v_new_status_id
+    WHERE RegistrationID = NEW.RegistrationID;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_update_registration_payment_status ON PAYMENT;
+CREATE TRIGGER trg_update_registration_payment_status
+AFTER INSERT OR UPDATE OF PaymentStatusID, Amount
+ON PAYMENT
+FOR EACH ROW
+EXECUTE FUNCTION fn_trg_update_registration_payment_status();
+```
+
+Screenshot of result:
+<img width="921" height="304" alt="image" src="https://github.com/user-attachments/assets/c9edd199-ac3b-4644-a8ab-2ac81eee6361" />
+
+---
+
+# 6. Trigger: trg_audit_tour_changes
+
+## Description
+
+Tracks changes made to the GUIDEDTOUR table.
+
+The trigger writes audit records into the TOUR_AUDIT table whenever a guided tour is inserted, updated, or deleted. For UPDATE operations, it stores changes in price or assigned guide.
+
+This trigger satisfies the requirement for an UPDATE trigger.
+
+## Features used
+
+- AFTER INSERT trigger
+- AFTER UPDATE trigger
+- AFTER DELETE trigger
+- Audit table
+- OLD and NEW records
+- INSERT DML operation
+- Trigger function
+
+```sql
+CREATE OR REPLACE FUNCTION fn_trg_audit_tour_changes()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'UPDATE') THEN
+        IF (OLD.Price IS DISTINCT FROM NEW.Price OR OLD.GuideID IS DISTINCT FROM NEW.GuideID) THEN
+            INSERT INTO TOUR_AUDIT (TourID, Action, OldPrice, NewPrice, OldGuideID, NewGuideID)
+            VALUES (NEW.TourID, 'UPDATE', OLD.Price, NEW.Price, OLD.GuideID, NEW.GuideID);
+        END IF;
+        RETURN NEW;
+
+    ELSIF (TG_OP = 'INSERT') THEN
+        INSERT INTO TOUR_AUDIT (TourID, Action, NewPrice, NewGuideID)
+        VALUES (NEW.TourID, 'INSERT', NEW.Price, NEW.GuideID);
+        RETURN NEW;
+
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO TOUR_AUDIT (TourID, Action, OldPrice, OldGuideID)
+        VALUES (OLD.TourID, 'DELETE', OLD.Price, OLD.GuideID);
+        RETURN OLD;
+    END IF;
+
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_audit_tour_changes ON GUIDEDTOUR;
+CREATE TRIGGER trg_audit_tour_changes
+AFTER INSERT OR UPDATE OR DELETE
+ON GUIDEDTOUR
+FOR EACH ROW
+EXECUTE FUNCTION fn_trg_audit_tour_changes();
+```
+
+Screenshot of result:
+<img width="1125" height="272" alt="image" src="https://github.com/user-attachments/assets/a36a7d72-4d5d-402a-b1b1-491c88bebe5f" />
+
+---
+
+# 7. Main Block 1: financials_and_discounts
+
+## Description
+
+Demonstrates the customer financial status function and the discount procedure.
+
+The program first checks the customer’s financial status, then applies a discount to a selected tour, and finally checks the customer’s financial status again after the update.
+
+It also tests exception handling by trying to apply an invalid discount.
+
+## Invokes
+
+- Function: `fn_calculate_customer_payment_status`
+- Procedure: `pr_apply_discount_to_tour_participants`
+
+```sql
+-- Code is located in:
+-- phase4/scripts/main/financials_and_discounts.sql
+```
+
+Screenshot of result:
+<img width="774" height="656" alt="image" src="https://github.com/user-attachments/assets/e6676c01-71f3-4cca-b495-9517f32ec221" />
+
+---
+
+# 8. Main Block 2: mainProgram2
+
+## Description
+
+Demonstrates the route difficulty refcursor function and the automatic guide assignment procedure.
+
+The program fetches tours according to a selected difficulty level, prints the tours using a loop over the refcursor, assigns an optimal guide to a tour, and tests exception handling with a non-existing tour ID.
+
+## Invokes
+
+- Function: `fn_get_route_tour_details_by_difficulty`
+- Procedure: `pr_assign_optimal_guide_to_tour`
+
+```sql
+-- Code is located in:
+-- phase4/scripts/main/mainProgram2.sql
+```
+
+Screenshot of result:
+<img width="775" height="583" alt="image" src="https://github.com/user-attachments/assets/db625de2-f7d3-4cc3-a258-89874dc11d8b" />
+
+---
+
+# 9. Alter Table / Additional Table
+
+## Description
+
+An additional audit table was created in order to support the tour audit trigger.
+
+The table stores changes made to guided tours, including price changes, guide changes, the user who made the change, and the timestamp of the change.
+
+```sql
+CREATE TABLE IF NOT EXISTS TOUR_AUDIT (
+    AuditID SERIAL PRIMARY KEY,
+    TourID INT NOT NULL,
+    Action VARCHAR(10) NOT NULL,
+    OldPrice NUMERIC(10,2),
+    NewPrice NUMERIC(10,2),
+    OldGuideID INT,
+    NewGuideID INT,
+    ChangedBy VARCHAR(100) DEFAULT CURRENT_USER,
+    ChangedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+COMMENT ON TABLE TOUR_AUDIT IS 'Audit table for tracking DML actions on the guided tours table';
+```
+
+Screenshot of result:
+<img width="1334" height="887" alt="image" src="https://github.com/user-attachments/assets/7d351b56-fe60-41b4-9e08-de0533bcf626" />
+
+---
+# Backup File (Phase 4)
+
+A full backup of the database after completing Phase 4 is included.
+
+📁 Location:
+
+```text
+backups/backup4.sql
+```
+
+<img width="1375" height="896" alt="image" src="https://github.com/user-attachments/assets/f2c47078-09c7-49ba-b398-df0f22faa817" />
+
+## Contents
+
+- All tables (schema)
+- All records (data)
+- Functions
+- Procedures
+- Triggers
+- Constraints
+- Indexes
+- Audit table
+- PL/pgSQL programs
+
+## Purpose
+
+This backup allows full restoration of the database state after completing Phase 4, including all PL/pgSQL programming components and trigger logic.
+
+---
+# Summary
+
+All Phase 4 programs were implemented and tested successfully.
+
+This phase includes:
+
+- Two PL/pgSQL functions
+- Two PL/pgSQL procedures
+- Two triggers
+- Two main programs
+- One audit table
+
+The programs demonstrate advanced PL/pgSQL features such as cursors, refcursors, DML operations, conditionals, loops, exception handling, records, and triggers.
+
+The screenshots above prove that each program executed successfully and performed its intended database operation.
