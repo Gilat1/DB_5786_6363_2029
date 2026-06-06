@@ -76,7 +76,7 @@ Guided Tour Management
   - [9. Updated Backup File](#9-updated-backup-file)
   - [Summary](#summary)
 
-  - [Phase 4: Programming with PL/pgSQL](#phase-4-programming-with-plpgsql)
+- [Phase 4: Programming with PL/pgSQL](#phase-4-programming-with-plpgsql)
   - [1. Function: fn_calculate_customer_payment_status](#1-function-fn_calculate_customer_payment_status)
     - [Description](#description)
     - [Features used](#features-used)
