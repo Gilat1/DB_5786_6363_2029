@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict hZQYA2qGOyaZGsEIfx6FEtHZKqp1cyhjyUUycIa6oW7ApYscU6HLbTYVDtci50D
+\restrict syFv9Z46V6hGcPhbKJD0gPncAiAPOTHrJrQX17bMPyhVtuJSIEMXyplznPTZACU
 
 -- Dumped from database version 18.3 (Debian 18.3-1.pgdg13+1)
 -- Dumped by pg_dump version 18.3
 
--- Started on 2026-06-01 17:14:05 UTC
+-- Started on 2026-06-06 20:03:46 UTC
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -335,7 +335,71 @@ CREATE VIEW public.vw_payment_summary_details AS
 ALTER VIEW public.vw_payment_summary_details OWNER TO "Gilat";
 
 --
--- TOC entry 3555 (class 0 OID 33020)
+-- TOC entry 235 (class 1259 OID 57402)
+-- Name: vw_route_management_department_view; Type: VIEW; Schema: public; Owner: Gilat
+--
+
+CREATE VIEW public.vw_route_management_department_view AS
+ SELECT r.routeid,
+    r.name AS routename,
+    r.description AS routedescription,
+    r.estimatedlength,
+    r.estimatedduration,
+    dl.difficultyname,
+    l.locationid,
+    l.locationname,
+    l.category AS locationcategory,
+    count(gt.tourid) AS numberofguidedtours,
+    avg(gt.price) AS averagetourprice
+   FROM ((((public.route r
+     JOIN public.difficultylevel dl ON ((r.difficultyid = dl.difficultyid)))
+     LEFT JOIN public.located_in li ON ((r.routeid = li.routeid)))
+     LEFT JOIN public.location l ON ((li.locationid = l.locationid)))
+     LEFT JOIN public.guidedtour gt ON ((r.routeid = gt.routeid)))
+  GROUP BY r.routeid, r.name, r.description, r.estimatedlength, r.estimatedduration, dl.difficultyname, l.locationid, l.locationname, l.category;
+
+
+ALTER VIEW public.vw_route_management_department_view OWNER TO "Gilat";
+
+--
+-- TOC entry 234 (class 1259 OID 57397)
+-- Name: vw_tour_guide_department_view; Type: VIEW; Schema: public; Owner: Gilat
+--
+
+CREATE VIEW public.vw_tour_guide_department_view AS
+ SELECT gt.tourid,
+    gt.startdate,
+    gt.enddate,
+    gt.starttime,
+    gt.endtime,
+    gt.meetingpoint,
+    gt.price,
+    gt.maxparticipants,
+    gt.notes AS tournotes,
+    g.guideid,
+    g.firstname AS guidefirstname,
+    g.lastname AS guidelastname,
+    g.phone AS guidephone,
+    g.email AS guideemail,
+    r.routeid,
+    r.name AS routename,
+    dl.difficultyname,
+    l.locationname,
+    count(reg.registrationid) AS numberofregistrations
+   FROM ((((((public.guidedtour gt
+     JOIN public.guide g ON ((gt.guideid = g.guideid)))
+     JOIN public.route r ON ((gt.routeid = r.routeid)))
+     JOIN public.difficultylevel dl ON ((r.difficultyid = dl.difficultyid)))
+     LEFT JOIN public.located_in li ON ((r.routeid = li.routeid)))
+     LEFT JOIN public.location l ON ((li.locationid = l.locationid)))
+     LEFT JOIN public.registration reg ON ((gt.tourid = reg.tourid)))
+  GROUP BY gt.tourid, gt.startdate, gt.enddate, gt.starttime, gt.endtime, gt.meetingpoint, gt.price, gt.maxparticipants, gt.notes, g.guideid, g.firstname, g.lastname, g.phone, g.email, r.routeid, r.name, dl.difficultyname, l.locationname;
+
+
+ALTER VIEW public.vw_tour_guide_department_view OWNER TO "Gilat";
+
+--
+-- TOC entry 3565 (class 0 OID 33020)
 -- Dependencies: 224
 -- Data for Name: customer; Type: TABLE DATA; Schema: public; Owner: Gilat
 --
@@ -844,7 +908,7 @@ INSERT INTO public.customer (customerid, fullname, phone, email, joindate) VALUE
 
 
 --
--- TOC entry 3551 (class 0 OID 32958)
+-- TOC entry 3561 (class 0 OID 32958)
 -- Dependencies: 220
 -- Data for Name: difficultylevel; Type: TABLE DATA; Schema: public; Owner: Gilat
 --
@@ -1352,515 +1416,515 @@ INSERT INTO public.difficultylevel (difficultyid, difficultyname) VALUES (500, '
 
 
 --
--- TOC entry 3550 (class 0 OID 32941)
+-- TOC entry 3560 (class 0 OID 32941)
 -- Dependencies: 219
 -- Data for Name: guide; Type: TABLE DATA; Schema: public; Owner: Gilat
 --
 
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (1, 'GuideFirst1', 'GuideLast1', '0500000001', 'guide1@mail.com', '1980-01-02', '2015-01-02', 301.00, 1, 0.10, 'Address 1', 'Guide note 1', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (2, 'GuideFirst2', 'GuideLast2', '0500000002', 'guide2@mail.com', '1980-01-03', '2015-01-03', 302.00, 2, 0.20, 'Address 2', 'Guide note 2', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (3, 'GuideFirst3', 'GuideLast3', '0500000003', 'guide3@mail.com', '1980-01-04', '2015-01-04', 303.00, 3, 0.30, 'Address 3', 'Guide note 3', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (4, 'GuideFirst4', 'GuideLast4', '0500000004', 'guide4@mail.com', '1980-01-05', '2015-01-05', 304.00, 4, 0.40, 'Address 4', 'Guide note 4', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (5, 'GuideFirst5', 'GuideLast5', '0500000005', 'guide5@mail.com', '1980-01-06', '2015-01-06', 305.00, 5, 0.50, 'Address 5', 'Guide note 5', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (6, 'GuideFirst6', 'GuideLast6', '0500000006', 'guide6@mail.com', '1980-01-07', '2015-01-07', 306.00, 6, 0.60, 'Address 6', 'Guide note 6', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (7, 'GuideFirst7', 'GuideLast7', '0500000007', 'guide7@mail.com', '1980-01-08', '2015-01-08', 307.00, 7, 0.70, 'Address 7', 'Guide note 7', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (8, 'GuideFirst8', 'GuideLast8', '0500000008', 'guide8@mail.com', '1980-01-09', '2015-01-09', 308.00, 8, 0.80, 'Address 8', 'Guide note 8', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (9, 'GuideFirst9', 'GuideLast9', '0500000009', 'guide9@mail.com', '1980-01-10', '2015-01-10', 309.00, 9, 0.90, 'Address 9', 'Guide note 9', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (10, 'GuideFirst10', 'GuideLast10', '0500000010', 'guide10@mail.com', '1980-01-11', '2015-01-11', 310.00, 10, 1.00, 'Address 10', 'Guide note 10', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (11, 'GuideFirst11', 'GuideLast11', '0500000011', 'guide11@mail.com', '1980-01-12', '2015-01-12', 311.00, 11, 1.10, 'Address 11', 'Guide note 11', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (12, 'GuideFirst12', 'GuideLast12', '0500000012', 'guide12@mail.com', '1980-01-13', '2015-01-13', 312.00, 12, 1.20, 'Address 12', 'Guide note 12', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (13, 'GuideFirst13', 'GuideLast13', '0500000013', 'guide13@mail.com', '1980-01-14', '2015-01-14', 313.00, 13, 1.30, 'Address 13', 'Guide note 13', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (14, 'GuideFirst14', 'GuideLast14', '0500000014', 'guide14@mail.com', '1980-01-15', '2015-01-15', 314.00, 14, 1.40, 'Address 14', 'Guide note 14', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (15, 'GuideFirst15', 'GuideLast15', '0500000015', 'guide15@mail.com', '1980-01-16', '2015-01-16', 315.00, 15, 1.50, 'Address 15', 'Guide note 15', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (16, 'GuideFirst16', 'GuideLast16', '0500000016', 'guide16@mail.com', '1980-01-17', '2015-01-17', 316.00, 16, 1.60, 'Address 16', 'Guide note 16', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (17, 'GuideFirst17', 'GuideLast17', '0500000017', 'guide17@mail.com', '1980-01-18', '2015-01-18', 317.00, 17, 1.70, 'Address 17', 'Guide note 17', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (18, 'GuideFirst18', 'GuideLast18', '0500000018', 'guide18@mail.com', '1980-01-19', '2015-01-19', 318.00, 18, 1.80, 'Address 18', 'Guide note 18', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (19, 'GuideFirst19', 'GuideLast19', '0500000019', 'guide19@mail.com', '1980-01-20', '2015-01-20', 319.00, 19, 1.90, 'Address 19', 'Guide note 19', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (20, 'GuideFirst20', 'GuideLast20', '0500000020', 'guide20@mail.com', '1980-01-21', '2015-01-21', 320.00, 20, 2.00, 'Address 20', 'Guide note 20', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (21, 'GuideFirst21', 'GuideLast21', '0500000021', 'guide21@mail.com', '1980-01-22', '2015-01-22', 321.00, 0, 2.10, 'Address 21', 'Guide note 21', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (22, 'GuideFirst22', 'GuideLast22', '0500000022', 'guide22@mail.com', '1980-01-23', '2015-01-23', 322.00, 1, 2.20, 'Address 22', 'Guide note 22', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (23, 'GuideFirst23', 'GuideLast23', '0500000023', 'guide23@mail.com', '1980-01-24', '2015-01-24', 323.00, 2, 2.30, 'Address 23', 'Guide note 23', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (24, 'GuideFirst24', 'GuideLast24', '0500000024', 'guide24@mail.com', '1980-01-25', '2015-01-25', 324.00, 3, 2.40, 'Address 24', 'Guide note 24', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (25, 'GuideFirst25', 'GuideLast25', '0500000025', 'guide25@mail.com', '1980-01-26', '2015-01-26', 325.00, 4, 2.50, 'Address 25', 'Guide note 25', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (26, 'GuideFirst26', 'GuideLast26', '0500000026', 'guide26@mail.com', '1980-01-27', '2015-01-27', 326.00, 5, 2.60, 'Address 26', 'Guide note 26', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (27, 'GuideFirst27', 'GuideLast27', '0500000027', 'guide27@mail.com', '1980-01-28', '2015-01-28', 327.00, 6, 2.70, 'Address 27', 'Guide note 27', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (28, 'GuideFirst28', 'GuideLast28', '0500000028', 'guide28@mail.com', '1980-01-29', '2015-01-29', 328.00, 7, 2.80, 'Address 28', 'Guide note 28', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (29, 'GuideFirst29', 'GuideLast29', '0500000029', 'guide29@mail.com', '1980-01-30', '2015-01-30', 329.00, 8, 2.90, 'Address 29', 'Guide note 29', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (30, 'GuideFirst30', 'GuideLast30', '0500000030', 'guide30@mail.com', '1980-01-31', '2015-01-31', 330.00, 9, 3.00, 'Address 30', 'Guide note 30', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (31, 'GuideFirst31', 'GuideLast31', '0500000031', 'guide31@mail.com', '1980-02-01', '2015-02-01', 331.00, 10, 3.10, 'Address 31', 'Guide note 31', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (32, 'GuideFirst32', 'GuideLast32', '0500000032', 'guide32@mail.com', '1980-02-02', '2015-02-02', 332.00, 11, 3.20, 'Address 32', 'Guide note 32', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (33, 'GuideFirst33', 'GuideLast33', '0500000033', 'guide33@mail.com', '1980-02-03', '2015-02-03', 333.00, 12, 3.30, 'Address 33', 'Guide note 33', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (34, 'GuideFirst34', 'GuideLast34', '0500000034', 'guide34@mail.com', '1980-02-04', '2015-02-04', 334.00, 13, 3.40, 'Address 34', 'Guide note 34', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (35, 'GuideFirst35', 'GuideLast35', '0500000035', 'guide35@mail.com', '1980-02-05', '2015-02-05', 335.00, 14, 3.50, 'Address 35', 'Guide note 35', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (36, 'GuideFirst36', 'GuideLast36', '0500000036', 'guide36@mail.com', '1980-02-06', '2015-02-06', 336.00, 15, 3.60, 'Address 36', 'Guide note 36', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (37, 'GuideFirst37', 'GuideLast37', '0500000037', 'guide37@mail.com', '1980-02-07', '2015-02-07', 337.00, 16, 3.70, 'Address 37', 'Guide note 37', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (38, 'GuideFirst38', 'GuideLast38', '0500000038', 'guide38@mail.com', '1980-02-08', '2015-02-08', 338.00, 17, 3.80, 'Address 38', 'Guide note 38', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (39, 'GuideFirst39', 'GuideLast39', '0500000039', 'guide39@mail.com', '1980-02-09', '2015-02-09', 339.00, 18, 3.90, 'Address 39', 'Guide note 39', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (40, 'GuideFirst40', 'GuideLast40', '0500000040', 'guide40@mail.com', '1980-02-10', '2015-02-10', 340.00, 19, 4.00, 'Address 40', 'Guide note 40', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (41, 'GuideFirst41', 'GuideLast41', '0500000041', 'guide41@mail.com', '1980-02-11', '2015-02-11', 341.00, 20, 4.10, 'Address 41', 'Guide note 41', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (42, 'GuideFirst42', 'GuideLast42', '0500000042', 'guide42@mail.com', '1980-02-12', '2015-02-12', 342.00, 0, 4.20, 'Address 42', 'Guide note 42', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (43, 'GuideFirst43', 'GuideLast43', '0500000043', 'guide43@mail.com', '1980-02-13', '2015-02-13', 343.00, 1, 4.30, 'Address 43', 'Guide note 43', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (44, 'GuideFirst44', 'GuideLast44', '0500000044', 'guide44@mail.com', '1980-02-14', '2015-02-14', 344.00, 2, 4.40, 'Address 44', 'Guide note 44', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (45, 'GuideFirst45', 'GuideLast45', '0500000045', 'guide45@mail.com', '1980-02-15', '2015-02-15', 345.00, 3, 4.50, 'Address 45', 'Guide note 45', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (46, 'GuideFirst46', 'GuideLast46', '0500000046', 'guide46@mail.com', '1980-02-16', '2015-02-16', 346.00, 4, 4.60, 'Address 46', 'Guide note 46', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (47, 'GuideFirst47', 'GuideLast47', '0500000047', 'guide47@mail.com', '1980-02-17', '2015-02-17', 347.00, 5, 4.70, 'Address 47', 'Guide note 47', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (48, 'GuideFirst48', 'GuideLast48', '0500000048', 'guide48@mail.com', '1980-02-18', '2015-02-18', 348.00, 6, 4.80, 'Address 48', 'Guide note 48', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (50, 'GuideFirst50', 'GuideLast50', '0500000050', 'guide50@mail.com', '1980-02-20', '2015-02-20', 350.00, 8, 0.00, 'Address 50', 'Guide note 50', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (51, 'GuideFirst51', 'GuideLast51', '0500000051', 'guide51@mail.com', '1980-02-21', '2015-02-21', 351.00, 9, 0.10, 'Address 51', 'Guide note 51', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (52, 'GuideFirst52', 'GuideLast52', '0500000052', 'guide52@mail.com', '1980-02-22', '2015-02-22', 352.00, 10, 0.20, 'Address 52', 'Guide note 52', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (53, 'GuideFirst53', 'GuideLast53', '0500000053', 'guide53@mail.com', '1980-02-23', '2015-02-23', 353.00, 11, 0.30, 'Address 53', 'Guide note 53', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (54, 'GuideFirst54', 'GuideLast54', '0500000054', 'guide54@mail.com', '1980-02-24', '2015-02-24', 354.00, 12, 0.40, 'Address 54', 'Guide note 54', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (55, 'GuideFirst55', 'GuideLast55', '0500000055', 'guide55@mail.com', '1980-02-25', '2015-02-25', 355.00, 13, 0.50, 'Address 55', 'Guide note 55', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (56, 'GuideFirst56', 'GuideLast56', '0500000056', 'guide56@mail.com', '1980-02-26', '2015-02-26', 356.00, 14, 0.60, 'Address 56', 'Guide note 56', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (57, 'GuideFirst57', 'GuideLast57', '0500000057', 'guide57@mail.com', '1980-02-27', '2015-02-27', 357.00, 15, 0.70, 'Address 57', 'Guide note 57', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (58, 'GuideFirst58', 'GuideLast58', '0500000058', 'guide58@mail.com', '1980-02-28', '2015-02-28', 358.00, 16, 0.80, 'Address 58', 'Guide note 58', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (59, 'GuideFirst59', 'GuideLast59', '0500000059', 'guide59@mail.com', '1980-02-29', '2015-03-01', 359.00, 17, 0.90, 'Address 59', 'Guide note 59', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (60, 'GuideFirst60', 'GuideLast60', '0500000060', 'guide60@mail.com', '1980-03-01', '2015-03-02', 360.00, 18, 1.00, 'Address 60', 'Guide note 60', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (61, 'GuideFirst61', 'GuideLast61', '0500000061', 'guide61@mail.com', '1980-03-02', '2015-03-03', 361.00, 19, 1.10, 'Address 61', 'Guide note 61', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (62, 'GuideFirst62', 'GuideLast62', '0500000062', 'guide62@mail.com', '1980-03-03', '2015-03-04', 362.00, 20, 1.20, 'Address 62', 'Guide note 62', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (63, 'GuideFirst63', 'GuideLast63', '0500000063', 'guide63@mail.com', '1980-03-04', '2015-03-05', 363.00, 0, 1.30, 'Address 63', 'Guide note 63', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (64, 'GuideFirst64', 'GuideLast64', '0500000064', 'guide64@mail.com', '1980-03-05', '2015-03-06', 364.00, 1, 1.40, 'Address 64', 'Guide note 64', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (65, 'GuideFirst65', 'GuideLast65', '0500000065', 'guide65@mail.com', '1980-03-06', '2015-03-07', 365.00, 2, 1.50, 'Address 65', 'Guide note 65', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (66, 'GuideFirst66', 'GuideLast66', '0500000066', 'guide66@mail.com', '1980-03-07', '2015-03-08', 366.00, 3, 1.60, 'Address 66', 'Guide note 66', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (67, 'GuideFirst67', 'GuideLast67', '0500000067', 'guide67@mail.com', '1980-03-08', '2015-03-09', 367.00, 4, 1.70, 'Address 67', 'Guide note 67', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (68, 'GuideFirst68', 'GuideLast68', '0500000068', 'guide68@mail.com', '1980-03-09', '2015-03-10', 368.00, 5, 1.80, 'Address 68', 'Guide note 68', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (69, 'GuideFirst69', 'GuideLast69', '0500000069', 'guide69@mail.com', '1980-03-10', '2015-03-11', 369.00, 6, 1.90, 'Address 69', 'Guide note 69', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (70, 'GuideFirst70', 'GuideLast70', '0500000070', 'guide70@mail.com', '1980-03-11', '2015-03-12', 370.00, 7, 2.00, 'Address 70', 'Guide note 70', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (71, 'GuideFirst71', 'GuideLast71', '0500000071', 'guide71@mail.com', '1980-03-12', '2015-03-13', 371.00, 8, 2.10, 'Address 71', 'Guide note 71', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (72, 'GuideFirst72', 'GuideLast72', '0500000072', 'guide72@mail.com', '1980-03-13', '2015-03-14', 372.00, 9, 2.20, 'Address 72', 'Guide note 72', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (73, 'GuideFirst73', 'GuideLast73', '0500000073', 'guide73@mail.com', '1980-03-14', '2015-03-15', 373.00, 10, 2.30, 'Address 73', 'Guide note 73', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (74, 'GuideFirst74', 'GuideLast74', '0500000074', 'guide74@mail.com', '1980-03-15', '2015-03-16', 374.00, 11, 2.40, 'Address 74', 'Guide note 74', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (75, 'GuideFirst75', 'GuideLast75', '0500000075', 'guide75@mail.com', '1980-03-16', '2015-03-17', 375.00, 12, 2.50, 'Address 75', 'Guide note 75', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (76, 'GuideFirst76', 'GuideLast76', '0500000076', 'guide76@mail.com', '1980-03-17', '2015-03-18', 376.00, 13, 2.60, 'Address 76', 'Guide note 76', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (77, 'GuideFirst77', 'GuideLast77', '0500000077', 'guide77@mail.com', '1980-03-18', '2015-03-19', 377.00, 14, 2.70, 'Address 77', 'Guide note 77', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (78, 'GuideFirst78', 'GuideLast78', '0500000078', 'guide78@mail.com', '1980-03-19', '2015-03-20', 378.00, 15, 2.80, 'Address 78', 'Guide note 78', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (79, 'GuideFirst79', 'GuideLast79', '0500000079', 'guide79@mail.com', '1980-03-20', '2015-03-21', 379.00, 16, 2.90, 'Address 79', 'Guide note 79', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (80, 'GuideFirst80', 'GuideLast80', '0500000080', 'guide80@mail.com', '1980-03-21', '2015-03-22', 380.00, 17, 3.00, 'Address 80', 'Guide note 80', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (81, 'GuideFirst81', 'GuideLast81', '0500000081', 'guide81@mail.com', '1980-03-22', '2015-03-23', 381.00, 18, 3.10, 'Address 81', 'Guide note 81', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (82, 'GuideFirst82', 'GuideLast82', '0500000082', 'guide82@mail.com', '1980-03-23', '2015-03-24', 382.00, 19, 3.20, 'Address 82', 'Guide note 82', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (83, 'GuideFirst83', 'GuideLast83', '0500000083', 'guide83@mail.com', '1980-03-24', '2015-03-25', 383.00, 20, 3.30, 'Address 83', 'Guide note 83', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (84, 'GuideFirst84', 'GuideLast84', '0500000084', 'guide84@mail.com', '1980-03-25', '2015-03-26', 384.00, 0, 3.40, 'Address 84', 'Guide note 84', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (85, 'GuideFirst85', 'GuideLast85', '0500000085', 'guide85@mail.com', '1980-03-26', '2015-03-27', 385.00, 1, 3.50, 'Address 85', 'Guide note 85', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (86, 'GuideFirst86', 'GuideLast86', '0500000086', 'guide86@mail.com', '1980-03-27', '2015-03-28', 386.00, 2, 3.60, 'Address 86', 'Guide note 86', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (87, 'GuideFirst87', 'GuideLast87', '0500000087', 'guide87@mail.com', '1980-03-28', '2015-03-29', 387.00, 3, 3.70, 'Address 87', 'Guide note 87', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (88, 'GuideFirst88', 'GuideLast88', '0500000088', 'guide88@mail.com', '1980-03-29', '2015-03-30', 388.00, 4, 3.80, 'Address 88', 'Guide note 88', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (89, 'GuideFirst89', 'GuideLast89', '0500000089', 'guide89@mail.com', '1980-03-30', '2015-03-31', 389.00, 5, 3.90, 'Address 89', 'Guide note 89', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (90, 'GuideFirst90', 'GuideLast90', '0500000090', 'guide90@mail.com', '1980-03-31', '2015-04-01', 390.00, 6, 4.00, 'Address 90', 'Guide note 90', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (91, 'GuideFirst91', 'GuideLast91', '0500000091', 'guide91@mail.com', '1980-04-01', '2015-04-02', 391.00, 7, 4.10, 'Address 91', 'Guide note 91', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (92, 'GuideFirst92', 'GuideLast92', '0500000092', 'guide92@mail.com', '1980-04-02', '2015-04-03', 392.00, 8, 4.20, 'Address 92', 'Guide note 92', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (93, 'GuideFirst93', 'GuideLast93', '0500000093', 'guide93@mail.com', '1980-04-03', '2015-04-04', 393.00, 9, 4.30, 'Address 93', 'Guide note 93', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (94, 'GuideFirst94', 'GuideLast94', '0500000094', 'guide94@mail.com', '1980-04-04', '2015-04-05', 394.00, 10, 4.40, 'Address 94', 'Guide note 94', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (95, 'GuideFirst95', 'GuideLast95', '0500000095', 'guide95@mail.com', '1980-04-05', '2015-04-06', 395.00, 11, 4.50, 'Address 95', 'Guide note 95', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (96, 'GuideFirst96', 'GuideLast96', '0500000096', 'guide96@mail.com', '1980-04-06', '2015-04-07', 396.00, 12, 4.60, 'Address 96', 'Guide note 96', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (97, 'GuideFirst97', 'GuideLast97', '0500000097', 'guide97@mail.com', '1980-04-07', '2015-04-08', 397.00, 13, 4.70, 'Address 97', 'Guide note 97', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (98, 'GuideFirst98', 'GuideLast98', '0500000098', 'guide98@mail.com', '1980-04-08', '2015-04-09', 398.00, 14, 4.80, 'Address 98', 'Guide note 98', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (100, 'GuideFirst100', 'GuideLast100', '0500000100', 'guide100@mail.com', '1980-04-10', '2015-04-11', 400.00, 16, 0.00, 'Address 100', 'Guide note 100', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (101, 'GuideFirst101', 'GuideLast101', '0500000101', 'guide101@mail.com', '1980-04-11', '2015-04-12', 401.00, 17, 0.10, 'Address 101', 'Guide note 101', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (102, 'GuideFirst102', 'GuideLast102', '0500000102', 'guide102@mail.com', '1980-04-12', '2015-04-13', 402.00, 18, 0.20, 'Address 102', 'Guide note 102', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (103, 'GuideFirst103', 'GuideLast103', '0500000103', 'guide103@mail.com', '1980-04-13', '2015-04-14', 403.00, 19, 0.30, 'Address 103', 'Guide note 103', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (104, 'GuideFirst104', 'GuideLast104', '0500000104', 'guide104@mail.com', '1980-04-14', '2015-04-15', 404.00, 20, 0.40, 'Address 104', 'Guide note 104', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (105, 'GuideFirst105', 'GuideLast105', '0500000105', 'guide105@mail.com', '1980-04-15', '2015-04-16', 405.00, 0, 0.50, 'Address 105', 'Guide note 105', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (106, 'GuideFirst106', 'GuideLast106', '0500000106', 'guide106@mail.com', '1980-04-16', '2015-04-17', 406.00, 1, 0.60, 'Address 106', 'Guide note 106', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (107, 'GuideFirst107', 'GuideLast107', '0500000107', 'guide107@mail.com', '1980-04-17', '2015-04-18', 407.00, 2, 0.70, 'Address 107', 'Guide note 107', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (108, 'GuideFirst108', 'GuideLast108', '0500000108', 'guide108@mail.com', '1980-04-18', '2015-04-19', 408.00, 3, 0.80, 'Address 108', 'Guide note 108', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (109, 'GuideFirst109', 'GuideLast109', '0500000109', 'guide109@mail.com', '1980-04-19', '2015-04-20', 409.00, 4, 0.90, 'Address 109', 'Guide note 109', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (110, 'GuideFirst110', 'GuideLast110', '0500000110', 'guide110@mail.com', '1980-04-20', '2015-04-21', 410.00, 5, 1.00, 'Address 110', 'Guide note 110', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (111, 'GuideFirst111', 'GuideLast111', '0500000111', 'guide111@mail.com', '1980-04-21', '2015-04-22', 411.00, 6, 1.10, 'Address 111', 'Guide note 111', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (112, 'GuideFirst112', 'GuideLast112', '0500000112', 'guide112@mail.com', '1980-04-22', '2015-04-23', 412.00, 7, 1.20, 'Address 112', 'Guide note 112', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (113, 'GuideFirst113', 'GuideLast113', '0500000113', 'guide113@mail.com', '1980-04-23', '2015-04-24', 413.00, 8, 1.30, 'Address 113', 'Guide note 113', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (114, 'GuideFirst114', 'GuideLast114', '0500000114', 'guide114@mail.com', '1980-04-24', '2015-04-25', 414.00, 9, 1.40, 'Address 114', 'Guide note 114', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (115, 'GuideFirst115', 'GuideLast115', '0500000115', 'guide115@mail.com', '1980-04-25', '2015-04-26', 415.00, 10, 1.50, 'Address 115', 'Guide note 115', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (116, 'GuideFirst116', 'GuideLast116', '0500000116', 'guide116@mail.com', '1980-04-26', '2015-04-27', 416.00, 11, 1.60, 'Address 116', 'Guide note 116', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (117, 'GuideFirst117', 'GuideLast117', '0500000117', 'guide117@mail.com', '1980-04-27', '2015-04-28', 417.00, 12, 1.70, 'Address 117', 'Guide note 117', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (118, 'GuideFirst118', 'GuideLast118', '0500000118', 'guide118@mail.com', '1980-04-28', '2015-04-29', 418.00, 13, 1.80, 'Address 118', 'Guide note 118', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (119, 'GuideFirst119', 'GuideLast119', '0500000119', 'guide119@mail.com', '1980-04-29', '2015-04-30', 419.00, 14, 1.90, 'Address 119', 'Guide note 119', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (120, 'GuideFirst120', 'GuideLast120', '0500000120', 'guide120@mail.com', '1980-04-30', '2015-05-01', 420.00, 15, 2.00, 'Address 120', 'Guide note 120', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (121, 'GuideFirst121', 'GuideLast121', '0500000121', 'guide121@mail.com', '1980-05-01', '2015-05-02', 421.00, 16, 2.10, 'Address 121', 'Guide note 121', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (122, 'GuideFirst122', 'GuideLast122', '0500000122', 'guide122@mail.com', '1980-05-02', '2015-05-03', 422.00, 17, 2.20, 'Address 122', 'Guide note 122', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (123, 'GuideFirst123', 'GuideLast123', '0500000123', 'guide123@mail.com', '1980-05-03', '2015-05-04', 423.00, 18, 2.30, 'Address 123', 'Guide note 123', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (124, 'GuideFirst124', 'GuideLast124', '0500000124', 'guide124@mail.com', '1980-05-04', '2015-05-05', 424.00, 19, 2.40, 'Address 124', 'Guide note 124', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (125, 'GuideFirst125', 'GuideLast125', '0500000125', 'guide125@mail.com', '1980-05-05', '2015-05-06', 425.00, 20, 2.50, 'Address 125', 'Guide note 125', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (126, 'GuideFirst126', 'GuideLast126', '0500000126', 'guide126@mail.com', '1980-05-06', '2015-05-07', 426.00, 0, 2.60, 'Address 126', 'Guide note 126', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (127, 'GuideFirst127', 'GuideLast127', '0500000127', 'guide127@mail.com', '1980-05-07', '2015-05-08', 427.00, 1, 2.70, 'Address 127', 'Guide note 127', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (128, 'GuideFirst128', 'GuideLast128', '0500000128', 'guide128@mail.com', '1980-05-08', '2015-05-09', 428.00, 2, 2.80, 'Address 128', 'Guide note 128', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (129, 'GuideFirst129', 'GuideLast129', '0500000129', 'guide129@mail.com', '1980-05-09', '2015-05-10', 429.00, 3, 2.90, 'Address 129', 'Guide note 129', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (130, 'GuideFirst130', 'GuideLast130', '0500000130', 'guide130@mail.com', '1980-05-10', '2015-05-11', 430.00, 4, 3.00, 'Address 130', 'Guide note 130', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (131, 'GuideFirst131', 'GuideLast131', '0500000131', 'guide131@mail.com', '1980-05-11', '2015-05-12', 431.00, 5, 3.10, 'Address 131', 'Guide note 131', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (132, 'GuideFirst132', 'GuideLast132', '0500000132', 'guide132@mail.com', '1980-05-12', '2015-05-13', 432.00, 6, 3.20, 'Address 132', 'Guide note 132', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (133, 'GuideFirst133', 'GuideLast133', '0500000133', 'guide133@mail.com', '1980-05-13', '2015-05-14', 433.00, 7, 3.30, 'Address 133', 'Guide note 133', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (134, 'GuideFirst134', 'GuideLast134', '0500000134', 'guide134@mail.com', '1980-05-14', '2015-05-15', 434.00, 8, 3.40, 'Address 134', 'Guide note 134', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (135, 'GuideFirst135', 'GuideLast135', '0500000135', 'guide135@mail.com', '1980-05-15', '2015-05-16', 435.00, 9, 3.50, 'Address 135', 'Guide note 135', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (136, 'GuideFirst136', 'GuideLast136', '0500000136', 'guide136@mail.com', '1980-05-16', '2015-05-17', 436.00, 10, 3.60, 'Address 136', 'Guide note 136', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (137, 'GuideFirst137', 'GuideLast137', '0500000137', 'guide137@mail.com', '1980-05-17', '2015-05-18', 437.00, 11, 3.70, 'Address 137', 'Guide note 137', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (138, 'GuideFirst138', 'GuideLast138', '0500000138', 'guide138@mail.com', '1980-05-18', '2015-05-19', 438.00, 12, 3.80, 'Address 138', 'Guide note 138', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (139, 'GuideFirst139', 'GuideLast139', '0500000139', 'guide139@mail.com', '1980-05-19', '2015-05-20', 439.00, 13, 3.90, 'Address 139', 'Guide note 139', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (140, 'GuideFirst140', 'GuideLast140', '0500000140', 'guide140@mail.com', '1980-05-20', '2015-05-21', 440.00, 14, 4.00, 'Address 140', 'Guide note 140', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (141, 'GuideFirst141', 'GuideLast141', '0500000141', 'guide141@mail.com', '1980-05-21', '2015-05-22', 441.00, 15, 4.10, 'Address 141', 'Guide note 141', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (142, 'GuideFirst142', 'GuideLast142', '0500000142', 'guide142@mail.com', '1980-05-22', '2015-05-23', 442.00, 16, 4.20, 'Address 142', 'Guide note 142', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (143, 'GuideFirst143', 'GuideLast143', '0500000143', 'guide143@mail.com', '1980-05-23', '2015-05-24', 443.00, 17, 4.30, 'Address 143', 'Guide note 143', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (144, 'GuideFirst144', 'GuideLast144', '0500000144', 'guide144@mail.com', '1980-05-24', '2015-05-25', 444.00, 18, 4.40, 'Address 144', 'Guide note 144', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (145, 'GuideFirst145', 'GuideLast145', '0500000145', 'guide145@mail.com', '1980-05-25', '2015-05-26', 445.00, 19, 4.50, 'Address 145', 'Guide note 145', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (146, 'GuideFirst146', 'GuideLast146', '0500000146', 'guide146@mail.com', '1980-05-26', '2015-05-27', 446.00, 20, 4.60, 'Address 146', 'Guide note 146', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (147, 'GuideFirst147', 'GuideLast147', '0500000147', 'guide147@mail.com', '1980-05-27', '2015-05-28', 447.00, 0, 4.70, 'Address 147', 'Guide note 147', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (148, 'GuideFirst148', 'GuideLast148', '0500000148', 'guide148@mail.com', '1980-05-28', '2015-05-29', 448.00, 1, 4.80, 'Address 148', 'Guide note 148', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (149, 'GuideFirst149', 'GuideLast149', '0500000149', 'guide149@mail.com', '1980-05-29', '2015-05-30', 449.00, 2, 4.90, 'Address 149', 'Guide note 149', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (150, 'GuideFirst150', 'GuideLast150', '0500000150', 'guide150@mail.com', '1980-05-30', '2015-05-31', 450.00, 3, 0.00, 'Address 150', 'Guide note 150', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (151, 'GuideFirst151', 'GuideLast151', '0500000151', 'guide151@mail.com', '1980-05-31', '2015-06-01', 451.00, 4, 0.10, 'Address 151', 'Guide note 151', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (152, 'GuideFirst152', 'GuideLast152', '0500000152', 'guide152@mail.com', '1980-06-01', '2015-06-02', 452.00, 5, 0.20, 'Address 152', 'Guide note 152', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (153, 'GuideFirst153', 'GuideLast153', '0500000153', 'guide153@mail.com', '1980-06-02', '2015-06-03', 453.00, 6, 0.30, 'Address 153', 'Guide note 153', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (154, 'GuideFirst154', 'GuideLast154', '0500000154', 'guide154@mail.com', '1980-06-03', '2015-06-04', 454.00, 7, 0.40, 'Address 154', 'Guide note 154', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (155, 'GuideFirst155', 'GuideLast155', '0500000155', 'guide155@mail.com', '1980-06-04', '2015-06-05', 455.00, 8, 0.50, 'Address 155', 'Guide note 155', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (156, 'GuideFirst156', 'GuideLast156', '0500000156', 'guide156@mail.com', '1980-06-05', '2015-06-06', 456.00, 9, 0.60, 'Address 156', 'Guide note 156', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (157, 'GuideFirst157', 'GuideLast157', '0500000157', 'guide157@mail.com', '1980-06-06', '2015-06-07', 457.00, 10, 0.70, 'Address 157', 'Guide note 157', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (158, 'GuideFirst158', 'GuideLast158', '0500000158', 'guide158@mail.com', '1980-06-07', '2015-06-08', 458.00, 11, 0.80, 'Address 158', 'Guide note 158', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (159, 'GuideFirst159', 'GuideLast159', '0500000159', 'guide159@mail.com', '1980-06-08', '2015-06-09', 459.00, 12, 0.90, 'Address 159', 'Guide note 159', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (160, 'GuideFirst160', 'GuideLast160', '0500000160', 'guide160@mail.com', '1980-06-09', '2015-06-10', 460.00, 13, 1.00, 'Address 160', 'Guide note 160', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (161, 'GuideFirst161', 'GuideLast161', '0500000161', 'guide161@mail.com', '1980-06-10', '2015-06-11', 461.00, 14, 1.10, 'Address 161', 'Guide note 161', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (162, 'GuideFirst162', 'GuideLast162', '0500000162', 'guide162@mail.com', '1980-06-11', '2015-06-12', 462.00, 15, 1.20, 'Address 162', 'Guide note 162', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (163, 'GuideFirst163', 'GuideLast163', '0500000163', 'guide163@mail.com', '1980-06-12', '2015-06-13', 463.00, 16, 1.30, 'Address 163', 'Guide note 163', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (164, 'GuideFirst164', 'GuideLast164', '0500000164', 'guide164@mail.com', '1980-06-13', '2015-06-14', 464.00, 17, 1.40, 'Address 164', 'Guide note 164', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (165, 'GuideFirst165', 'GuideLast165', '0500000165', 'guide165@mail.com', '1980-06-14', '2015-06-15', 465.00, 18, 1.50, 'Address 165', 'Guide note 165', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (166, 'GuideFirst166', 'GuideLast166', '0500000166', 'guide166@mail.com', '1980-06-15', '2015-06-16', 466.00, 19, 1.60, 'Address 166', 'Guide note 166', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (167, 'GuideFirst167', 'GuideLast167', '0500000167', 'guide167@mail.com', '1980-06-16', '2015-06-17', 467.00, 20, 1.70, 'Address 167', 'Guide note 167', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (168, 'GuideFirst168', 'GuideLast168', '0500000168', 'guide168@mail.com', '1980-06-17', '2015-06-18', 468.00, 0, 1.80, 'Address 168', 'Guide note 168', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (169, 'GuideFirst169', 'GuideLast169', '0500000169', 'guide169@mail.com', '1980-06-18', '2015-06-19', 469.00, 1, 1.90, 'Address 169', 'Guide note 169', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (170, 'GuideFirst170', 'GuideLast170', '0500000170', 'guide170@mail.com', '1980-06-19', '2015-06-20', 470.00, 2, 2.00, 'Address 170', 'Guide note 170', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (171, 'GuideFirst171', 'GuideLast171', '0500000171', 'guide171@mail.com', '1980-06-20', '2015-06-21', 471.00, 3, 2.10, 'Address 171', 'Guide note 171', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (172, 'GuideFirst172', 'GuideLast172', '0500000172', 'guide172@mail.com', '1980-06-21', '2015-06-22', 472.00, 4, 2.20, 'Address 172', 'Guide note 172', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (173, 'GuideFirst173', 'GuideLast173', '0500000173', 'guide173@mail.com', '1980-06-22', '2015-06-23', 473.00, 5, 2.30, 'Address 173', 'Guide note 173', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (174, 'GuideFirst174', 'GuideLast174', '0500000174', 'guide174@mail.com', '1980-06-23', '2015-06-24', 474.00, 6, 2.40, 'Address 174', 'Guide note 174', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (175, 'GuideFirst175', 'GuideLast175', '0500000175', 'guide175@mail.com', '1980-06-24', '2015-06-25', 475.00, 7, 2.50, 'Address 175', 'Guide note 175', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (176, 'GuideFirst176', 'GuideLast176', '0500000176', 'guide176@mail.com', '1980-06-25', '2015-06-26', 476.00, 8, 2.60, 'Address 176', 'Guide note 176', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (177, 'GuideFirst177', 'GuideLast177', '0500000177', 'guide177@mail.com', '1980-06-26', '2015-06-27', 477.00, 9, 2.70, 'Address 177', 'Guide note 177', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (178, 'GuideFirst178', 'GuideLast178', '0500000178', 'guide178@mail.com', '1980-06-27', '2015-06-28', 478.00, 10, 2.80, 'Address 178', 'Guide note 178', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (179, 'GuideFirst179', 'GuideLast179', '0500000179', 'guide179@mail.com', '1980-06-28', '2015-06-29', 479.00, 11, 2.90, 'Address 179', 'Guide note 179', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (180, 'GuideFirst180', 'GuideLast180', '0500000180', 'guide180@mail.com', '1980-06-29', '2015-06-30', 480.00, 12, 3.00, 'Address 180', 'Guide note 180', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (181, 'GuideFirst181', 'GuideLast181', '0500000181', 'guide181@mail.com', '1980-06-30', '2015-07-01', 481.00, 13, 3.10, 'Address 181', 'Guide note 181', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (182, 'GuideFirst182', 'GuideLast182', '0500000182', 'guide182@mail.com', '1980-07-01', '2015-07-02', 482.00, 14, 3.20, 'Address 182', 'Guide note 182', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (183, 'GuideFirst183', 'GuideLast183', '0500000183', 'guide183@mail.com', '1980-07-02', '2015-07-03', 483.00, 15, 3.30, 'Address 183', 'Guide note 183', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (184, 'GuideFirst184', 'GuideLast184', '0500000184', 'guide184@mail.com', '1980-07-03', '2015-07-04', 484.00, 16, 3.40, 'Address 184', 'Guide note 184', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (185, 'GuideFirst185', 'GuideLast185', '0500000185', 'guide185@mail.com', '1980-07-04', '2015-07-05', 485.00, 17, 3.50, 'Address 185', 'Guide note 185', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (186, 'GuideFirst186', 'GuideLast186', '0500000186', 'guide186@mail.com', '1980-07-05', '2015-07-06', 486.00, 18, 3.60, 'Address 186', 'Guide note 186', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (187, 'GuideFirst187', 'GuideLast187', '0500000187', 'guide187@mail.com', '1980-07-06', '2015-07-07', 487.00, 19, 3.70, 'Address 187', 'Guide note 187', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (188, 'GuideFirst188', 'GuideLast188', '0500000188', 'guide188@mail.com', '1980-07-07', '2015-07-08', 488.00, 20, 3.80, 'Address 188', 'Guide note 188', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (189, 'GuideFirst189', 'GuideLast189', '0500000189', 'guide189@mail.com', '1980-07-08', '2015-07-09', 489.00, 0, 3.90, 'Address 189', 'Guide note 189', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (190, 'GuideFirst190', 'GuideLast190', '0500000190', 'guide190@mail.com', '1980-07-09', '2015-07-10', 490.00, 1, 4.00, 'Address 190', 'Guide note 190', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (191, 'GuideFirst191', 'GuideLast191', '0500000191', 'guide191@mail.com', '1980-07-10', '2015-07-11', 491.00, 2, 4.10, 'Address 191', 'Guide note 191', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (192, 'GuideFirst192', 'GuideLast192', '0500000192', 'guide192@mail.com', '1980-07-11', '2015-07-12', 492.00, 3, 4.20, 'Address 192', 'Guide note 192', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (193, 'GuideFirst193', 'GuideLast193', '0500000193', 'guide193@mail.com', '1980-07-12', '2015-07-13', 493.00, 4, 4.30, 'Address 193', 'Guide note 193', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (194, 'GuideFirst194', 'GuideLast194', '0500000194', 'guide194@mail.com', '1980-07-13', '2015-07-14', 494.00, 5, 4.40, 'Address 194', 'Guide note 194', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (195, 'GuideFirst195', 'GuideLast195', '0500000195', 'guide195@mail.com', '1980-07-14', '2015-07-15', 495.00, 6, 4.50, 'Address 195', 'Guide note 195', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (196, 'GuideFirst196', 'GuideLast196', '0500000196', 'guide196@mail.com', '1980-07-15', '2015-07-16', 496.00, 7, 4.60, 'Address 196', 'Guide note 196', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (197, 'GuideFirst197', 'GuideLast197', '0500000197', 'guide197@mail.com', '1980-07-16', '2015-07-17', 497.00, 8, 4.70, 'Address 197', 'Guide note 197', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (198, 'GuideFirst198', 'GuideLast198', '0500000198', 'guide198@mail.com', '1980-07-17', '2015-07-18', 498.00, 9, 4.80, 'Address 198', 'Guide note 198', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (200, 'GuideFirst200', 'GuideLast200', '0500000200', 'guide200@mail.com', '1980-07-19', '2015-07-20', 300.00, 11, 0.00, 'Address 200', 'Guide note 200', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (201, 'GuideFirst201', 'GuideLast201', '0500000201', 'guide201@mail.com', '1980-07-20', '2015-07-21', 301.00, 12, 0.10, 'Address 201', 'Guide note 201', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (202, 'GuideFirst202', 'GuideLast202', '0500000202', 'guide202@mail.com', '1980-07-21', '2015-07-22', 302.00, 13, 0.20, 'Address 202', 'Guide note 202', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (203, 'GuideFirst203', 'GuideLast203', '0500000203', 'guide203@mail.com', '1980-07-22', '2015-07-23', 303.00, 14, 0.30, 'Address 203', 'Guide note 203', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (204, 'GuideFirst204', 'GuideLast204', '0500000204', 'guide204@mail.com', '1980-07-23', '2015-07-24', 304.00, 15, 0.40, 'Address 204', 'Guide note 204', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (205, 'GuideFirst205', 'GuideLast205', '0500000205', 'guide205@mail.com', '1980-07-24', '2015-07-25', 305.00, 16, 0.50, 'Address 205', 'Guide note 205', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (206, 'GuideFirst206', 'GuideLast206', '0500000206', 'guide206@mail.com', '1980-07-25', '2015-07-26', 306.00, 17, 0.60, 'Address 206', 'Guide note 206', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (207, 'GuideFirst207', 'GuideLast207', '0500000207', 'guide207@mail.com', '1980-07-26', '2015-07-27', 307.00, 18, 0.70, 'Address 207', 'Guide note 207', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (208, 'GuideFirst208', 'GuideLast208', '0500000208', 'guide208@mail.com', '1980-07-27', '2015-07-28', 308.00, 19, 0.80, 'Address 208', 'Guide note 208', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (209, 'GuideFirst209', 'GuideLast209', '0500000209', 'guide209@mail.com', '1980-07-28', '2015-07-29', 309.00, 20, 0.90, 'Address 209', 'Guide note 209', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (210, 'GuideFirst210', 'GuideLast210', '0500000210', 'guide210@mail.com', '1980-07-29', '2015-07-30', 310.00, 0, 1.00, 'Address 210', 'Guide note 210', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (211, 'GuideFirst211', 'GuideLast211', '0500000211', 'guide211@mail.com', '1980-07-30', '2015-07-31', 311.00, 1, 1.10, 'Address 211', 'Guide note 211', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (212, 'GuideFirst212', 'GuideLast212', '0500000212', 'guide212@mail.com', '1980-07-31', '2015-08-01', 312.00, 2, 1.20, 'Address 212', 'Guide note 212', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (213, 'GuideFirst213', 'GuideLast213', '0500000213', 'guide213@mail.com', '1980-08-01', '2015-08-02', 313.00, 3, 1.30, 'Address 213', 'Guide note 213', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (214, 'GuideFirst214', 'GuideLast214', '0500000214', 'guide214@mail.com', '1980-08-02', '2015-08-03', 314.00, 4, 1.40, 'Address 214', 'Guide note 214', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (215, 'GuideFirst215', 'GuideLast215', '0500000215', 'guide215@mail.com', '1980-08-03', '2015-08-04', 315.00, 5, 1.50, 'Address 215', 'Guide note 215', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (216, 'GuideFirst216', 'GuideLast216', '0500000216', 'guide216@mail.com', '1980-08-04', '2015-08-05', 316.00, 6, 1.60, 'Address 216', 'Guide note 216', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (217, 'GuideFirst217', 'GuideLast217', '0500000217', 'guide217@mail.com', '1980-08-05', '2015-08-06', 317.00, 7, 1.70, 'Address 217', 'Guide note 217', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (218, 'GuideFirst218', 'GuideLast218', '0500000218', 'guide218@mail.com', '1980-08-06', '2015-08-07', 318.00, 8, 1.80, 'Address 218', 'Guide note 218', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (219, 'GuideFirst219', 'GuideLast219', '0500000219', 'guide219@mail.com', '1980-08-07', '2015-08-08', 319.00, 9, 1.90, 'Address 219', 'Guide note 219', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (220, 'GuideFirst220', 'GuideLast220', '0500000220', 'guide220@mail.com', '1980-08-08', '2015-08-09', 320.00, 10, 2.00, 'Address 220', 'Guide note 220', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (221, 'GuideFirst221', 'GuideLast221', '0500000221', 'guide221@mail.com', '1980-08-09', '2015-08-10', 321.00, 11, 2.10, 'Address 221', 'Guide note 221', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (222, 'GuideFirst222', 'GuideLast222', '0500000222', 'guide222@mail.com', '1980-08-10', '2015-08-11', 322.00, 12, 2.20, 'Address 222', 'Guide note 222', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (223, 'GuideFirst223', 'GuideLast223', '0500000223', 'guide223@mail.com', '1980-08-11', '2015-08-12', 323.00, 13, 2.30, 'Address 223', 'Guide note 223', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (224, 'GuideFirst224', 'GuideLast224', '0500000224', 'guide224@mail.com', '1980-08-12', '2015-08-13', 324.00, 14, 2.40, 'Address 224', 'Guide note 224', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (225, 'GuideFirst225', 'GuideLast225', '0500000225', 'guide225@mail.com', '1980-08-13', '2015-08-14', 325.00, 15, 2.50, 'Address 225', 'Guide note 225', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (226, 'GuideFirst226', 'GuideLast226', '0500000226', 'guide226@mail.com', '1980-08-14', '2015-08-15', 326.00, 16, 2.60, 'Address 226', 'Guide note 226', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (227, 'GuideFirst227', 'GuideLast227', '0500000227', 'guide227@mail.com', '1980-08-15', '2015-08-16', 327.00, 17, 2.70, 'Address 227', 'Guide note 227', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (228, 'GuideFirst228', 'GuideLast228', '0500000228', 'guide228@mail.com', '1980-08-16', '2015-08-17', 328.00, 18, 2.80, 'Address 228', 'Guide note 228', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (229, 'GuideFirst229', 'GuideLast229', '0500000229', 'guide229@mail.com', '1980-08-17', '2015-08-18', 329.00, 19, 2.90, 'Address 229', 'Guide note 229', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (230, 'GuideFirst230', 'GuideLast230', '0500000230', 'guide230@mail.com', '1980-08-18', '2015-08-19', 330.00, 20, 3.00, 'Address 230', 'Guide note 230', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (231, 'GuideFirst231', 'GuideLast231', '0500000231', 'guide231@mail.com', '1980-08-19', '2015-08-20', 331.00, 0, 3.10, 'Address 231', 'Guide note 231', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (232, 'GuideFirst232', 'GuideLast232', '0500000232', 'guide232@mail.com', '1980-08-20', '2015-08-21', 332.00, 1, 3.20, 'Address 232', 'Guide note 232', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (233, 'GuideFirst233', 'GuideLast233', '0500000233', 'guide233@mail.com', '1980-08-21', '2015-08-22', 333.00, 2, 3.30, 'Address 233', 'Guide note 233', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (234, 'GuideFirst234', 'GuideLast234', '0500000234', 'guide234@mail.com', '1980-08-22', '2015-08-23', 334.00, 3, 3.40, 'Address 234', 'Guide note 234', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (235, 'GuideFirst235', 'GuideLast235', '0500000235', 'guide235@mail.com', '1980-08-23', '2015-08-24', 335.00, 4, 3.50, 'Address 235', 'Guide note 235', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (236, 'GuideFirst236', 'GuideLast236', '0500000236', 'guide236@mail.com', '1980-08-24', '2015-08-25', 336.00, 5, 3.60, 'Address 236', 'Guide note 236', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (237, 'GuideFirst237', 'GuideLast237', '0500000237', 'guide237@mail.com', '1980-08-25', '2015-08-26', 337.00, 6, 3.70, 'Address 237', 'Guide note 237', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (238, 'GuideFirst238', 'GuideLast238', '0500000238', 'guide238@mail.com', '1980-08-26', '2015-08-27', 338.00, 7, 3.80, 'Address 238', 'Guide note 238', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (239, 'GuideFirst239', 'GuideLast239', '0500000239', 'guide239@mail.com', '1980-08-27', '2015-08-28', 339.00, 8, 3.90, 'Address 239', 'Guide note 239', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (240, 'GuideFirst240', 'GuideLast240', '0500000240', 'guide240@mail.com', '1980-08-28', '2015-08-29', 340.00, 9, 4.00, 'Address 240', 'Guide note 240', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (241, 'GuideFirst241', 'GuideLast241', '0500000241', 'guide241@mail.com', '1980-08-29', '2015-08-30', 341.00, 10, 4.10, 'Address 241', 'Guide note 241', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (242, 'GuideFirst242', 'GuideLast242', '0500000242', 'guide242@mail.com', '1980-08-30', '2015-08-31', 342.00, 11, 4.20, 'Address 242', 'Guide note 242', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (243, 'GuideFirst243', 'GuideLast243', '0500000243', 'guide243@mail.com', '1980-08-31', '2015-09-01', 343.00, 12, 4.30, 'Address 243', 'Guide note 243', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (244, 'GuideFirst244', 'GuideLast244', '0500000244', 'guide244@mail.com', '1980-09-01', '2015-09-02', 344.00, 13, 4.40, 'Address 244', 'Guide note 244', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (245, 'GuideFirst245', 'GuideLast245', '0500000245', 'guide245@mail.com', '1980-09-02', '2015-09-03', 345.00, 14, 4.50, 'Address 245', 'Guide note 245', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (246, 'GuideFirst246', 'GuideLast246', '0500000246', 'guide246@mail.com', '1980-09-03', '2015-09-04', 346.00, 15, 4.60, 'Address 246', 'Guide note 246', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (247, 'GuideFirst247', 'GuideLast247', '0500000247', 'guide247@mail.com', '1980-09-04', '2015-09-05', 347.00, 16, 4.70, 'Address 247', 'Guide note 247', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (248, 'GuideFirst248', 'GuideLast248', '0500000248', 'guide248@mail.com', '1980-09-05', '2015-09-06', 348.00, 17, 4.80, 'Address 248', 'Guide note 248', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (250, 'GuideFirst250', 'GuideLast250', '0500000250', 'guide250@mail.com', '1980-09-07', '2015-09-08', 350.00, 19, 0.00, 'Address 250', 'Guide note 250', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (251, 'GuideFirst251', 'GuideLast251', '0500000251', 'guide251@mail.com', '1980-09-08', '2015-09-09', 351.00, 20, 0.10, 'Address 251', 'Guide note 251', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (252, 'GuideFirst252', 'GuideLast252', '0500000252', 'guide252@mail.com', '1980-09-09', '2015-09-10', 352.00, 0, 0.20, 'Address 252', 'Guide note 252', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (253, 'GuideFirst253', 'GuideLast253', '0500000253', 'guide253@mail.com', '1980-09-10', '2015-09-11', 353.00, 1, 0.30, 'Address 253', 'Guide note 253', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (254, 'GuideFirst254', 'GuideLast254', '0500000254', 'guide254@mail.com', '1980-09-11', '2015-09-12', 354.00, 2, 0.40, 'Address 254', 'Guide note 254', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (255, 'GuideFirst255', 'GuideLast255', '0500000255', 'guide255@mail.com', '1980-09-12', '2015-09-13', 355.00, 3, 0.50, 'Address 255', 'Guide note 255', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (256, 'GuideFirst256', 'GuideLast256', '0500000256', 'guide256@mail.com', '1980-09-13', '2015-09-14', 356.00, 4, 0.60, 'Address 256', 'Guide note 256', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (257, 'GuideFirst257', 'GuideLast257', '0500000257', 'guide257@mail.com', '1980-09-14', '2015-09-15', 357.00, 5, 0.70, 'Address 257', 'Guide note 257', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (258, 'GuideFirst258', 'GuideLast258', '0500000258', 'guide258@mail.com', '1980-09-15', '2015-09-16', 358.00, 6, 0.80, 'Address 258', 'Guide note 258', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (259, 'GuideFirst259', 'GuideLast259', '0500000259', 'guide259@mail.com', '1980-09-16', '2015-09-17', 359.00, 7, 0.90, 'Address 259', 'Guide note 259', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (260, 'GuideFirst260', 'GuideLast260', '0500000260', 'guide260@mail.com', '1980-09-17', '2015-09-18', 360.00, 8, 1.00, 'Address 260', 'Guide note 260', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (261, 'GuideFirst261', 'GuideLast261', '0500000261', 'guide261@mail.com', '1980-09-18', '2015-09-19', 361.00, 9, 1.10, 'Address 261', 'Guide note 261', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (262, 'GuideFirst262', 'GuideLast262', '0500000262', 'guide262@mail.com', '1980-09-19', '2015-09-20', 362.00, 10, 1.20, 'Address 262', 'Guide note 262', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (263, 'GuideFirst263', 'GuideLast263', '0500000263', 'guide263@mail.com', '1980-09-20', '2015-09-21', 363.00, 11, 1.30, 'Address 263', 'Guide note 263', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (264, 'GuideFirst264', 'GuideLast264', '0500000264', 'guide264@mail.com', '1980-09-21', '2015-09-22', 364.00, 12, 1.40, 'Address 264', 'Guide note 264', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (265, 'GuideFirst265', 'GuideLast265', '0500000265', 'guide265@mail.com', '1980-09-22', '2015-09-23', 365.00, 13, 1.50, 'Address 265', 'Guide note 265', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (266, 'GuideFirst266', 'GuideLast266', '0500000266', 'guide266@mail.com', '1980-09-23', '2015-09-24', 366.00, 14, 1.60, 'Address 266', 'Guide note 266', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (267, 'GuideFirst267', 'GuideLast267', '0500000267', 'guide267@mail.com', '1980-09-24', '2015-09-25', 367.00, 15, 1.70, 'Address 267', 'Guide note 267', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (268, 'GuideFirst268', 'GuideLast268', '0500000268', 'guide268@mail.com', '1980-09-25', '2015-09-26', 368.00, 16, 1.80, 'Address 268', 'Guide note 268', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (269, 'GuideFirst269', 'GuideLast269', '0500000269', 'guide269@mail.com', '1980-09-26', '2015-09-27', 369.00, 17, 1.90, 'Address 269', 'Guide note 269', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (270, 'GuideFirst270', 'GuideLast270', '0500000270', 'guide270@mail.com', '1980-09-27', '2015-09-28', 370.00, 18, 2.00, 'Address 270', 'Guide note 270', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (271, 'GuideFirst271', 'GuideLast271', '0500000271', 'guide271@mail.com', '1980-09-28', '2015-09-29', 371.00, 19, 2.10, 'Address 271', 'Guide note 271', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (272, 'GuideFirst272', 'GuideLast272', '0500000272', 'guide272@mail.com', '1980-09-29', '2015-09-30', 372.00, 20, 2.20, 'Address 272', 'Guide note 272', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (273, 'GuideFirst273', 'GuideLast273', '0500000273', 'guide273@mail.com', '1980-09-30', '2015-10-01', 373.00, 0, 2.30, 'Address 273', 'Guide note 273', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (274, 'GuideFirst274', 'GuideLast274', '0500000274', 'guide274@mail.com', '1980-10-01', '2015-10-02', 374.00, 1, 2.40, 'Address 274', 'Guide note 274', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (275, 'GuideFirst275', 'GuideLast275', '0500000275', 'guide275@mail.com', '1980-10-02', '2015-10-03', 375.00, 2, 2.50, 'Address 275', 'Guide note 275', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (276, 'GuideFirst276', 'GuideLast276', '0500000276', 'guide276@mail.com', '1980-10-03', '2015-10-04', 376.00, 3, 2.60, 'Address 276', 'Guide note 276', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (277, 'GuideFirst277', 'GuideLast277', '0500000277', 'guide277@mail.com', '1980-10-04', '2015-10-05', 377.00, 4, 2.70, 'Address 277', 'Guide note 277', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (278, 'GuideFirst278', 'GuideLast278', '0500000278', 'guide278@mail.com', '1980-10-05', '2015-10-06', 378.00, 5, 2.80, 'Address 278', 'Guide note 278', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (279, 'GuideFirst279', 'GuideLast279', '0500000279', 'guide279@mail.com', '1980-10-06', '2015-10-07', 379.00, 6, 2.90, 'Address 279', 'Guide note 279', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (280, 'GuideFirst280', 'GuideLast280', '0500000280', 'guide280@mail.com', '1980-10-07', '2015-10-08', 380.00, 7, 3.00, 'Address 280', 'Guide note 280', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (281, 'GuideFirst281', 'GuideLast281', '0500000281', 'guide281@mail.com', '1980-10-08', '2015-10-09', 381.00, 8, 3.10, 'Address 281', 'Guide note 281', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (282, 'GuideFirst282', 'GuideLast282', '0500000282', 'guide282@mail.com', '1980-10-09', '2015-10-10', 382.00, 9, 3.20, 'Address 282', 'Guide note 282', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (283, 'GuideFirst283', 'GuideLast283', '0500000283', 'guide283@mail.com', '1980-10-10', '2015-10-11', 383.00, 10, 3.30, 'Address 283', 'Guide note 283', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (284, 'GuideFirst284', 'GuideLast284', '0500000284', 'guide284@mail.com', '1980-10-11', '2015-10-12', 384.00, 11, 3.40, 'Address 284', 'Guide note 284', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (285, 'GuideFirst285', 'GuideLast285', '0500000285', 'guide285@mail.com', '1980-10-12', '2015-10-13', 385.00, 12, 3.50, 'Address 285', 'Guide note 285', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (286, 'GuideFirst286', 'GuideLast286', '0500000286', 'guide286@mail.com', '1980-10-13', '2015-10-14', 386.00, 13, 3.60, 'Address 286', 'Guide note 286', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (287, 'GuideFirst287', 'GuideLast287', '0500000287', 'guide287@mail.com', '1980-10-14', '2015-10-15', 387.00, 14, 3.70, 'Address 287', 'Guide note 287', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (288, 'GuideFirst288', 'GuideLast288', '0500000288', 'guide288@mail.com', '1980-10-15', '2015-10-16', 388.00, 15, 3.80, 'Address 288', 'Guide note 288', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (289, 'GuideFirst289', 'GuideLast289', '0500000289', 'guide289@mail.com', '1980-10-16', '2015-10-17', 389.00, 16, 3.90, 'Address 289', 'Guide note 289', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (290, 'GuideFirst290', 'GuideLast290', '0500000290', 'guide290@mail.com', '1980-10-17', '2015-10-18', 390.00, 17, 4.00, 'Address 290', 'Guide note 290', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (291, 'GuideFirst291', 'GuideLast291', '0500000291', 'guide291@mail.com', '1980-10-18', '2015-10-19', 391.00, 18, 4.10, 'Address 291', 'Guide note 291', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (292, 'GuideFirst292', 'GuideLast292', '0500000292', 'guide292@mail.com', '1980-10-19', '2015-10-20', 392.00, 19, 4.20, 'Address 292', 'Guide note 292', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (293, 'GuideFirst293', 'GuideLast293', '0500000293', 'guide293@mail.com', '1980-10-20', '2015-10-21', 393.00, 20, 4.30, 'Address 293', 'Guide note 293', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (294, 'GuideFirst294', 'GuideLast294', '0500000294', 'guide294@mail.com', '1980-10-21', '2015-10-22', 394.00, 0, 4.40, 'Address 294', 'Guide note 294', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (295, 'GuideFirst295', 'GuideLast295', '0500000295', 'guide295@mail.com', '1980-10-22', '2015-10-23', 395.00, 1, 4.50, 'Address 295', 'Guide note 295', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (296, 'GuideFirst296', 'GuideLast296', '0500000296', 'guide296@mail.com', '1980-10-23', '2015-10-24', 396.00, 2, 4.60, 'Address 296', 'Guide note 296', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (297, 'GuideFirst297', 'GuideLast297', '0500000297', 'guide297@mail.com', '1980-10-24', '2015-10-25', 397.00, 3, 4.70, 'Address 297', 'Guide note 297', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (298, 'GuideFirst298', 'GuideLast298', '0500000298', 'guide298@mail.com', '1980-10-25', '2015-10-26', 398.00, 4, 4.80, 'Address 298', 'Guide note 298', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (299, 'GuideFirst299', 'GuideLast299', '0500000299', 'guide299@mail.com', '1980-10-26', '2015-10-27', 399.00, 5, 4.90, 'Address 299', 'Guide note 299', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (300, 'GuideFirst300', 'GuideLast300', '0500000300', 'guide300@mail.com', '1980-10-27', '2015-10-28', 400.00, 6, 0.00, 'Address 300', 'Guide note 300', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (301, 'GuideFirst301', 'GuideLast301', '0500000301', 'guide301@mail.com', '1980-10-28', '2015-10-29', 401.00, 7, 0.10, 'Address 301', 'Guide note 301', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (302, 'GuideFirst302', 'GuideLast302', '0500000302', 'guide302@mail.com', '1980-10-29', '2015-10-30', 402.00, 8, 0.20, 'Address 302', 'Guide note 302', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (303, 'GuideFirst303', 'GuideLast303', '0500000303', 'guide303@mail.com', '1980-10-30', '2015-10-31', 403.00, 9, 0.30, 'Address 303', 'Guide note 303', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (304, 'GuideFirst304', 'GuideLast304', '0500000304', 'guide304@mail.com', '1980-10-31', '2015-11-01', 404.00, 10, 0.40, 'Address 304', 'Guide note 304', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (305, 'GuideFirst305', 'GuideLast305', '0500000305', 'guide305@mail.com', '1980-11-01', '2015-11-02', 405.00, 11, 0.50, 'Address 305', 'Guide note 305', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (306, 'GuideFirst306', 'GuideLast306', '0500000306', 'guide306@mail.com', '1980-11-02', '2015-11-03', 406.00, 12, 0.60, 'Address 306', 'Guide note 306', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (307, 'GuideFirst307', 'GuideLast307', '0500000307', 'guide307@mail.com', '1980-11-03', '2015-11-04', 407.00, 13, 0.70, 'Address 307', 'Guide note 307', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (308, 'GuideFirst308', 'GuideLast308', '0500000308', 'guide308@mail.com', '1980-11-04', '2015-11-05', 408.00, 14, 0.80, 'Address 308', 'Guide note 308', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (309, 'GuideFirst309', 'GuideLast309', '0500000309', 'guide309@mail.com', '1980-11-05', '2015-11-06', 409.00, 15, 0.90, 'Address 309', 'Guide note 309', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (310, 'GuideFirst310', 'GuideLast310', '0500000310', 'guide310@mail.com', '1980-11-06', '2015-11-07', 410.00, 16, 1.00, 'Address 310', 'Guide note 310', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (311, 'GuideFirst311', 'GuideLast311', '0500000311', 'guide311@mail.com', '1980-11-07', '2015-11-08', 411.00, 17, 1.10, 'Address 311', 'Guide note 311', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (312, 'GuideFirst312', 'GuideLast312', '0500000312', 'guide312@mail.com', '1980-11-08', '2015-11-09', 412.00, 18, 1.20, 'Address 312', 'Guide note 312', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (313, 'GuideFirst313', 'GuideLast313', '0500000313', 'guide313@mail.com', '1980-11-09', '2015-11-10', 413.00, 19, 1.30, 'Address 313', 'Guide note 313', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (314, 'GuideFirst314', 'GuideLast314', '0500000314', 'guide314@mail.com', '1980-11-10', '2015-11-11', 414.00, 20, 1.40, 'Address 314', 'Guide note 314', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (315, 'GuideFirst315', 'GuideLast315', '0500000315', 'guide315@mail.com', '1980-11-11', '2015-11-12', 415.00, 0, 1.50, 'Address 315', 'Guide note 315', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (316, 'GuideFirst316', 'GuideLast316', '0500000316', 'guide316@mail.com', '1980-11-12', '2015-11-13', 416.00, 1, 1.60, 'Address 316', 'Guide note 316', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (317, 'GuideFirst317', 'GuideLast317', '0500000317', 'guide317@mail.com', '1980-11-13', '2015-11-14', 417.00, 2, 1.70, 'Address 317', 'Guide note 317', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (318, 'GuideFirst318', 'GuideLast318', '0500000318', 'guide318@mail.com', '1980-11-14', '2015-11-15', 418.00, 3, 1.80, 'Address 318', 'Guide note 318', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (319, 'GuideFirst319', 'GuideLast319', '0500000319', 'guide319@mail.com', '1980-11-15', '2015-11-16', 419.00, 4, 1.90, 'Address 319', 'Guide note 319', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (320, 'GuideFirst320', 'GuideLast320', '0500000320', 'guide320@mail.com', '1980-11-16', '2015-11-17', 420.00, 5, 2.00, 'Address 320', 'Guide note 320', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (321, 'GuideFirst321', 'GuideLast321', '0500000321', 'guide321@mail.com', '1980-11-17', '2015-11-18', 421.00, 6, 2.10, 'Address 321', 'Guide note 321', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (322, 'GuideFirst322', 'GuideLast322', '0500000322', 'guide322@mail.com', '1980-11-18', '2015-11-19', 422.00, 7, 2.20, 'Address 322', 'Guide note 322', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (323, 'GuideFirst323', 'GuideLast323', '0500000323', 'guide323@mail.com', '1980-11-19', '2015-11-20', 423.00, 8, 2.30, 'Address 323', 'Guide note 323', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (324, 'GuideFirst324', 'GuideLast324', '0500000324', 'guide324@mail.com', '1980-11-20', '2015-11-21', 424.00, 9, 2.40, 'Address 324', 'Guide note 324', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (325, 'GuideFirst325', 'GuideLast325', '0500000325', 'guide325@mail.com', '1980-11-21', '2015-11-22', 425.00, 10, 2.50, 'Address 325', 'Guide note 325', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (326, 'GuideFirst326', 'GuideLast326', '0500000326', 'guide326@mail.com', '1980-11-22', '2015-11-23', 426.00, 11, 2.60, 'Address 326', 'Guide note 326', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (327, 'GuideFirst327', 'GuideLast327', '0500000327', 'guide327@mail.com', '1980-11-23', '2015-11-24', 427.00, 12, 2.70, 'Address 327', 'Guide note 327', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (328, 'GuideFirst328', 'GuideLast328', '0500000328', 'guide328@mail.com', '1980-11-24', '2015-11-25', 428.00, 13, 2.80, 'Address 328', 'Guide note 328', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (329, 'GuideFirst329', 'GuideLast329', '0500000329', 'guide329@mail.com', '1980-11-25', '2015-11-26', 429.00, 14, 2.90, 'Address 329', 'Guide note 329', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (330, 'GuideFirst330', 'GuideLast330', '0500000330', 'guide330@mail.com', '1980-11-26', '2015-11-27', 430.00, 15, 3.00, 'Address 330', 'Guide note 330', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (331, 'GuideFirst331', 'GuideLast331', '0500000331', 'guide331@mail.com', '1980-11-27', '2015-11-28', 431.00, 16, 3.10, 'Address 331', 'Guide note 331', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (332, 'GuideFirst332', 'GuideLast332', '0500000332', 'guide332@mail.com', '1980-11-28', '2015-11-29', 432.00, 17, 3.20, 'Address 332', 'Guide note 332', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (333, 'GuideFirst333', 'GuideLast333', '0500000333', 'guide333@mail.com', '1980-11-29', '2015-11-30', 433.00, 18, 3.30, 'Address 333', 'Guide note 333', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (334, 'GuideFirst334', 'GuideLast334', '0500000334', 'guide334@mail.com', '1980-11-30', '2015-12-01', 434.00, 19, 3.40, 'Address 334', 'Guide note 334', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (335, 'GuideFirst335', 'GuideLast335', '0500000335', 'guide335@mail.com', '1980-12-01', '2015-12-02', 435.00, 20, 3.50, 'Address 335', 'Guide note 335', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (336, 'GuideFirst336', 'GuideLast336', '0500000336', 'guide336@mail.com', '1980-12-02', '2015-12-03', 436.00, 0, 3.60, 'Address 336', 'Guide note 336', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (337, 'GuideFirst337', 'GuideLast337', '0500000337', 'guide337@mail.com', '1980-12-03', '2015-12-04', 437.00, 1, 3.70, 'Address 337', 'Guide note 337', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (338, 'GuideFirst338', 'GuideLast338', '0500000338', 'guide338@mail.com', '1980-12-04', '2015-12-05', 438.00, 2, 3.80, 'Address 338', 'Guide note 338', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (339, 'GuideFirst339', 'GuideLast339', '0500000339', 'guide339@mail.com', '1980-12-05', '2015-12-06', 439.00, 3, 3.90, 'Address 339', 'Guide note 339', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (340, 'GuideFirst340', 'GuideLast340', '0500000340', 'guide340@mail.com', '1980-12-06', '2015-12-07', 440.00, 4, 4.00, 'Address 340', 'Guide note 340', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (341, 'GuideFirst341', 'GuideLast341', '0500000341', 'guide341@mail.com', '1980-12-07', '2015-12-08', 441.00, 5, 4.10, 'Address 341', 'Guide note 341', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (342, 'GuideFirst342', 'GuideLast342', '0500000342', 'guide342@mail.com', '1980-12-08', '2015-12-09', 442.00, 6, 4.20, 'Address 342', 'Guide note 342', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (343, 'GuideFirst343', 'GuideLast343', '0500000343', 'guide343@mail.com', '1980-12-09', '2015-12-10', 443.00, 7, 4.30, 'Address 343', 'Guide note 343', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (344, 'GuideFirst344', 'GuideLast344', '0500000344', 'guide344@mail.com', '1980-12-10', '2015-12-11', 444.00, 8, 4.40, 'Address 344', 'Guide note 344', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (345, 'GuideFirst345', 'GuideLast345', '0500000345', 'guide345@mail.com', '1980-12-11', '2015-12-12', 445.00, 9, 4.50, 'Address 345', 'Guide note 345', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (346, 'GuideFirst346', 'GuideLast346', '0500000346', 'guide346@mail.com', '1980-12-12', '2015-12-13', 446.00, 10, 4.60, 'Address 346', 'Guide note 346', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (347, 'GuideFirst347', 'GuideLast347', '0500000347', 'guide347@mail.com', '1980-12-13', '2015-12-14', 447.00, 11, 4.70, 'Address 347', 'Guide note 347', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (348, 'GuideFirst348', 'GuideLast348', '0500000348', 'guide348@mail.com', '1980-12-14', '2015-12-15', 448.00, 12, 4.80, 'Address 348', 'Guide note 348', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (350, 'GuideFirst350', 'GuideLast350', '0500000350', 'guide350@mail.com', '1980-12-16', '2015-12-17', 450.00, 14, 0.00, 'Address 350', 'Guide note 350', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (351, 'GuideFirst351', 'GuideLast351', '0500000351', 'guide351@mail.com', '1980-12-17', '2015-12-18', 451.00, 15, 0.10, 'Address 351', 'Guide note 351', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (352, 'GuideFirst352', 'GuideLast352', '0500000352', 'guide352@mail.com', '1980-12-18', '2015-12-19', 452.00, 16, 0.20, 'Address 352', 'Guide note 352', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (353, 'GuideFirst353', 'GuideLast353', '0500000353', 'guide353@mail.com', '1980-12-19', '2015-12-20', 453.00, 17, 0.30, 'Address 353', 'Guide note 353', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (354, 'GuideFirst354', 'GuideLast354', '0500000354', 'guide354@mail.com', '1980-12-20', '2015-12-21', 454.00, 18, 0.40, 'Address 354', 'Guide note 354', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (355, 'GuideFirst355', 'GuideLast355', '0500000355', 'guide355@mail.com', '1980-12-21', '2015-12-22', 455.00, 19, 0.50, 'Address 355', 'Guide note 355', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (356, 'GuideFirst356', 'GuideLast356', '0500000356', 'guide356@mail.com', '1980-12-22', '2015-12-23', 456.00, 20, 0.60, 'Address 356', 'Guide note 356', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (357, 'GuideFirst357', 'GuideLast357', '0500000357', 'guide357@mail.com', '1980-12-23', '2015-12-24', 457.00, 0, 0.70, 'Address 357', 'Guide note 357', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (358, 'GuideFirst358', 'GuideLast358', '0500000358', 'guide358@mail.com', '1980-12-24', '2015-12-25', 458.00, 1, 0.80, 'Address 358', 'Guide note 358', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (359, 'GuideFirst359', 'GuideLast359', '0500000359', 'guide359@mail.com', '1980-12-25', '2015-12-26', 459.00, 2, 0.90, 'Address 359', 'Guide note 359', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (360, 'GuideFirst360', 'GuideLast360', '0500000360', 'guide360@mail.com', '1980-12-26', '2015-12-27', 460.00, 3, 1.00, 'Address 360', 'Guide note 360', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (361, 'GuideFirst361', 'GuideLast361', '0500000361', 'guide361@mail.com', '1980-12-27', '2015-12-28', 461.00, 4, 1.10, 'Address 361', 'Guide note 361', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (362, 'GuideFirst362', 'GuideLast362', '0500000362', 'guide362@mail.com', '1980-12-28', '2015-12-29', 462.00, 5, 1.20, 'Address 362', 'Guide note 362', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (363, 'GuideFirst363', 'GuideLast363', '0500000363', 'guide363@mail.com', '1980-12-29', '2015-12-30', 463.00, 6, 1.30, 'Address 363', 'Guide note 363', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (364, 'GuideFirst364', 'GuideLast364', '0500000364', 'guide364@mail.com', '1980-12-30', '2015-12-31', 464.00, 7, 1.40, 'Address 364', 'Guide note 364', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (365, 'GuideFirst365', 'GuideLast365', '0500000365', 'guide365@mail.com', '1980-12-31', '2016-01-01', 465.00, 8, 1.50, 'Address 365', 'Guide note 365', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (366, 'GuideFirst366', 'GuideLast366', '0500000366', 'guide366@mail.com', '1981-01-01', '2016-01-02', 466.00, 9, 1.60, 'Address 366', 'Guide note 366', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (367, 'GuideFirst367', 'GuideLast367', '0500000367', 'guide367@mail.com', '1981-01-02', '2016-01-03', 467.00, 10, 1.70, 'Address 367', 'Guide note 367', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (368, 'GuideFirst368', 'GuideLast368', '0500000368', 'guide368@mail.com', '1981-01-03', '2016-01-04', 468.00, 11, 1.80, 'Address 368', 'Guide note 368', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (369, 'GuideFirst369', 'GuideLast369', '0500000369', 'guide369@mail.com', '1981-01-04', '2016-01-05', 469.00, 12, 1.90, 'Address 369', 'Guide note 369', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (370, 'GuideFirst370', 'GuideLast370', '0500000370', 'guide370@mail.com', '1981-01-05', '2016-01-06', 470.00, 13, 2.00, 'Address 370', 'Guide note 370', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (371, 'GuideFirst371', 'GuideLast371', '0500000371', 'guide371@mail.com', '1981-01-06', '2016-01-07', 471.00, 14, 2.10, 'Address 371', 'Guide note 371', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (372, 'GuideFirst372', 'GuideLast372', '0500000372', 'guide372@mail.com', '1981-01-07', '2016-01-08', 472.00, 15, 2.20, 'Address 372', 'Guide note 372', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (373, 'GuideFirst373', 'GuideLast373', '0500000373', 'guide373@mail.com', '1981-01-08', '2016-01-09', 473.00, 16, 2.30, 'Address 373', 'Guide note 373', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (374, 'GuideFirst374', 'GuideLast374', '0500000374', 'guide374@mail.com', '1981-01-09', '2016-01-10', 474.00, 17, 2.40, 'Address 374', 'Guide note 374', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (375, 'GuideFirst375', 'GuideLast375', '0500000375', 'guide375@mail.com', '1981-01-10', '2016-01-11', 475.00, 18, 2.50, 'Address 375', 'Guide note 375', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (376, 'GuideFirst376', 'GuideLast376', '0500000376', 'guide376@mail.com', '1981-01-11', '2016-01-12', 476.00, 19, 2.60, 'Address 376', 'Guide note 376', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (377, 'GuideFirst377', 'GuideLast377', '0500000377', 'guide377@mail.com', '1981-01-12', '2016-01-13', 477.00, 20, 2.70, 'Address 377', 'Guide note 377', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (378, 'GuideFirst378', 'GuideLast378', '0500000378', 'guide378@mail.com', '1981-01-13', '2016-01-14', 478.00, 0, 2.80, 'Address 378', 'Guide note 378', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (379, 'GuideFirst379', 'GuideLast379', '0500000379', 'guide379@mail.com', '1981-01-14', '2016-01-15', 479.00, 1, 2.90, 'Address 379', 'Guide note 379', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (380, 'GuideFirst380', 'GuideLast380', '0500000380', 'guide380@mail.com', '1981-01-15', '2016-01-16', 480.00, 2, 3.00, 'Address 380', 'Guide note 380', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (381, 'GuideFirst381', 'GuideLast381', '0500000381', 'guide381@mail.com', '1981-01-16', '2016-01-17', 481.00, 3, 3.10, 'Address 381', 'Guide note 381', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (382, 'GuideFirst382', 'GuideLast382', '0500000382', 'guide382@mail.com', '1981-01-17', '2016-01-18', 482.00, 4, 3.20, 'Address 382', 'Guide note 382', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (383, 'GuideFirst383', 'GuideLast383', '0500000383', 'guide383@mail.com', '1981-01-18', '2016-01-19', 483.00, 5, 3.30, 'Address 383', 'Guide note 383', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (384, 'GuideFirst384', 'GuideLast384', '0500000384', 'guide384@mail.com', '1981-01-19', '2016-01-20', 484.00, 6, 3.40, 'Address 384', 'Guide note 384', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (385, 'GuideFirst385', 'GuideLast385', '0500000385', 'guide385@mail.com', '1981-01-20', '2016-01-21', 485.00, 7, 3.50, 'Address 385', 'Guide note 385', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (386, 'GuideFirst386', 'GuideLast386', '0500000386', 'guide386@mail.com', '1981-01-21', '2016-01-22', 486.00, 8, 3.60, 'Address 386', 'Guide note 386', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (387, 'GuideFirst387', 'GuideLast387', '0500000387', 'guide387@mail.com', '1981-01-22', '2016-01-23', 487.00, 9, 3.70, 'Address 387', 'Guide note 387', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (388, 'GuideFirst388', 'GuideLast388', '0500000388', 'guide388@mail.com', '1981-01-23', '2016-01-24', 488.00, 10, 3.80, 'Address 388', 'Guide note 388', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (389, 'GuideFirst389', 'GuideLast389', '0500000389', 'guide389@mail.com', '1981-01-24', '2016-01-25', 489.00, 11, 3.90, 'Address 389', 'Guide note 389', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (390, 'GuideFirst390', 'GuideLast390', '0500000390', 'guide390@mail.com', '1981-01-25', '2016-01-26', 490.00, 12, 4.00, 'Address 390', 'Guide note 390', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (391, 'GuideFirst391', 'GuideLast391', '0500000391', 'guide391@mail.com', '1981-01-26', '2016-01-27', 491.00, 13, 4.10, 'Address 391', 'Guide note 391', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (392, 'GuideFirst392', 'GuideLast392', '0500000392', 'guide392@mail.com', '1981-01-27', '2016-01-28', 492.00, 14, 4.20, 'Address 392', 'Guide note 392', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (393, 'GuideFirst393', 'GuideLast393', '0500000393', 'guide393@mail.com', '1981-01-28', '2016-01-29', 493.00, 15, 4.30, 'Address 393', 'Guide note 393', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (394, 'GuideFirst394', 'GuideLast394', '0500000394', 'guide394@mail.com', '1981-01-29', '2016-01-30', 494.00, 16, 4.40, 'Address 394', 'Guide note 394', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (395, 'GuideFirst395', 'GuideLast395', '0500000395', 'guide395@mail.com', '1981-01-30', '2016-01-31', 495.00, 17, 4.50, 'Address 395', 'Guide note 395', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (396, 'GuideFirst396', 'GuideLast396', '0500000396', 'guide396@mail.com', '1981-01-31', '2016-02-01', 496.00, 18, 4.60, 'Address 396', 'Guide note 396', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (397, 'GuideFirst397', 'GuideLast397', '0500000397', 'guide397@mail.com', '1981-02-01', '2016-02-02', 497.00, 19, 4.70, 'Address 397', 'Guide note 397', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (398, 'GuideFirst398', 'GuideLast398', '0500000398', 'guide398@mail.com', '1981-02-02', '2016-02-03', 498.00, 20, 4.80, 'Address 398', 'Guide note 398', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (399, 'GuideFirst399', 'GuideLast399', '0500000399', 'guide399@mail.com', '1981-02-03', '2016-02-04', 499.00, 0, 4.90, 'Address 399', 'Guide note 399', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (400, 'GuideFirst400', 'GuideLast400', '0500000400', 'guide400@mail.com', '1981-02-04', '2016-02-05', 300.00, 1, 0.00, 'Address 400', 'Guide note 400', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (401, 'GuideFirst401', 'GuideLast401', '0500000401', 'guide401@mail.com', '1981-02-05', '2016-02-06', 301.00, 2, 0.10, 'Address 401', 'Guide note 401', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (402, 'GuideFirst402', 'GuideLast402', '0500000402', 'guide402@mail.com', '1981-02-06', '2016-02-07', 302.00, 3, 0.20, 'Address 402', 'Guide note 402', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (403, 'GuideFirst403', 'GuideLast403', '0500000403', 'guide403@mail.com', '1981-02-07', '2016-02-08', 303.00, 4, 0.30, 'Address 403', 'Guide note 403', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (404, 'GuideFirst404', 'GuideLast404', '0500000404', 'guide404@mail.com', '1981-02-08', '2016-02-09', 304.00, 5, 0.40, 'Address 404', 'Guide note 404', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (405, 'GuideFirst405', 'GuideLast405', '0500000405', 'guide405@mail.com', '1981-02-09', '2016-02-10', 305.00, 6, 0.50, 'Address 405', 'Guide note 405', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (406, 'GuideFirst406', 'GuideLast406', '0500000406', 'guide406@mail.com', '1981-02-10', '2016-02-11', 306.00, 7, 0.60, 'Address 406', 'Guide note 406', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (407, 'GuideFirst407', 'GuideLast407', '0500000407', 'guide407@mail.com', '1981-02-11', '2016-02-12', 307.00, 8, 0.70, 'Address 407', 'Guide note 407', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (408, 'GuideFirst408', 'GuideLast408', '0500000408', 'guide408@mail.com', '1981-02-12', '2016-02-13', 308.00, 9, 0.80, 'Address 408', 'Guide note 408', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (409, 'GuideFirst409', 'GuideLast409', '0500000409', 'guide409@mail.com', '1981-02-13', '2016-02-14', 309.00, 10, 0.90, 'Address 409', 'Guide note 409', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (410, 'GuideFirst410', 'GuideLast410', '0500000410', 'guide410@mail.com', '1981-02-14', '2016-02-15', 310.00, 11, 1.00, 'Address 410', 'Guide note 410', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (411, 'GuideFirst411', 'GuideLast411', '0500000411', 'guide411@mail.com', '1981-02-15', '2016-02-16', 311.00, 12, 1.10, 'Address 411', 'Guide note 411', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (412, 'GuideFirst412', 'GuideLast412', '0500000412', 'guide412@mail.com', '1981-02-16', '2016-02-17', 312.00, 13, 1.20, 'Address 412', 'Guide note 412', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (413, 'GuideFirst413', 'GuideLast413', '0500000413', 'guide413@mail.com', '1981-02-17', '2016-02-18', 313.00, 14, 1.30, 'Address 413', 'Guide note 413', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (414, 'GuideFirst414', 'GuideLast414', '0500000414', 'guide414@mail.com', '1981-02-18', '2016-02-19', 314.00, 15, 1.40, 'Address 414', 'Guide note 414', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (415, 'GuideFirst415', 'GuideLast415', '0500000415', 'guide415@mail.com', '1981-02-19', '2016-02-20', 315.00, 16, 1.50, 'Address 415', 'Guide note 415', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (416, 'GuideFirst416', 'GuideLast416', '0500000416', 'guide416@mail.com', '1981-02-20', '2016-02-21', 316.00, 17, 1.60, 'Address 416', 'Guide note 416', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (417, 'GuideFirst417', 'GuideLast417', '0500000417', 'guide417@mail.com', '1981-02-21', '2016-02-22', 317.00, 18, 1.70, 'Address 417', 'Guide note 417', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (418, 'GuideFirst418', 'GuideLast418', '0500000418', 'guide418@mail.com', '1981-02-22', '2016-02-23', 318.00, 19, 1.80, 'Address 418', 'Guide note 418', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (419, 'GuideFirst419', 'GuideLast419', '0500000419', 'guide419@mail.com', '1981-02-23', '2016-02-24', 319.00, 20, 1.90, 'Address 419', 'Guide note 419', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (420, 'GuideFirst420', 'GuideLast420', '0500000420', 'guide420@mail.com', '1981-02-24', '2016-02-25', 320.00, 0, 2.00, 'Address 420', 'Guide note 420', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (421, 'GuideFirst421', 'GuideLast421', '0500000421', 'guide421@mail.com', '1981-02-25', '2016-02-26', 321.00, 1, 2.10, 'Address 421', 'Guide note 421', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (422, 'GuideFirst422', 'GuideLast422', '0500000422', 'guide422@mail.com', '1981-02-26', '2016-02-27', 322.00, 2, 2.20, 'Address 422', 'Guide note 422', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (423, 'GuideFirst423', 'GuideLast423', '0500000423', 'guide423@mail.com', '1981-02-27', '2016-02-28', 323.00, 3, 2.30, 'Address 423', 'Guide note 423', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (424, 'GuideFirst424', 'GuideLast424', '0500000424', 'guide424@mail.com', '1981-02-28', '2016-02-29', 324.00, 4, 2.40, 'Address 424', 'Guide note 424', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (425, 'GuideFirst425', 'GuideLast425', '0500000425', 'guide425@mail.com', '1981-03-01', '2016-03-01', 325.00, 5, 2.50, 'Address 425', 'Guide note 425', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (426, 'GuideFirst426', 'GuideLast426', '0500000426', 'guide426@mail.com', '1981-03-02', '2016-03-02', 326.00, 6, 2.60, 'Address 426', 'Guide note 426', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (427, 'GuideFirst427', 'GuideLast427', '0500000427', 'guide427@mail.com', '1981-03-03', '2016-03-03', 327.00, 7, 2.70, 'Address 427', 'Guide note 427', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (428, 'GuideFirst428', 'GuideLast428', '0500000428', 'guide428@mail.com', '1981-03-04', '2016-03-04', 328.00, 8, 2.80, 'Address 428', 'Guide note 428', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (429, 'GuideFirst429', 'GuideLast429', '0500000429', 'guide429@mail.com', '1981-03-05', '2016-03-05', 329.00, 9, 2.90, 'Address 429', 'Guide note 429', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (430, 'GuideFirst430', 'GuideLast430', '0500000430', 'guide430@mail.com', '1981-03-06', '2016-03-06', 330.00, 10, 3.00, 'Address 430', 'Guide note 430', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (431, 'GuideFirst431', 'GuideLast431', '0500000431', 'guide431@mail.com', '1981-03-07', '2016-03-07', 331.00, 11, 3.10, 'Address 431', 'Guide note 431', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (432, 'GuideFirst432', 'GuideLast432', '0500000432', 'guide432@mail.com', '1981-03-08', '2016-03-08', 332.00, 12, 3.20, 'Address 432', 'Guide note 432', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (433, 'GuideFirst433', 'GuideLast433', '0500000433', 'guide433@mail.com', '1981-03-09', '2016-03-09', 333.00, 13, 3.30, 'Address 433', 'Guide note 433', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (434, 'GuideFirst434', 'GuideLast434', '0500000434', 'guide434@mail.com', '1981-03-10', '2016-03-10', 334.00, 14, 3.40, 'Address 434', 'Guide note 434', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (435, 'GuideFirst435', 'GuideLast435', '0500000435', 'guide435@mail.com', '1981-03-11', '2016-03-11', 335.00, 15, 3.50, 'Address 435', 'Guide note 435', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (436, 'GuideFirst436', 'GuideLast436', '0500000436', 'guide436@mail.com', '1981-03-12', '2016-03-12', 336.00, 16, 3.60, 'Address 436', 'Guide note 436', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (437, 'GuideFirst437', 'GuideLast437', '0500000437', 'guide437@mail.com', '1981-03-13', '2016-03-13', 337.00, 17, 3.70, 'Address 437', 'Guide note 437', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (438, 'GuideFirst438', 'GuideLast438', '0500000438', 'guide438@mail.com', '1981-03-14', '2016-03-14', 338.00, 18, 3.80, 'Address 438', 'Guide note 438', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (439, 'GuideFirst439', 'GuideLast439', '0500000439', 'guide439@mail.com', '1981-03-15', '2016-03-15', 339.00, 19, 3.90, 'Address 439', 'Guide note 439', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (440, 'GuideFirst440', 'GuideLast440', '0500000440', 'guide440@mail.com', '1981-03-16', '2016-03-16', 340.00, 20, 4.00, 'Address 440', 'Guide note 440', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (441, 'GuideFirst441', 'GuideLast441', '0500000441', 'guide441@mail.com', '1981-03-17', '2016-03-17', 341.00, 0, 4.10, 'Address 441', 'Guide note 441', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (442, 'GuideFirst442', 'GuideLast442', '0500000442', 'guide442@mail.com', '1981-03-18', '2016-03-18', 342.00, 1, 4.20, 'Address 442', 'Guide note 442', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (443, 'GuideFirst443', 'GuideLast443', '0500000443', 'guide443@mail.com', '1981-03-19', '2016-03-19', 343.00, 2, 4.30, 'Address 443', 'Guide note 443', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (444, 'GuideFirst444', 'GuideLast444', '0500000444', 'guide444@mail.com', '1981-03-20', '2016-03-20', 344.00, 3, 4.40, 'Address 444', 'Guide note 444', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (445, 'GuideFirst445', 'GuideLast445', '0500000445', 'guide445@mail.com', '1981-03-21', '2016-03-21', 345.00, 4, 4.50, 'Address 445', 'Guide note 445', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (446, 'GuideFirst446', 'GuideLast446', '0500000446', 'guide446@mail.com', '1981-03-22', '2016-03-22', 346.00, 5, 4.60, 'Address 446', 'Guide note 446', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (447, 'GuideFirst447', 'GuideLast447', '0500000447', 'guide447@mail.com', '1981-03-23', '2016-03-23', 347.00, 6, 4.70, 'Address 447', 'Guide note 447', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (448, 'GuideFirst448', 'GuideLast448', '0500000448', 'guide448@mail.com', '1981-03-24', '2016-03-24', 348.00, 7, 4.80, 'Address 448', 'Guide note 448', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (450, 'GuideFirst450', 'GuideLast450', '0500000450', 'guide450@mail.com', '1981-03-26', '2016-03-26', 350.00, 9, 0.00, 'Address 450', 'Guide note 450', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (451, 'GuideFirst451', 'GuideLast451', '0500000451', 'guide451@mail.com', '1981-03-27', '2016-03-27', 351.00, 10, 0.10, 'Address 451', 'Guide note 451', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (452, 'GuideFirst452', 'GuideLast452', '0500000452', 'guide452@mail.com', '1981-03-28', '2016-03-28', 352.00, 11, 0.20, 'Address 452', 'Guide note 452', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (453, 'GuideFirst453', 'GuideLast453', '0500000453', 'guide453@mail.com', '1981-03-29', '2016-03-29', 353.00, 12, 0.30, 'Address 453', 'Guide note 453', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (454, 'GuideFirst454', 'GuideLast454', '0500000454', 'guide454@mail.com', '1981-03-30', '2016-03-30', 354.00, 13, 0.40, 'Address 454', 'Guide note 454', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (455, 'GuideFirst455', 'GuideLast455', '0500000455', 'guide455@mail.com', '1981-03-31', '2016-03-31', 355.00, 14, 0.50, 'Address 455', 'Guide note 455', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (456, 'GuideFirst456', 'GuideLast456', '0500000456', 'guide456@mail.com', '1981-04-01', '2016-04-01', 356.00, 15, 0.60, 'Address 456', 'Guide note 456', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (457, 'GuideFirst457', 'GuideLast457', '0500000457', 'guide457@mail.com', '1981-04-02', '2016-04-02', 357.00, 16, 0.70, 'Address 457', 'Guide note 457', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (458, 'GuideFirst458', 'GuideLast458', '0500000458', 'guide458@mail.com', '1981-04-03', '2016-04-03', 358.00, 17, 0.80, 'Address 458', 'Guide note 458', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (459, 'GuideFirst459', 'GuideLast459', '0500000459', 'guide459@mail.com', '1981-04-04', '2016-04-04', 359.00, 18, 0.90, 'Address 459', 'Guide note 459', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (460, 'GuideFirst460', 'GuideLast460', '0500000460', 'guide460@mail.com', '1981-04-05', '2016-04-05', 360.00, 19, 1.00, 'Address 460', 'Guide note 460', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (461, 'GuideFirst461', 'GuideLast461', '0500000461', 'guide461@mail.com', '1981-04-06', '2016-04-06', 361.00, 20, 1.10, 'Address 461', 'Guide note 461', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (462, 'GuideFirst462', 'GuideLast462', '0500000462', 'guide462@mail.com', '1981-04-07', '2016-04-07', 362.00, 0, 1.20, 'Address 462', 'Guide note 462', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (463, 'GuideFirst463', 'GuideLast463', '0500000463', 'guide463@mail.com', '1981-04-08', '2016-04-08', 363.00, 1, 1.30, 'Address 463', 'Guide note 463', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (464, 'GuideFirst464', 'GuideLast464', '0500000464', 'guide464@mail.com', '1981-04-09', '2016-04-09', 364.00, 2, 1.40, 'Address 464', 'Guide note 464', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (465, 'GuideFirst465', 'GuideLast465', '0500000465', 'guide465@mail.com', '1981-04-10', '2016-04-10', 365.00, 3, 1.50, 'Address 465', 'Guide note 465', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (466, 'GuideFirst466', 'GuideLast466', '0500000466', 'guide466@mail.com', '1981-04-11', '2016-04-11', 366.00, 4, 1.60, 'Address 466', 'Guide note 466', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (467, 'GuideFirst467', 'GuideLast467', '0500000467', 'guide467@mail.com', '1981-04-12', '2016-04-12', 367.00, 5, 1.70, 'Address 467', 'Guide note 467', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (468, 'GuideFirst468', 'GuideLast468', '0500000468', 'guide468@mail.com', '1981-04-13', '2016-04-13', 368.00, 6, 1.80, 'Address 468', 'Guide note 468', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (469, 'GuideFirst469', 'GuideLast469', '0500000469', 'guide469@mail.com', '1981-04-14', '2016-04-14', 369.00, 7, 1.90, 'Address 469', 'Guide note 469', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (470, 'GuideFirst470', 'GuideLast470', '0500000470', 'guide470@mail.com', '1981-04-15', '2016-04-15', 370.00, 8, 2.00, 'Address 470', 'Guide note 470', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (471, 'GuideFirst471', 'GuideLast471', '0500000471', 'guide471@mail.com', '1981-04-16', '2016-04-16', 371.00, 9, 2.10, 'Address 471', 'Guide note 471', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (472, 'GuideFirst472', 'GuideLast472', '0500000472', 'guide472@mail.com', '1981-04-17', '2016-04-17', 372.00, 10, 2.20, 'Address 472', 'Guide note 472', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (473, 'GuideFirst473', 'GuideLast473', '0500000473', 'guide473@mail.com', '1981-04-18', '2016-04-18', 373.00, 11, 2.30, 'Address 473', 'Guide note 473', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (474, 'GuideFirst474', 'GuideLast474', '0500000474', 'guide474@mail.com', '1981-04-19', '2016-04-19', 374.00, 12, 2.40, 'Address 474', 'Guide note 474', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (475, 'GuideFirst475', 'GuideLast475', '0500000475', 'guide475@mail.com', '1981-04-20', '2016-04-20', 375.00, 13, 2.50, 'Address 475', 'Guide note 475', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (476, 'GuideFirst476', 'GuideLast476', '0500000476', 'guide476@mail.com', '1981-04-21', '2016-04-21', 376.00, 14, 2.60, 'Address 476', 'Guide note 476', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (477, 'GuideFirst477', 'GuideLast477', '0500000477', 'guide477@mail.com', '1981-04-22', '2016-04-22', 377.00, 15, 2.70, 'Address 477', 'Guide note 477', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (478, 'GuideFirst478', 'GuideLast478', '0500000478', 'guide478@mail.com', '1981-04-23', '2016-04-23', 378.00, 16, 2.80, 'Address 478', 'Guide note 478', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (479, 'GuideFirst479', 'GuideLast479', '0500000479', 'guide479@mail.com', '1981-04-24', '2016-04-24', 379.00, 17, 2.90, 'Address 479', 'Guide note 479', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (480, 'GuideFirst480', 'GuideLast480', '0500000480', 'guide480@mail.com', '1981-04-25', '2016-04-25', 380.00, 18, 3.00, 'Address 480', 'Guide note 480', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (481, 'GuideFirst481', 'GuideLast481', '0500000481', 'guide481@mail.com', '1981-04-26', '2016-04-26', 381.00, 19, 3.10, 'Address 481', 'Guide note 481', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (482, 'GuideFirst482', 'GuideLast482', '0500000482', 'guide482@mail.com', '1981-04-27', '2016-04-27', 382.00, 20, 3.20, 'Address 482', 'Guide note 482', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (483, 'GuideFirst483', 'GuideLast483', '0500000483', 'guide483@mail.com', '1981-04-28', '2016-04-28', 383.00, 0, 3.30, 'Address 483', 'Guide note 483', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (484, 'GuideFirst484', 'GuideLast484', '0500000484', 'guide484@mail.com', '1981-04-29', '2016-04-29', 384.00, 1, 3.40, 'Address 484', 'Guide note 484', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (485, 'GuideFirst485', 'GuideLast485', '0500000485', 'guide485@mail.com', '1981-04-30', '2016-04-30', 385.00, 2, 3.50, 'Address 485', 'Guide note 485', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (486, 'GuideFirst486', 'GuideLast486', '0500000486', 'guide486@mail.com', '1981-05-01', '2016-05-01', 386.00, 3, 3.60, 'Address 486', 'Guide note 486', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (487, 'GuideFirst487', 'GuideLast487', '0500000487', 'guide487@mail.com', '1981-05-02', '2016-05-02', 387.00, 4, 3.70, 'Address 487', 'Guide note 487', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (488, 'GuideFirst488', 'GuideLast488', '0500000488', 'guide488@mail.com', '1981-05-03', '2016-05-03', 388.00, 5, 3.80, 'Address 488', 'Guide note 488', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (489, 'GuideFirst489', 'GuideLast489', '0500000489', 'guide489@mail.com', '1981-05-04', '2016-05-04', 389.00, 6, 3.90, 'Address 489', 'Guide note 489', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (490, 'GuideFirst490', 'GuideLast490', '0500000490', 'guide490@mail.com', '1981-05-05', '2016-05-05', 390.00, 7, 4.00, 'Address 490', 'Guide note 490', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (491, 'GuideFirst491', 'GuideLast491', '0500000491', 'guide491@mail.com', '1981-05-06', '2016-05-06', 391.00, 8, 4.10, 'Address 491', 'Guide note 491', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (492, 'GuideFirst492', 'GuideLast492', '0500000492', 'guide492@mail.com', '1981-05-07', '2016-05-07', 392.00, 9, 4.20, 'Address 492', 'Guide note 492', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (493, 'GuideFirst493', 'GuideLast493', '0500000493', 'guide493@mail.com', '1981-05-08', '2016-05-08', 393.00, 10, 4.30, 'Address 493', 'Guide note 493', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (494, 'GuideFirst494', 'GuideLast494', '0500000494', 'guide494@mail.com', '1981-05-09', '2016-05-09', 394.00, 11, 4.40, 'Address 494', 'Guide note 494', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (495, 'GuideFirst495', 'GuideLast495', '0500000495', 'guide495@mail.com', '1981-05-10', '2016-05-10', 395.00, 12, 4.50, 'Address 495', 'Guide note 495', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (496, 'GuideFirst496', 'GuideLast496', '0500000496', 'guide496@mail.com', '1981-05-11', '2016-05-11', 396.00, 13, 4.60, 'Address 496', 'Guide note 496', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (497, 'GuideFirst497', 'GuideLast497', '0500000497', 'guide497@mail.com', '1981-05-12', '2016-05-12', 397.00, 14, 4.70, 'Address 497', 'Guide note 497', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (498, 'GuideFirst498', 'GuideLast498', '0500000498', 'guide498@mail.com', '1981-05-13', '2016-05-13', 398.00, 15, 4.80, 'Address 498', 'Guide note 498', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (500, 'GuideFirst500', 'GuideLast500', '0500000500', 'guide500@mail.com', '1981-05-15', '2016-05-15', 400.00, 17, 0.00, 'Address 500', 'Guide note 500', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (49, 'GuideFirst49', 'GuideLast49', '0500000049', 'guide49@mail.com', '1980-02-19', '2015-02-19', 383.90, 7, 4.90, 'Address 49', 'Guide note 49', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (99, 'GuideFirst99', 'GuideLast99', '0500000099', 'guide99@mail.com', '1980-04-09', '2015-04-10', 438.90, 15, 4.90, 'Address 99', 'Guide note 99', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (199, 'GuideFirst199', 'GuideLast199', '0500000199', 'guide199@mail.com', '1980-07-18', '2015-07-19', 548.90, 10, 4.90, 'Address 199', 'Guide note 199', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (249, 'GuideFirst249', 'GuideLast249', '0500000249', 'guide249@mail.com', '1980-09-06', '2015-09-07', 383.90, 18, 4.90, 'Address 249', 'Guide note 249', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (349, 'GuideFirst349', 'GuideLast349', '0500000349', 'guide349@mail.com', '1980-12-15', '2015-12-16', 493.90, 13, 4.90, 'Address 349', 'Guide note 349', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (449, 'GuideFirst449', 'GuideLast449', '0500000449', 'guide449@mail.com', '1981-03-25', '2016-03-25', 383.90, 8, 4.90, 'Address 449', 'Guide note 449', NULL);
-INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (499, 'GuideFirst499', 'GuideLast499', '0500000499', 'guide499@mail.com', '1981-05-14', '2016-05-14', 438.90, 16, 4.90, 'Address 499', 'Guide note 499', NULL);
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (1, 'GuideFirst1', 'GuideLast1', '0500000001', 'guide1@mail.com', '1980-01-02', '2015-01-02', 301.00, 1, 0.10, 'Address 1', 'Guide note 1', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (2, 'GuideFirst2', 'GuideLast2', '0500000002', 'guide2@mail.com', '1980-01-03', '2015-01-03', 302.00, 2, 0.20, 'Address 2', 'Guide note 2', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (3, 'GuideFirst3', 'GuideLast3', '0500000003', 'guide3@mail.com', '1980-01-04', '2015-01-04', 303.00, 3, 0.30, 'Address 3', 'Guide note 3', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (4, 'GuideFirst4', 'GuideLast4', '0500000004', 'guide4@mail.com', '1980-01-05', '2015-01-05', 304.00, 4, 0.40, 'Address 4', 'Guide note 4', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (5, 'GuideFirst5', 'GuideLast5', '0500000005', 'guide5@mail.com', '1980-01-06', '2015-01-06', 305.00, 5, 0.50, 'Address 5', 'Guide note 5', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (6, 'GuideFirst6', 'GuideLast6', '0500000006', 'guide6@mail.com', '1980-01-07', '2015-01-07', 306.00, 6, 0.60, 'Address 6', 'Guide note 6', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (7, 'GuideFirst7', 'GuideLast7', '0500000007', 'guide7@mail.com', '1980-01-08', '2015-01-08', 307.00, 7, 0.70, 'Address 7', 'Guide note 7', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (8, 'GuideFirst8', 'GuideLast8', '0500000008', 'guide8@mail.com', '1980-01-09', '2015-01-09', 308.00, 8, 0.80, 'Address 8', 'Guide note 8', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (9, 'GuideFirst9', 'GuideLast9', '0500000009', 'guide9@mail.com', '1980-01-10', '2015-01-10', 309.00, 9, 0.90, 'Address 9', 'Guide note 9', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (10, 'GuideFirst10', 'GuideLast10', '0500000010', 'guide10@mail.com', '1980-01-11', '2015-01-11', 310.00, 10, 1.00, 'Address 10', 'Guide note 10', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (11, 'GuideFirst11', 'GuideLast11', '0500000011', 'guide11@mail.com', '1980-01-12', '2015-01-12', 311.00, 11, 1.10, 'Address 11', 'Guide note 11', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (12, 'GuideFirst12', 'GuideLast12', '0500000012', 'guide12@mail.com', '1980-01-13', '2015-01-13', 312.00, 12, 1.20, 'Address 12', 'Guide note 12', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (13, 'GuideFirst13', 'GuideLast13', '0500000013', 'guide13@mail.com', '1980-01-14', '2015-01-14', 313.00, 13, 1.30, 'Address 13', 'Guide note 13', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (14, 'GuideFirst14', 'GuideLast14', '0500000014', 'guide14@mail.com', '1980-01-15', '2015-01-15', 314.00, 14, 1.40, 'Address 14', 'Guide note 14', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (15, 'GuideFirst15', 'GuideLast15', '0500000015', 'guide15@mail.com', '1980-01-16', '2015-01-16', 315.00, 15, 1.50, 'Address 15', 'Guide note 15', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (16, 'GuideFirst16', 'GuideLast16', '0500000016', 'guide16@mail.com', '1980-01-17', '2015-01-17', 316.00, 16, 1.60, 'Address 16', 'Guide note 16', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (17, 'GuideFirst17', 'GuideLast17', '0500000017', 'guide17@mail.com', '1980-01-18', '2015-01-18', 317.00, 17, 1.70, 'Address 17', 'Guide note 17', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (18, 'GuideFirst18', 'GuideLast18', '0500000018', 'guide18@mail.com', '1980-01-19', '2015-01-19', 318.00, 18, 1.80, 'Address 18', 'Guide note 18', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (19, 'GuideFirst19', 'GuideLast19', '0500000019', 'guide19@mail.com', '1980-01-20', '2015-01-20', 319.00, 19, 1.90, 'Address 19', 'Guide note 19', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (20, 'GuideFirst20', 'GuideLast20', '0500000020', 'guide20@mail.com', '1980-01-21', '2015-01-21', 320.00, 20, 2.00, 'Address 20', 'Guide note 20', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (21, 'GuideFirst21', 'GuideLast21', '0500000021', 'guide21@mail.com', '1980-01-22', '2015-01-22', 321.00, 0, 2.10, 'Address 21', 'Guide note 21', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (22, 'GuideFirst22', 'GuideLast22', '0500000022', 'guide22@mail.com', '1980-01-23', '2015-01-23', 322.00, 1, 2.20, 'Address 22', 'Guide note 22', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (23, 'GuideFirst23', 'GuideLast23', '0500000023', 'guide23@mail.com', '1980-01-24', '2015-01-24', 323.00, 2, 2.30, 'Address 23', 'Guide note 23', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (24, 'GuideFirst24', 'GuideLast24', '0500000024', 'guide24@mail.com', '1980-01-25', '2015-01-25', 324.00, 3, 2.40, 'Address 24', 'Guide note 24', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (25, 'GuideFirst25', 'GuideLast25', '0500000025', 'guide25@mail.com', '1980-01-26', '2015-01-26', 325.00, 4, 2.50, 'Address 25', 'Guide note 25', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (26, 'GuideFirst26', 'GuideLast26', '0500000026', 'guide26@mail.com', '1980-01-27', '2015-01-27', 326.00, 5, 2.60, 'Address 26', 'Guide note 26', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (27, 'GuideFirst27', 'GuideLast27', '0500000027', 'guide27@mail.com', '1980-01-28', '2015-01-28', 327.00, 6, 2.70, 'Address 27', 'Guide note 27', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (28, 'GuideFirst28', 'GuideLast28', '0500000028', 'guide28@mail.com', '1980-01-29', '2015-01-29', 328.00, 7, 2.80, 'Address 28', 'Guide note 28', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (29, 'GuideFirst29', 'GuideLast29', '0500000029', 'guide29@mail.com', '1980-01-30', '2015-01-30', 329.00, 8, 2.90, 'Address 29', 'Guide note 29', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (30, 'GuideFirst30', 'GuideLast30', '0500000030', 'guide30@mail.com', '1980-01-31', '2015-01-31', 330.00, 9, 3.00, 'Address 30', 'Guide note 30', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (31, 'GuideFirst31', 'GuideLast31', '0500000031', 'guide31@mail.com', '1980-02-01', '2015-02-01', 331.00, 10, 3.10, 'Address 31', 'Guide note 31', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (32, 'GuideFirst32', 'GuideLast32', '0500000032', 'guide32@mail.com', '1980-02-02', '2015-02-02', 332.00, 11, 3.20, 'Address 32', 'Guide note 32', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (33, 'GuideFirst33', 'GuideLast33', '0500000033', 'guide33@mail.com', '1980-02-03', '2015-02-03', 333.00, 12, 3.30, 'Address 33', 'Guide note 33', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (34, 'GuideFirst34', 'GuideLast34', '0500000034', 'guide34@mail.com', '1980-02-04', '2015-02-04', 334.00, 13, 3.40, 'Address 34', 'Guide note 34', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (35, 'GuideFirst35', 'GuideLast35', '0500000035', 'guide35@mail.com', '1980-02-05', '2015-02-05', 335.00, 14, 3.50, 'Address 35', 'Guide note 35', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (36, 'GuideFirst36', 'GuideLast36', '0500000036', 'guide36@mail.com', '1980-02-06', '2015-02-06', 336.00, 15, 3.60, 'Address 36', 'Guide note 36', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (37, 'GuideFirst37', 'GuideLast37', '0500000037', 'guide37@mail.com', '1980-02-07', '2015-02-07', 337.00, 16, 3.70, 'Address 37', 'Guide note 37', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (38, 'GuideFirst38', 'GuideLast38', '0500000038', 'guide38@mail.com', '1980-02-08', '2015-02-08', 338.00, 17, 3.80, 'Address 38', 'Guide note 38', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (39, 'GuideFirst39', 'GuideLast39', '0500000039', 'guide39@mail.com', '1980-02-09', '2015-02-09', 339.00, 18, 3.90, 'Address 39', 'Guide note 39', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (40, 'GuideFirst40', 'GuideLast40', '0500000040', 'guide40@mail.com', '1980-02-10', '2015-02-10', 340.00, 19, 4.00, 'Address 40', 'Guide note 40', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (41, 'GuideFirst41', 'GuideLast41', '0500000041', 'guide41@mail.com', '1980-02-11', '2015-02-11', 341.00, 20, 4.10, 'Address 41', 'Guide note 41', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (42, 'GuideFirst42', 'GuideLast42', '0500000042', 'guide42@mail.com', '1980-02-12', '2015-02-12', 342.00, 0, 4.20, 'Address 42', 'Guide note 42', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (43, 'GuideFirst43', 'GuideLast43', '0500000043', 'guide43@mail.com', '1980-02-13', '2015-02-13', 343.00, 1, 4.30, 'Address 43', 'Guide note 43', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (44, 'GuideFirst44', 'GuideLast44', '0500000044', 'guide44@mail.com', '1980-02-14', '2015-02-14', 344.00, 2, 4.40, 'Address 44', 'Guide note 44', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (45, 'GuideFirst45', 'GuideLast45', '0500000045', 'guide45@mail.com', '1980-02-15', '2015-02-15', 345.00, 3, 4.50, 'Address 45', 'Guide note 45', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (46, 'GuideFirst46', 'GuideLast46', '0500000046', 'guide46@mail.com', '1980-02-16', '2015-02-16', 346.00, 4, 4.60, 'Address 46', 'Guide note 46', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (47, 'GuideFirst47', 'GuideLast47', '0500000047', 'guide47@mail.com', '1980-02-17', '2015-02-17', 347.00, 5, 4.70, 'Address 47', 'Guide note 47', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (48, 'GuideFirst48', 'GuideLast48', '0500000048', 'guide48@mail.com', '1980-02-18', '2015-02-18', 348.00, 6, 4.80, 'Address 48', 'Guide note 48', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (50, 'GuideFirst50', 'GuideLast50', '0500000050', 'guide50@mail.com', '1980-02-20', '2015-02-20', 350.00, 8, 0.00, 'Address 50', 'Guide note 50', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (51, 'GuideFirst51', 'GuideLast51', '0500000051', 'guide51@mail.com', '1980-02-21', '2015-02-21', 351.00, 9, 0.10, 'Address 51', 'Guide note 51', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (52, 'GuideFirst52', 'GuideLast52', '0500000052', 'guide52@mail.com', '1980-02-22', '2015-02-22', 352.00, 10, 0.20, 'Address 52', 'Guide note 52', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (53, 'GuideFirst53', 'GuideLast53', '0500000053', 'guide53@mail.com', '1980-02-23', '2015-02-23', 353.00, 11, 0.30, 'Address 53', 'Guide note 53', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (54, 'GuideFirst54', 'GuideLast54', '0500000054', 'guide54@mail.com', '1980-02-24', '2015-02-24', 354.00, 12, 0.40, 'Address 54', 'Guide note 54', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (55, 'GuideFirst55', 'GuideLast55', '0500000055', 'guide55@mail.com', '1980-02-25', '2015-02-25', 355.00, 13, 0.50, 'Address 55', 'Guide note 55', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (56, 'GuideFirst56', 'GuideLast56', '0500000056', 'guide56@mail.com', '1980-02-26', '2015-02-26', 356.00, 14, 0.60, 'Address 56', 'Guide note 56', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (57, 'GuideFirst57', 'GuideLast57', '0500000057', 'guide57@mail.com', '1980-02-27', '2015-02-27', 357.00, 15, 0.70, 'Address 57', 'Guide note 57', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (58, 'GuideFirst58', 'GuideLast58', '0500000058', 'guide58@mail.com', '1980-02-28', '2015-02-28', 358.00, 16, 0.80, 'Address 58', 'Guide note 58', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (59, 'GuideFirst59', 'GuideLast59', '0500000059', 'guide59@mail.com', '1980-02-29', '2015-03-01', 359.00, 17, 0.90, 'Address 59', 'Guide note 59', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (60, 'GuideFirst60', 'GuideLast60', '0500000060', 'guide60@mail.com', '1980-03-01', '2015-03-02', 360.00, 18, 1.00, 'Address 60', 'Guide note 60', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (61, 'GuideFirst61', 'GuideLast61', '0500000061', 'guide61@mail.com', '1980-03-02', '2015-03-03', 361.00, 19, 1.10, 'Address 61', 'Guide note 61', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (62, 'GuideFirst62', 'GuideLast62', '0500000062', 'guide62@mail.com', '1980-03-03', '2015-03-04', 362.00, 20, 1.20, 'Address 62', 'Guide note 62', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (63, 'GuideFirst63', 'GuideLast63', '0500000063', 'guide63@mail.com', '1980-03-04', '2015-03-05', 363.00, 0, 1.30, 'Address 63', 'Guide note 63', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (64, 'GuideFirst64', 'GuideLast64', '0500000064', 'guide64@mail.com', '1980-03-05', '2015-03-06', 364.00, 1, 1.40, 'Address 64', 'Guide note 64', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (65, 'GuideFirst65', 'GuideLast65', '0500000065', 'guide65@mail.com', '1980-03-06', '2015-03-07', 365.00, 2, 1.50, 'Address 65', 'Guide note 65', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (66, 'GuideFirst66', 'GuideLast66', '0500000066', 'guide66@mail.com', '1980-03-07', '2015-03-08', 366.00, 3, 1.60, 'Address 66', 'Guide note 66', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (67, 'GuideFirst67', 'GuideLast67', '0500000067', 'guide67@mail.com', '1980-03-08', '2015-03-09', 367.00, 4, 1.70, 'Address 67', 'Guide note 67', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (68, 'GuideFirst68', 'GuideLast68', '0500000068', 'guide68@mail.com', '1980-03-09', '2015-03-10', 368.00, 5, 1.80, 'Address 68', 'Guide note 68', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (69, 'GuideFirst69', 'GuideLast69', '0500000069', 'guide69@mail.com', '1980-03-10', '2015-03-11', 369.00, 6, 1.90, 'Address 69', 'Guide note 69', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (70, 'GuideFirst70', 'GuideLast70', '0500000070', 'guide70@mail.com', '1980-03-11', '2015-03-12', 370.00, 7, 2.00, 'Address 70', 'Guide note 70', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (71, 'GuideFirst71', 'GuideLast71', '0500000071', 'guide71@mail.com', '1980-03-12', '2015-03-13', 371.00, 8, 2.10, 'Address 71', 'Guide note 71', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (72, 'GuideFirst72', 'GuideLast72', '0500000072', 'guide72@mail.com', '1980-03-13', '2015-03-14', 372.00, 9, 2.20, 'Address 72', 'Guide note 72', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (73, 'GuideFirst73', 'GuideLast73', '0500000073', 'guide73@mail.com', '1980-03-14', '2015-03-15', 373.00, 10, 2.30, 'Address 73', 'Guide note 73', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (74, 'GuideFirst74', 'GuideLast74', '0500000074', 'guide74@mail.com', '1980-03-15', '2015-03-16', 374.00, 11, 2.40, 'Address 74', 'Guide note 74', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (75, 'GuideFirst75', 'GuideLast75', '0500000075', 'guide75@mail.com', '1980-03-16', '2015-03-17', 375.00, 12, 2.50, 'Address 75', 'Guide note 75', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (76, 'GuideFirst76', 'GuideLast76', '0500000076', 'guide76@mail.com', '1980-03-17', '2015-03-18', 376.00, 13, 2.60, 'Address 76', 'Guide note 76', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (77, 'GuideFirst77', 'GuideLast77', '0500000077', 'guide77@mail.com', '1980-03-18', '2015-03-19', 377.00, 14, 2.70, 'Address 77', 'Guide note 77', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (78, 'GuideFirst78', 'GuideLast78', '0500000078', 'guide78@mail.com', '1980-03-19', '2015-03-20', 378.00, 15, 2.80, 'Address 78', 'Guide note 78', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (79, 'GuideFirst79', 'GuideLast79', '0500000079', 'guide79@mail.com', '1980-03-20', '2015-03-21', 379.00, 16, 2.90, 'Address 79', 'Guide note 79', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (80, 'GuideFirst80', 'GuideLast80', '0500000080', 'guide80@mail.com', '1980-03-21', '2015-03-22', 380.00, 17, 3.00, 'Address 80', 'Guide note 80', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (81, 'GuideFirst81', 'GuideLast81', '0500000081', 'guide81@mail.com', '1980-03-22', '2015-03-23', 381.00, 18, 3.10, 'Address 81', 'Guide note 81', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (82, 'GuideFirst82', 'GuideLast82', '0500000082', 'guide82@mail.com', '1980-03-23', '2015-03-24', 382.00, 19, 3.20, 'Address 82', 'Guide note 82', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (83, 'GuideFirst83', 'GuideLast83', '0500000083', 'guide83@mail.com', '1980-03-24', '2015-03-25', 383.00, 20, 3.30, 'Address 83', 'Guide note 83', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (84, 'GuideFirst84', 'GuideLast84', '0500000084', 'guide84@mail.com', '1980-03-25', '2015-03-26', 384.00, 0, 3.40, 'Address 84', 'Guide note 84', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (85, 'GuideFirst85', 'GuideLast85', '0500000085', 'guide85@mail.com', '1980-03-26', '2015-03-27', 385.00, 1, 3.50, 'Address 85', 'Guide note 85', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (86, 'GuideFirst86', 'GuideLast86', '0500000086', 'guide86@mail.com', '1980-03-27', '2015-03-28', 386.00, 2, 3.60, 'Address 86', 'Guide note 86', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (87, 'GuideFirst87', 'GuideLast87', '0500000087', 'guide87@mail.com', '1980-03-28', '2015-03-29', 387.00, 3, 3.70, 'Address 87', 'Guide note 87', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (88, 'GuideFirst88', 'GuideLast88', '0500000088', 'guide88@mail.com', '1980-03-29', '2015-03-30', 388.00, 4, 3.80, 'Address 88', 'Guide note 88', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (89, 'GuideFirst89', 'GuideLast89', '0500000089', 'guide89@mail.com', '1980-03-30', '2015-03-31', 389.00, 5, 3.90, 'Address 89', 'Guide note 89', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (90, 'GuideFirst90', 'GuideLast90', '0500000090', 'guide90@mail.com', '1980-03-31', '2015-04-01', 390.00, 6, 4.00, 'Address 90', 'Guide note 90', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (91, 'GuideFirst91', 'GuideLast91', '0500000091', 'guide91@mail.com', '1980-04-01', '2015-04-02', 391.00, 7, 4.10, 'Address 91', 'Guide note 91', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (92, 'GuideFirst92', 'GuideLast92', '0500000092', 'guide92@mail.com', '1980-04-02', '2015-04-03', 392.00, 8, 4.20, 'Address 92', 'Guide note 92', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (93, 'GuideFirst93', 'GuideLast93', '0500000093', 'guide93@mail.com', '1980-04-03', '2015-04-04', 393.00, 9, 4.30, 'Address 93', 'Guide note 93', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (94, 'GuideFirst94', 'GuideLast94', '0500000094', 'guide94@mail.com', '1980-04-04', '2015-04-05', 394.00, 10, 4.40, 'Address 94', 'Guide note 94', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (95, 'GuideFirst95', 'GuideLast95', '0500000095', 'guide95@mail.com', '1980-04-05', '2015-04-06', 395.00, 11, 4.50, 'Address 95', 'Guide note 95', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (96, 'GuideFirst96', 'GuideLast96', '0500000096', 'guide96@mail.com', '1980-04-06', '2015-04-07', 396.00, 12, 4.60, 'Address 96', 'Guide note 96', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (97, 'GuideFirst97', 'GuideLast97', '0500000097', 'guide97@mail.com', '1980-04-07', '2015-04-08', 397.00, 13, 4.70, 'Address 97', 'Guide note 97', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (98, 'GuideFirst98', 'GuideLast98', '0500000098', 'guide98@mail.com', '1980-04-08', '2015-04-09', 398.00, 14, 4.80, 'Address 98', 'Guide note 98', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (100, 'GuideFirst100', 'GuideLast100', '0500000100', 'guide100@mail.com', '1980-04-10', '2015-04-11', 400.00, 16, 0.00, 'Address 100', 'Guide note 100', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (101, 'GuideFirst101', 'GuideLast101', '0500000101', 'guide101@mail.com', '1980-04-11', '2015-04-12', 401.00, 17, 0.10, 'Address 101', 'Guide note 101', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (102, 'GuideFirst102', 'GuideLast102', '0500000102', 'guide102@mail.com', '1980-04-12', '2015-04-13', 402.00, 18, 0.20, 'Address 102', 'Guide note 102', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (103, 'GuideFirst103', 'GuideLast103', '0500000103', 'guide103@mail.com', '1980-04-13', '2015-04-14', 403.00, 19, 0.30, 'Address 103', 'Guide note 103', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (104, 'GuideFirst104', 'GuideLast104', '0500000104', 'guide104@mail.com', '1980-04-14', '2015-04-15', 404.00, 20, 0.40, 'Address 104', 'Guide note 104', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (105, 'GuideFirst105', 'GuideLast105', '0500000105', 'guide105@mail.com', '1980-04-15', '2015-04-16', 405.00, 0, 0.50, 'Address 105', 'Guide note 105', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (106, 'GuideFirst106', 'GuideLast106', '0500000106', 'guide106@mail.com', '1980-04-16', '2015-04-17', 406.00, 1, 0.60, 'Address 106', 'Guide note 106', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (107, 'GuideFirst107', 'GuideLast107', '0500000107', 'guide107@mail.com', '1980-04-17', '2015-04-18', 407.00, 2, 0.70, 'Address 107', 'Guide note 107', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (108, 'GuideFirst108', 'GuideLast108', '0500000108', 'guide108@mail.com', '1980-04-18', '2015-04-19', 408.00, 3, 0.80, 'Address 108', 'Guide note 108', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (109, 'GuideFirst109', 'GuideLast109', '0500000109', 'guide109@mail.com', '1980-04-19', '2015-04-20', 409.00, 4, 0.90, 'Address 109', 'Guide note 109', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (110, 'GuideFirst110', 'GuideLast110', '0500000110', 'guide110@mail.com', '1980-04-20', '2015-04-21', 410.00, 5, 1.00, 'Address 110', 'Guide note 110', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (111, 'GuideFirst111', 'GuideLast111', '0500000111', 'guide111@mail.com', '1980-04-21', '2015-04-22', 411.00, 6, 1.10, 'Address 111', 'Guide note 111', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (112, 'GuideFirst112', 'GuideLast112', '0500000112', 'guide112@mail.com', '1980-04-22', '2015-04-23', 412.00, 7, 1.20, 'Address 112', 'Guide note 112', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (113, 'GuideFirst113', 'GuideLast113', '0500000113', 'guide113@mail.com', '1980-04-23', '2015-04-24', 413.00, 8, 1.30, 'Address 113', 'Guide note 113', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (114, 'GuideFirst114', 'GuideLast114', '0500000114', 'guide114@mail.com', '1980-04-24', '2015-04-25', 414.00, 9, 1.40, 'Address 114', 'Guide note 114', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (115, 'GuideFirst115', 'GuideLast115', '0500000115', 'guide115@mail.com', '1980-04-25', '2015-04-26', 415.00, 10, 1.50, 'Address 115', 'Guide note 115', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (116, 'GuideFirst116', 'GuideLast116', '0500000116', 'guide116@mail.com', '1980-04-26', '2015-04-27', 416.00, 11, 1.60, 'Address 116', 'Guide note 116', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (117, 'GuideFirst117', 'GuideLast117', '0500000117', 'guide117@mail.com', '1980-04-27', '2015-04-28', 417.00, 12, 1.70, 'Address 117', 'Guide note 117', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (118, 'GuideFirst118', 'GuideLast118', '0500000118', 'guide118@mail.com', '1980-04-28', '2015-04-29', 418.00, 13, 1.80, 'Address 118', 'Guide note 118', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (119, 'GuideFirst119', 'GuideLast119', '0500000119', 'guide119@mail.com', '1980-04-29', '2015-04-30', 419.00, 14, 1.90, 'Address 119', 'Guide note 119', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (120, 'GuideFirst120', 'GuideLast120', '0500000120', 'guide120@mail.com', '1980-04-30', '2015-05-01', 420.00, 15, 2.00, 'Address 120', 'Guide note 120', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (121, 'GuideFirst121', 'GuideLast121', '0500000121', 'guide121@mail.com', '1980-05-01', '2015-05-02', 421.00, 16, 2.10, 'Address 121', 'Guide note 121', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (122, 'GuideFirst122', 'GuideLast122', '0500000122', 'guide122@mail.com', '1980-05-02', '2015-05-03', 422.00, 17, 2.20, 'Address 122', 'Guide note 122', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (123, 'GuideFirst123', 'GuideLast123', '0500000123', 'guide123@mail.com', '1980-05-03', '2015-05-04', 423.00, 18, 2.30, 'Address 123', 'Guide note 123', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (124, 'GuideFirst124', 'GuideLast124', '0500000124', 'guide124@mail.com', '1980-05-04', '2015-05-05', 424.00, 19, 2.40, 'Address 124', 'Guide note 124', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (125, 'GuideFirst125', 'GuideLast125', '0500000125', 'guide125@mail.com', '1980-05-05', '2015-05-06', 425.00, 20, 2.50, 'Address 125', 'Guide note 125', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (126, 'GuideFirst126', 'GuideLast126', '0500000126', 'guide126@mail.com', '1980-05-06', '2015-05-07', 426.00, 0, 2.60, 'Address 126', 'Guide note 126', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (127, 'GuideFirst127', 'GuideLast127', '0500000127', 'guide127@mail.com', '1980-05-07', '2015-05-08', 427.00, 1, 2.70, 'Address 127', 'Guide note 127', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (128, 'GuideFirst128', 'GuideLast128', '0500000128', 'guide128@mail.com', '1980-05-08', '2015-05-09', 428.00, 2, 2.80, 'Address 128', 'Guide note 128', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (129, 'GuideFirst129', 'GuideLast129', '0500000129', 'guide129@mail.com', '1980-05-09', '2015-05-10', 429.00, 3, 2.90, 'Address 129', 'Guide note 129', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (130, 'GuideFirst130', 'GuideLast130', '0500000130', 'guide130@mail.com', '1980-05-10', '2015-05-11', 430.00, 4, 3.00, 'Address 130', 'Guide note 130', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (131, 'GuideFirst131', 'GuideLast131', '0500000131', 'guide131@mail.com', '1980-05-11', '2015-05-12', 431.00, 5, 3.10, 'Address 131', 'Guide note 131', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (132, 'GuideFirst132', 'GuideLast132', '0500000132', 'guide132@mail.com', '1980-05-12', '2015-05-13', 432.00, 6, 3.20, 'Address 132', 'Guide note 132', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (133, 'GuideFirst133', 'GuideLast133', '0500000133', 'guide133@mail.com', '1980-05-13', '2015-05-14', 433.00, 7, 3.30, 'Address 133', 'Guide note 133', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (134, 'GuideFirst134', 'GuideLast134', '0500000134', 'guide134@mail.com', '1980-05-14', '2015-05-15', 434.00, 8, 3.40, 'Address 134', 'Guide note 134', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (135, 'GuideFirst135', 'GuideLast135', '0500000135', 'guide135@mail.com', '1980-05-15', '2015-05-16', 435.00, 9, 3.50, 'Address 135', 'Guide note 135', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (136, 'GuideFirst136', 'GuideLast136', '0500000136', 'guide136@mail.com', '1980-05-16', '2015-05-17', 436.00, 10, 3.60, 'Address 136', 'Guide note 136', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (137, 'GuideFirst137', 'GuideLast137', '0500000137', 'guide137@mail.com', '1980-05-17', '2015-05-18', 437.00, 11, 3.70, 'Address 137', 'Guide note 137', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (138, 'GuideFirst138', 'GuideLast138', '0500000138', 'guide138@mail.com', '1980-05-18', '2015-05-19', 438.00, 12, 3.80, 'Address 138', 'Guide note 138', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (139, 'GuideFirst139', 'GuideLast139', '0500000139', 'guide139@mail.com', '1980-05-19', '2015-05-20', 439.00, 13, 3.90, 'Address 139', 'Guide note 139', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (140, 'GuideFirst140', 'GuideLast140', '0500000140', 'guide140@mail.com', '1980-05-20', '2015-05-21', 440.00, 14, 4.00, 'Address 140', 'Guide note 140', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (141, 'GuideFirst141', 'GuideLast141', '0500000141', 'guide141@mail.com', '1980-05-21', '2015-05-22', 441.00, 15, 4.10, 'Address 141', 'Guide note 141', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (142, 'GuideFirst142', 'GuideLast142', '0500000142', 'guide142@mail.com', '1980-05-22', '2015-05-23', 442.00, 16, 4.20, 'Address 142', 'Guide note 142', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (143, 'GuideFirst143', 'GuideLast143', '0500000143', 'guide143@mail.com', '1980-05-23', '2015-05-24', 443.00, 17, 4.30, 'Address 143', 'Guide note 143', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (144, 'GuideFirst144', 'GuideLast144', '0500000144', 'guide144@mail.com', '1980-05-24', '2015-05-25', 444.00, 18, 4.40, 'Address 144', 'Guide note 144', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (145, 'GuideFirst145', 'GuideLast145', '0500000145', 'guide145@mail.com', '1980-05-25', '2015-05-26', 445.00, 19, 4.50, 'Address 145', 'Guide note 145', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (146, 'GuideFirst146', 'GuideLast146', '0500000146', 'guide146@mail.com', '1980-05-26', '2015-05-27', 446.00, 20, 4.60, 'Address 146', 'Guide note 146', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (147, 'GuideFirst147', 'GuideLast147', '0500000147', 'guide147@mail.com', '1980-05-27', '2015-05-28', 447.00, 0, 4.70, 'Address 147', 'Guide note 147', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (148, 'GuideFirst148', 'GuideLast148', '0500000148', 'guide148@mail.com', '1980-05-28', '2015-05-29', 448.00, 1, 4.80, 'Address 148', 'Guide note 148', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (149, 'GuideFirst149', 'GuideLast149', '0500000149', 'guide149@mail.com', '1980-05-29', '2015-05-30', 449.00, 2, 4.90, 'Address 149', 'Guide note 149', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (150, 'GuideFirst150', 'GuideLast150', '0500000150', 'guide150@mail.com', '1980-05-30', '2015-05-31', 450.00, 3, 0.00, 'Address 150', 'Guide note 150', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (151, 'GuideFirst151', 'GuideLast151', '0500000151', 'guide151@mail.com', '1980-05-31', '2015-06-01', 451.00, 4, 0.10, 'Address 151', 'Guide note 151', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (152, 'GuideFirst152', 'GuideLast152', '0500000152', 'guide152@mail.com', '1980-06-01', '2015-06-02', 452.00, 5, 0.20, 'Address 152', 'Guide note 152', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (153, 'GuideFirst153', 'GuideLast153', '0500000153', 'guide153@mail.com', '1980-06-02', '2015-06-03', 453.00, 6, 0.30, 'Address 153', 'Guide note 153', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (154, 'GuideFirst154', 'GuideLast154', '0500000154', 'guide154@mail.com', '1980-06-03', '2015-06-04', 454.00, 7, 0.40, 'Address 154', 'Guide note 154', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (155, 'GuideFirst155', 'GuideLast155', '0500000155', 'guide155@mail.com', '1980-06-04', '2015-06-05', 455.00, 8, 0.50, 'Address 155', 'Guide note 155', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (156, 'GuideFirst156', 'GuideLast156', '0500000156', 'guide156@mail.com', '1980-06-05', '2015-06-06', 456.00, 9, 0.60, 'Address 156', 'Guide note 156', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (157, 'GuideFirst157', 'GuideLast157', '0500000157', 'guide157@mail.com', '1980-06-06', '2015-06-07', 457.00, 10, 0.70, 'Address 157', 'Guide note 157', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (158, 'GuideFirst158', 'GuideLast158', '0500000158', 'guide158@mail.com', '1980-06-07', '2015-06-08', 458.00, 11, 0.80, 'Address 158', 'Guide note 158', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (159, 'GuideFirst159', 'GuideLast159', '0500000159', 'guide159@mail.com', '1980-06-08', '2015-06-09', 459.00, 12, 0.90, 'Address 159', 'Guide note 159', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (160, 'GuideFirst160', 'GuideLast160', '0500000160', 'guide160@mail.com', '1980-06-09', '2015-06-10', 460.00, 13, 1.00, 'Address 160', 'Guide note 160', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (161, 'GuideFirst161', 'GuideLast161', '0500000161', 'guide161@mail.com', '1980-06-10', '2015-06-11', 461.00, 14, 1.10, 'Address 161', 'Guide note 161', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (162, 'GuideFirst162', 'GuideLast162', '0500000162', 'guide162@mail.com', '1980-06-11', '2015-06-12', 462.00, 15, 1.20, 'Address 162', 'Guide note 162', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (163, 'GuideFirst163', 'GuideLast163', '0500000163', 'guide163@mail.com', '1980-06-12', '2015-06-13', 463.00, 16, 1.30, 'Address 163', 'Guide note 163', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (164, 'GuideFirst164', 'GuideLast164', '0500000164', 'guide164@mail.com', '1980-06-13', '2015-06-14', 464.00, 17, 1.40, 'Address 164', 'Guide note 164', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (165, 'GuideFirst165', 'GuideLast165', '0500000165', 'guide165@mail.com', '1980-06-14', '2015-06-15', 465.00, 18, 1.50, 'Address 165', 'Guide note 165', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (166, 'GuideFirst166', 'GuideLast166', '0500000166', 'guide166@mail.com', '1980-06-15', '2015-06-16', 466.00, 19, 1.60, 'Address 166', 'Guide note 166', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (167, 'GuideFirst167', 'GuideLast167', '0500000167', 'guide167@mail.com', '1980-06-16', '2015-06-17', 467.00, 20, 1.70, 'Address 167', 'Guide note 167', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (168, 'GuideFirst168', 'GuideLast168', '0500000168', 'guide168@mail.com', '1980-06-17', '2015-06-18', 468.00, 0, 1.80, 'Address 168', 'Guide note 168', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (169, 'GuideFirst169', 'GuideLast169', '0500000169', 'guide169@mail.com', '1980-06-18', '2015-06-19', 469.00, 1, 1.90, 'Address 169', 'Guide note 169', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (170, 'GuideFirst170', 'GuideLast170', '0500000170', 'guide170@mail.com', '1980-06-19', '2015-06-20', 470.00, 2, 2.00, 'Address 170', 'Guide note 170', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (171, 'GuideFirst171', 'GuideLast171', '0500000171', 'guide171@mail.com', '1980-06-20', '2015-06-21', 471.00, 3, 2.10, 'Address 171', 'Guide note 171', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (172, 'GuideFirst172', 'GuideLast172', '0500000172', 'guide172@mail.com', '1980-06-21', '2015-06-22', 472.00, 4, 2.20, 'Address 172', 'Guide note 172', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (173, 'GuideFirst173', 'GuideLast173', '0500000173', 'guide173@mail.com', '1980-06-22', '2015-06-23', 473.00, 5, 2.30, 'Address 173', 'Guide note 173', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (174, 'GuideFirst174', 'GuideLast174', '0500000174', 'guide174@mail.com', '1980-06-23', '2015-06-24', 474.00, 6, 2.40, 'Address 174', 'Guide note 174', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (175, 'GuideFirst175', 'GuideLast175', '0500000175', 'guide175@mail.com', '1980-06-24', '2015-06-25', 475.00, 7, 2.50, 'Address 175', 'Guide note 175', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (176, 'GuideFirst176', 'GuideLast176', '0500000176', 'guide176@mail.com', '1980-06-25', '2015-06-26', 476.00, 8, 2.60, 'Address 176', 'Guide note 176', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (177, 'GuideFirst177', 'GuideLast177', '0500000177', 'guide177@mail.com', '1980-06-26', '2015-06-27', 477.00, 9, 2.70, 'Address 177', 'Guide note 177', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (178, 'GuideFirst178', 'GuideLast178', '0500000178', 'guide178@mail.com', '1980-06-27', '2015-06-28', 478.00, 10, 2.80, 'Address 178', 'Guide note 178', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (179, 'GuideFirst179', 'GuideLast179', '0500000179', 'guide179@mail.com', '1980-06-28', '2015-06-29', 479.00, 11, 2.90, 'Address 179', 'Guide note 179', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (180, 'GuideFirst180', 'GuideLast180', '0500000180', 'guide180@mail.com', '1980-06-29', '2015-06-30', 480.00, 12, 3.00, 'Address 180', 'Guide note 180', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (181, 'GuideFirst181', 'GuideLast181', '0500000181', 'guide181@mail.com', '1980-06-30', '2015-07-01', 481.00, 13, 3.10, 'Address 181', 'Guide note 181', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (182, 'GuideFirst182', 'GuideLast182', '0500000182', 'guide182@mail.com', '1980-07-01', '2015-07-02', 482.00, 14, 3.20, 'Address 182', 'Guide note 182', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (183, 'GuideFirst183', 'GuideLast183', '0500000183', 'guide183@mail.com', '1980-07-02', '2015-07-03', 483.00, 15, 3.30, 'Address 183', 'Guide note 183', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (184, 'GuideFirst184', 'GuideLast184', '0500000184', 'guide184@mail.com', '1980-07-03', '2015-07-04', 484.00, 16, 3.40, 'Address 184', 'Guide note 184', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (185, 'GuideFirst185', 'GuideLast185', '0500000185', 'guide185@mail.com', '1980-07-04', '2015-07-05', 485.00, 17, 3.50, 'Address 185', 'Guide note 185', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (186, 'GuideFirst186', 'GuideLast186', '0500000186', 'guide186@mail.com', '1980-07-05', '2015-07-06', 486.00, 18, 3.60, 'Address 186', 'Guide note 186', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (187, 'GuideFirst187', 'GuideLast187', '0500000187', 'guide187@mail.com', '1980-07-06', '2015-07-07', 487.00, 19, 3.70, 'Address 187', 'Guide note 187', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (188, 'GuideFirst188', 'GuideLast188', '0500000188', 'guide188@mail.com', '1980-07-07', '2015-07-08', 488.00, 20, 3.80, 'Address 188', 'Guide note 188', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (189, 'GuideFirst189', 'GuideLast189', '0500000189', 'guide189@mail.com', '1980-07-08', '2015-07-09', 489.00, 0, 3.90, 'Address 189', 'Guide note 189', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (190, 'GuideFirst190', 'GuideLast190', '0500000190', 'guide190@mail.com', '1980-07-09', '2015-07-10', 490.00, 1, 4.00, 'Address 190', 'Guide note 190', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (191, 'GuideFirst191', 'GuideLast191', '0500000191', 'guide191@mail.com', '1980-07-10', '2015-07-11', 491.00, 2, 4.10, 'Address 191', 'Guide note 191', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (192, 'GuideFirst192', 'GuideLast192', '0500000192', 'guide192@mail.com', '1980-07-11', '2015-07-12', 492.00, 3, 4.20, 'Address 192', 'Guide note 192', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (193, 'GuideFirst193', 'GuideLast193', '0500000193', 'guide193@mail.com', '1980-07-12', '2015-07-13', 493.00, 4, 4.30, 'Address 193', 'Guide note 193', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (194, 'GuideFirst194', 'GuideLast194', '0500000194', 'guide194@mail.com', '1980-07-13', '2015-07-14', 494.00, 5, 4.40, 'Address 194', 'Guide note 194', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (195, 'GuideFirst195', 'GuideLast195', '0500000195', 'guide195@mail.com', '1980-07-14', '2015-07-15', 495.00, 6, 4.50, 'Address 195', 'Guide note 195', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (196, 'GuideFirst196', 'GuideLast196', '0500000196', 'guide196@mail.com', '1980-07-15', '2015-07-16', 496.00, 7, 4.60, 'Address 196', 'Guide note 196', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (197, 'GuideFirst197', 'GuideLast197', '0500000197', 'guide197@mail.com', '1980-07-16', '2015-07-17', 497.00, 8, 4.70, 'Address 197', 'Guide note 197', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (198, 'GuideFirst198', 'GuideLast198', '0500000198', 'guide198@mail.com', '1980-07-17', '2015-07-18', 498.00, 9, 4.80, 'Address 198', 'Guide note 198', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (200, 'GuideFirst200', 'GuideLast200', '0500000200', 'guide200@mail.com', '1980-07-19', '2015-07-20', 300.00, 11, 0.00, 'Address 200', 'Guide note 200', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (201, 'GuideFirst201', 'GuideLast201', '0500000201', 'guide201@mail.com', '1980-07-20', '2015-07-21', 301.00, 12, 0.10, 'Address 201', 'Guide note 201', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (202, 'GuideFirst202', 'GuideLast202', '0500000202', 'guide202@mail.com', '1980-07-21', '2015-07-22', 302.00, 13, 0.20, 'Address 202', 'Guide note 202', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (203, 'GuideFirst203', 'GuideLast203', '0500000203', 'guide203@mail.com', '1980-07-22', '2015-07-23', 303.00, 14, 0.30, 'Address 203', 'Guide note 203', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (204, 'GuideFirst204', 'GuideLast204', '0500000204', 'guide204@mail.com', '1980-07-23', '2015-07-24', 304.00, 15, 0.40, 'Address 204', 'Guide note 204', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (205, 'GuideFirst205', 'GuideLast205', '0500000205', 'guide205@mail.com', '1980-07-24', '2015-07-25', 305.00, 16, 0.50, 'Address 205', 'Guide note 205', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (206, 'GuideFirst206', 'GuideLast206', '0500000206', 'guide206@mail.com', '1980-07-25', '2015-07-26', 306.00, 17, 0.60, 'Address 206', 'Guide note 206', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (207, 'GuideFirst207', 'GuideLast207', '0500000207', 'guide207@mail.com', '1980-07-26', '2015-07-27', 307.00, 18, 0.70, 'Address 207', 'Guide note 207', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (208, 'GuideFirst208', 'GuideLast208', '0500000208', 'guide208@mail.com', '1980-07-27', '2015-07-28', 308.00, 19, 0.80, 'Address 208', 'Guide note 208', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (209, 'GuideFirst209', 'GuideLast209', '0500000209', 'guide209@mail.com', '1980-07-28', '2015-07-29', 309.00, 20, 0.90, 'Address 209', 'Guide note 209', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (210, 'GuideFirst210', 'GuideLast210', '0500000210', 'guide210@mail.com', '1980-07-29', '2015-07-30', 310.00, 0, 1.00, 'Address 210', 'Guide note 210', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (211, 'GuideFirst211', 'GuideLast211', '0500000211', 'guide211@mail.com', '1980-07-30', '2015-07-31', 311.00, 1, 1.10, 'Address 211', 'Guide note 211', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (212, 'GuideFirst212', 'GuideLast212', '0500000212', 'guide212@mail.com', '1980-07-31', '2015-08-01', 312.00, 2, 1.20, 'Address 212', 'Guide note 212', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (213, 'GuideFirst213', 'GuideLast213', '0500000213', 'guide213@mail.com', '1980-08-01', '2015-08-02', 313.00, 3, 1.30, 'Address 213', 'Guide note 213', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (214, 'GuideFirst214', 'GuideLast214', '0500000214', 'guide214@mail.com', '1980-08-02', '2015-08-03', 314.00, 4, 1.40, 'Address 214', 'Guide note 214', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (215, 'GuideFirst215', 'GuideLast215', '0500000215', 'guide215@mail.com', '1980-08-03', '2015-08-04', 315.00, 5, 1.50, 'Address 215', 'Guide note 215', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (216, 'GuideFirst216', 'GuideLast216', '0500000216', 'guide216@mail.com', '1980-08-04', '2015-08-05', 316.00, 6, 1.60, 'Address 216', 'Guide note 216', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (217, 'GuideFirst217', 'GuideLast217', '0500000217', 'guide217@mail.com', '1980-08-05', '2015-08-06', 317.00, 7, 1.70, 'Address 217', 'Guide note 217', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (218, 'GuideFirst218', 'GuideLast218', '0500000218', 'guide218@mail.com', '1980-08-06', '2015-08-07', 318.00, 8, 1.80, 'Address 218', 'Guide note 218', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (219, 'GuideFirst219', 'GuideLast219', '0500000219', 'guide219@mail.com', '1980-08-07', '2015-08-08', 319.00, 9, 1.90, 'Address 219', 'Guide note 219', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (220, 'GuideFirst220', 'GuideLast220', '0500000220', 'guide220@mail.com', '1980-08-08', '2015-08-09', 320.00, 10, 2.00, 'Address 220', 'Guide note 220', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (221, 'GuideFirst221', 'GuideLast221', '0500000221', 'guide221@mail.com', '1980-08-09', '2015-08-10', 321.00, 11, 2.10, 'Address 221', 'Guide note 221', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (222, 'GuideFirst222', 'GuideLast222', '0500000222', 'guide222@mail.com', '1980-08-10', '2015-08-11', 322.00, 12, 2.20, 'Address 222', 'Guide note 222', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (223, 'GuideFirst223', 'GuideLast223', '0500000223', 'guide223@mail.com', '1980-08-11', '2015-08-12', 323.00, 13, 2.30, 'Address 223', 'Guide note 223', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (224, 'GuideFirst224', 'GuideLast224', '0500000224', 'guide224@mail.com', '1980-08-12', '2015-08-13', 324.00, 14, 2.40, 'Address 224', 'Guide note 224', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (225, 'GuideFirst225', 'GuideLast225', '0500000225', 'guide225@mail.com', '1980-08-13', '2015-08-14', 325.00, 15, 2.50, 'Address 225', 'Guide note 225', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (226, 'GuideFirst226', 'GuideLast226', '0500000226', 'guide226@mail.com', '1980-08-14', '2015-08-15', 326.00, 16, 2.60, 'Address 226', 'Guide note 226', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (227, 'GuideFirst227', 'GuideLast227', '0500000227', 'guide227@mail.com', '1980-08-15', '2015-08-16', 327.00, 17, 2.70, 'Address 227', 'Guide note 227', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (228, 'GuideFirst228', 'GuideLast228', '0500000228', 'guide228@mail.com', '1980-08-16', '2015-08-17', 328.00, 18, 2.80, 'Address 228', 'Guide note 228', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (229, 'GuideFirst229', 'GuideLast229', '0500000229', 'guide229@mail.com', '1980-08-17', '2015-08-18', 329.00, 19, 2.90, 'Address 229', 'Guide note 229', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (230, 'GuideFirst230', 'GuideLast230', '0500000230', 'guide230@mail.com', '1980-08-18', '2015-08-19', 330.00, 20, 3.00, 'Address 230', 'Guide note 230', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (231, 'GuideFirst231', 'GuideLast231', '0500000231', 'guide231@mail.com', '1980-08-19', '2015-08-20', 331.00, 0, 3.10, 'Address 231', 'Guide note 231', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (232, 'GuideFirst232', 'GuideLast232', '0500000232', 'guide232@mail.com', '1980-08-20', '2015-08-21', 332.00, 1, 3.20, 'Address 232', 'Guide note 232', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (233, 'GuideFirst233', 'GuideLast233', '0500000233', 'guide233@mail.com', '1980-08-21', '2015-08-22', 333.00, 2, 3.30, 'Address 233', 'Guide note 233', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (234, 'GuideFirst234', 'GuideLast234', '0500000234', 'guide234@mail.com', '1980-08-22', '2015-08-23', 334.00, 3, 3.40, 'Address 234', 'Guide note 234', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (235, 'GuideFirst235', 'GuideLast235', '0500000235', 'guide235@mail.com', '1980-08-23', '2015-08-24', 335.00, 4, 3.50, 'Address 235', 'Guide note 235', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (236, 'GuideFirst236', 'GuideLast236', '0500000236', 'guide236@mail.com', '1980-08-24', '2015-08-25', 336.00, 5, 3.60, 'Address 236', 'Guide note 236', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (237, 'GuideFirst237', 'GuideLast237', '0500000237', 'guide237@mail.com', '1980-08-25', '2015-08-26', 337.00, 6, 3.70, 'Address 237', 'Guide note 237', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (238, 'GuideFirst238', 'GuideLast238', '0500000238', 'guide238@mail.com', '1980-08-26', '2015-08-27', 338.00, 7, 3.80, 'Address 238', 'Guide note 238', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (239, 'GuideFirst239', 'GuideLast239', '0500000239', 'guide239@mail.com', '1980-08-27', '2015-08-28', 339.00, 8, 3.90, 'Address 239', 'Guide note 239', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (240, 'GuideFirst240', 'GuideLast240', '0500000240', 'guide240@mail.com', '1980-08-28', '2015-08-29', 340.00, 9, 4.00, 'Address 240', 'Guide note 240', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (241, 'GuideFirst241', 'GuideLast241', '0500000241', 'guide241@mail.com', '1980-08-29', '2015-08-30', 341.00, 10, 4.10, 'Address 241', 'Guide note 241', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (242, 'GuideFirst242', 'GuideLast242', '0500000242', 'guide242@mail.com', '1980-08-30', '2015-08-31', 342.00, 11, 4.20, 'Address 242', 'Guide note 242', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (243, 'GuideFirst243', 'GuideLast243', '0500000243', 'guide243@mail.com', '1980-08-31', '2015-09-01', 343.00, 12, 4.30, 'Address 243', 'Guide note 243', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (244, 'GuideFirst244', 'GuideLast244', '0500000244', 'guide244@mail.com', '1980-09-01', '2015-09-02', 344.00, 13, 4.40, 'Address 244', 'Guide note 244', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (245, 'GuideFirst245', 'GuideLast245', '0500000245', 'guide245@mail.com', '1980-09-02', '2015-09-03', 345.00, 14, 4.50, 'Address 245', 'Guide note 245', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (246, 'GuideFirst246', 'GuideLast246', '0500000246', 'guide246@mail.com', '1980-09-03', '2015-09-04', 346.00, 15, 4.60, 'Address 246', 'Guide note 246', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (247, 'GuideFirst247', 'GuideLast247', '0500000247', 'guide247@mail.com', '1980-09-04', '2015-09-05', 347.00, 16, 4.70, 'Address 247', 'Guide note 247', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (248, 'GuideFirst248', 'GuideLast248', '0500000248', 'guide248@mail.com', '1980-09-05', '2015-09-06', 348.00, 17, 4.80, 'Address 248', 'Guide note 248', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (250, 'GuideFirst250', 'GuideLast250', '0500000250', 'guide250@mail.com', '1980-09-07', '2015-09-08', 350.00, 19, 0.00, 'Address 250', 'Guide note 250', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (251, 'GuideFirst251', 'GuideLast251', '0500000251', 'guide251@mail.com', '1980-09-08', '2015-09-09', 351.00, 20, 0.10, 'Address 251', 'Guide note 251', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (252, 'GuideFirst252', 'GuideLast252', '0500000252', 'guide252@mail.com', '1980-09-09', '2015-09-10', 352.00, 0, 0.20, 'Address 252', 'Guide note 252', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (253, 'GuideFirst253', 'GuideLast253', '0500000253', 'guide253@mail.com', '1980-09-10', '2015-09-11', 353.00, 1, 0.30, 'Address 253', 'Guide note 253', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (254, 'GuideFirst254', 'GuideLast254', '0500000254', 'guide254@mail.com', '1980-09-11', '2015-09-12', 354.00, 2, 0.40, 'Address 254', 'Guide note 254', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (255, 'GuideFirst255', 'GuideLast255', '0500000255', 'guide255@mail.com', '1980-09-12', '2015-09-13', 355.00, 3, 0.50, 'Address 255', 'Guide note 255', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (256, 'GuideFirst256', 'GuideLast256', '0500000256', 'guide256@mail.com', '1980-09-13', '2015-09-14', 356.00, 4, 0.60, 'Address 256', 'Guide note 256', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (257, 'GuideFirst257', 'GuideLast257', '0500000257', 'guide257@mail.com', '1980-09-14', '2015-09-15', 357.00, 5, 0.70, 'Address 257', 'Guide note 257', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (258, 'GuideFirst258', 'GuideLast258', '0500000258', 'guide258@mail.com', '1980-09-15', '2015-09-16', 358.00, 6, 0.80, 'Address 258', 'Guide note 258', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (259, 'GuideFirst259', 'GuideLast259', '0500000259', 'guide259@mail.com', '1980-09-16', '2015-09-17', 359.00, 7, 0.90, 'Address 259', 'Guide note 259', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (260, 'GuideFirst260', 'GuideLast260', '0500000260', 'guide260@mail.com', '1980-09-17', '2015-09-18', 360.00, 8, 1.00, 'Address 260', 'Guide note 260', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (261, 'GuideFirst261', 'GuideLast261', '0500000261', 'guide261@mail.com', '1980-09-18', '2015-09-19', 361.00, 9, 1.10, 'Address 261', 'Guide note 261', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (262, 'GuideFirst262', 'GuideLast262', '0500000262', 'guide262@mail.com', '1980-09-19', '2015-09-20', 362.00, 10, 1.20, 'Address 262', 'Guide note 262', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (263, 'GuideFirst263', 'GuideLast263', '0500000263', 'guide263@mail.com', '1980-09-20', '2015-09-21', 363.00, 11, 1.30, 'Address 263', 'Guide note 263', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (264, 'GuideFirst264', 'GuideLast264', '0500000264', 'guide264@mail.com', '1980-09-21', '2015-09-22', 364.00, 12, 1.40, 'Address 264', 'Guide note 264', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (265, 'GuideFirst265', 'GuideLast265', '0500000265', 'guide265@mail.com', '1980-09-22', '2015-09-23', 365.00, 13, 1.50, 'Address 265', 'Guide note 265', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (266, 'GuideFirst266', 'GuideLast266', '0500000266', 'guide266@mail.com', '1980-09-23', '2015-09-24', 366.00, 14, 1.60, 'Address 266', 'Guide note 266', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (267, 'GuideFirst267', 'GuideLast267', '0500000267', 'guide267@mail.com', '1980-09-24', '2015-09-25', 367.00, 15, 1.70, 'Address 267', 'Guide note 267', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (268, 'GuideFirst268', 'GuideLast268', '0500000268', 'guide268@mail.com', '1980-09-25', '2015-09-26', 368.00, 16, 1.80, 'Address 268', 'Guide note 268', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (269, 'GuideFirst269', 'GuideLast269', '0500000269', 'guide269@mail.com', '1980-09-26', '2015-09-27', 369.00, 17, 1.90, 'Address 269', 'Guide note 269', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (270, 'GuideFirst270', 'GuideLast270', '0500000270', 'guide270@mail.com', '1980-09-27', '2015-09-28', 370.00, 18, 2.00, 'Address 270', 'Guide note 270', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (271, 'GuideFirst271', 'GuideLast271', '0500000271', 'guide271@mail.com', '1980-09-28', '2015-09-29', 371.00, 19, 2.10, 'Address 271', 'Guide note 271', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (272, 'GuideFirst272', 'GuideLast272', '0500000272', 'guide272@mail.com', '1980-09-29', '2015-09-30', 372.00, 20, 2.20, 'Address 272', 'Guide note 272', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (273, 'GuideFirst273', 'GuideLast273', '0500000273', 'guide273@mail.com', '1980-09-30', '2015-10-01', 373.00, 0, 2.30, 'Address 273', 'Guide note 273', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (274, 'GuideFirst274', 'GuideLast274', '0500000274', 'guide274@mail.com', '1980-10-01', '2015-10-02', 374.00, 1, 2.40, 'Address 274', 'Guide note 274', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (275, 'GuideFirst275', 'GuideLast275', '0500000275', 'guide275@mail.com', '1980-10-02', '2015-10-03', 375.00, 2, 2.50, 'Address 275', 'Guide note 275', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (276, 'GuideFirst276', 'GuideLast276', '0500000276', 'guide276@mail.com', '1980-10-03', '2015-10-04', 376.00, 3, 2.60, 'Address 276', 'Guide note 276', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (277, 'GuideFirst277', 'GuideLast277', '0500000277', 'guide277@mail.com', '1980-10-04', '2015-10-05', 377.00, 4, 2.70, 'Address 277', 'Guide note 277', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (278, 'GuideFirst278', 'GuideLast278', '0500000278', 'guide278@mail.com', '1980-10-05', '2015-10-06', 378.00, 5, 2.80, 'Address 278', 'Guide note 278', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (279, 'GuideFirst279', 'GuideLast279', '0500000279', 'guide279@mail.com', '1980-10-06', '2015-10-07', 379.00, 6, 2.90, 'Address 279', 'Guide note 279', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (280, 'GuideFirst280', 'GuideLast280', '0500000280', 'guide280@mail.com', '1980-10-07', '2015-10-08', 380.00, 7, 3.00, 'Address 280', 'Guide note 280', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (281, 'GuideFirst281', 'GuideLast281', '0500000281', 'guide281@mail.com', '1980-10-08', '2015-10-09', 381.00, 8, 3.10, 'Address 281', 'Guide note 281', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (282, 'GuideFirst282', 'GuideLast282', '0500000282', 'guide282@mail.com', '1980-10-09', '2015-10-10', 382.00, 9, 3.20, 'Address 282', 'Guide note 282', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (283, 'GuideFirst283', 'GuideLast283', '0500000283', 'guide283@mail.com', '1980-10-10', '2015-10-11', 383.00, 10, 3.30, 'Address 283', 'Guide note 283', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (284, 'GuideFirst284', 'GuideLast284', '0500000284', 'guide284@mail.com', '1980-10-11', '2015-10-12', 384.00, 11, 3.40, 'Address 284', 'Guide note 284', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (285, 'GuideFirst285', 'GuideLast285', '0500000285', 'guide285@mail.com', '1980-10-12', '2015-10-13', 385.00, 12, 3.50, 'Address 285', 'Guide note 285', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (286, 'GuideFirst286', 'GuideLast286', '0500000286', 'guide286@mail.com', '1980-10-13', '2015-10-14', 386.00, 13, 3.60, 'Address 286', 'Guide note 286', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (287, 'GuideFirst287', 'GuideLast287', '0500000287', 'guide287@mail.com', '1980-10-14', '2015-10-15', 387.00, 14, 3.70, 'Address 287', 'Guide note 287', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (288, 'GuideFirst288', 'GuideLast288', '0500000288', 'guide288@mail.com', '1980-10-15', '2015-10-16', 388.00, 15, 3.80, 'Address 288', 'Guide note 288', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (289, 'GuideFirst289', 'GuideLast289', '0500000289', 'guide289@mail.com', '1980-10-16', '2015-10-17', 389.00, 16, 3.90, 'Address 289', 'Guide note 289', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (290, 'GuideFirst290', 'GuideLast290', '0500000290', 'guide290@mail.com', '1980-10-17', '2015-10-18', 390.00, 17, 4.00, 'Address 290', 'Guide note 290', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (291, 'GuideFirst291', 'GuideLast291', '0500000291', 'guide291@mail.com', '1980-10-18', '2015-10-19', 391.00, 18, 4.10, 'Address 291', 'Guide note 291', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (292, 'GuideFirst292', 'GuideLast292', '0500000292', 'guide292@mail.com', '1980-10-19', '2015-10-20', 392.00, 19, 4.20, 'Address 292', 'Guide note 292', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (293, 'GuideFirst293', 'GuideLast293', '0500000293', 'guide293@mail.com', '1980-10-20', '2015-10-21', 393.00, 20, 4.30, 'Address 293', 'Guide note 293', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (294, 'GuideFirst294', 'GuideLast294', '0500000294', 'guide294@mail.com', '1980-10-21', '2015-10-22', 394.00, 0, 4.40, 'Address 294', 'Guide note 294', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (295, 'GuideFirst295', 'GuideLast295', '0500000295', 'guide295@mail.com', '1980-10-22', '2015-10-23', 395.00, 1, 4.50, 'Address 295', 'Guide note 295', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (296, 'GuideFirst296', 'GuideLast296', '0500000296', 'guide296@mail.com', '1980-10-23', '2015-10-24', 396.00, 2, 4.60, 'Address 296', 'Guide note 296', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (297, 'GuideFirst297', 'GuideLast297', '0500000297', 'guide297@mail.com', '1980-10-24', '2015-10-25', 397.00, 3, 4.70, 'Address 297', 'Guide note 297', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (298, 'GuideFirst298', 'GuideLast298', '0500000298', 'guide298@mail.com', '1980-10-25', '2015-10-26', 398.00, 4, 4.80, 'Address 298', 'Guide note 298', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (299, 'GuideFirst299', 'GuideLast299', '0500000299', 'guide299@mail.com', '1980-10-26', '2015-10-27', 399.00, 5, 4.90, 'Address 299', 'Guide note 299', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (300, 'GuideFirst300', 'GuideLast300', '0500000300', 'guide300@mail.com', '1980-10-27', '2015-10-28', 400.00, 6, 0.00, 'Address 300', 'Guide note 300', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (301, 'GuideFirst301', 'GuideLast301', '0500000301', 'guide301@mail.com', '1980-10-28', '2015-10-29', 401.00, 7, 0.10, 'Address 301', 'Guide note 301', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (302, 'GuideFirst302', 'GuideLast302', '0500000302', 'guide302@mail.com', '1980-10-29', '2015-10-30', 402.00, 8, 0.20, 'Address 302', 'Guide note 302', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (303, 'GuideFirst303', 'GuideLast303', '0500000303', 'guide303@mail.com', '1980-10-30', '2015-10-31', 403.00, 9, 0.30, 'Address 303', 'Guide note 303', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (304, 'GuideFirst304', 'GuideLast304', '0500000304', 'guide304@mail.com', '1980-10-31', '2015-11-01', 404.00, 10, 0.40, 'Address 304', 'Guide note 304', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (305, 'GuideFirst305', 'GuideLast305', '0500000305', 'guide305@mail.com', '1980-11-01', '2015-11-02', 405.00, 11, 0.50, 'Address 305', 'Guide note 305', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (306, 'GuideFirst306', 'GuideLast306', '0500000306', 'guide306@mail.com', '1980-11-02', '2015-11-03', 406.00, 12, 0.60, 'Address 306', 'Guide note 306', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (307, 'GuideFirst307', 'GuideLast307', '0500000307', 'guide307@mail.com', '1980-11-03', '2015-11-04', 407.00, 13, 0.70, 'Address 307', 'Guide note 307', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (308, 'GuideFirst308', 'GuideLast308', '0500000308', 'guide308@mail.com', '1980-11-04', '2015-11-05', 408.00, 14, 0.80, 'Address 308', 'Guide note 308', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (309, 'GuideFirst309', 'GuideLast309', '0500000309', 'guide309@mail.com', '1980-11-05', '2015-11-06', 409.00, 15, 0.90, 'Address 309', 'Guide note 309', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (310, 'GuideFirst310', 'GuideLast310', '0500000310', 'guide310@mail.com', '1980-11-06', '2015-11-07', 410.00, 16, 1.00, 'Address 310', 'Guide note 310', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (311, 'GuideFirst311', 'GuideLast311', '0500000311', 'guide311@mail.com', '1980-11-07', '2015-11-08', 411.00, 17, 1.10, 'Address 311', 'Guide note 311', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (312, 'GuideFirst312', 'GuideLast312', '0500000312', 'guide312@mail.com', '1980-11-08', '2015-11-09', 412.00, 18, 1.20, 'Address 312', 'Guide note 312', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (313, 'GuideFirst313', 'GuideLast313', '0500000313', 'guide313@mail.com', '1980-11-09', '2015-11-10', 413.00, 19, 1.30, 'Address 313', 'Guide note 313', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (314, 'GuideFirst314', 'GuideLast314', '0500000314', 'guide314@mail.com', '1980-11-10', '2015-11-11', 414.00, 20, 1.40, 'Address 314', 'Guide note 314', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (315, 'GuideFirst315', 'GuideLast315', '0500000315', 'guide315@mail.com', '1980-11-11', '2015-11-12', 415.00, 0, 1.50, 'Address 315', 'Guide note 315', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (316, 'GuideFirst316', 'GuideLast316', '0500000316', 'guide316@mail.com', '1980-11-12', '2015-11-13', 416.00, 1, 1.60, 'Address 316', 'Guide note 316', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (317, 'GuideFirst317', 'GuideLast317', '0500000317', 'guide317@mail.com', '1980-11-13', '2015-11-14', 417.00, 2, 1.70, 'Address 317', 'Guide note 317', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (318, 'GuideFirst318', 'GuideLast318', '0500000318', 'guide318@mail.com', '1980-11-14', '2015-11-15', 418.00, 3, 1.80, 'Address 318', 'Guide note 318', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (319, 'GuideFirst319', 'GuideLast319', '0500000319', 'guide319@mail.com', '1980-11-15', '2015-11-16', 419.00, 4, 1.90, 'Address 319', 'Guide note 319', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (320, 'GuideFirst320', 'GuideLast320', '0500000320', 'guide320@mail.com', '1980-11-16', '2015-11-17', 420.00, 5, 2.00, 'Address 320', 'Guide note 320', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (321, 'GuideFirst321', 'GuideLast321', '0500000321', 'guide321@mail.com', '1980-11-17', '2015-11-18', 421.00, 6, 2.10, 'Address 321', 'Guide note 321', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (322, 'GuideFirst322', 'GuideLast322', '0500000322', 'guide322@mail.com', '1980-11-18', '2015-11-19', 422.00, 7, 2.20, 'Address 322', 'Guide note 322', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (323, 'GuideFirst323', 'GuideLast323', '0500000323', 'guide323@mail.com', '1980-11-19', '2015-11-20', 423.00, 8, 2.30, 'Address 323', 'Guide note 323', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (324, 'GuideFirst324', 'GuideLast324', '0500000324', 'guide324@mail.com', '1980-11-20', '2015-11-21', 424.00, 9, 2.40, 'Address 324', 'Guide note 324', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (325, 'GuideFirst325', 'GuideLast325', '0500000325', 'guide325@mail.com', '1980-11-21', '2015-11-22', 425.00, 10, 2.50, 'Address 325', 'Guide note 325', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (326, 'GuideFirst326', 'GuideLast326', '0500000326', 'guide326@mail.com', '1980-11-22', '2015-11-23', 426.00, 11, 2.60, 'Address 326', 'Guide note 326', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (327, 'GuideFirst327', 'GuideLast327', '0500000327', 'guide327@mail.com', '1980-11-23', '2015-11-24', 427.00, 12, 2.70, 'Address 327', 'Guide note 327', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (328, 'GuideFirst328', 'GuideLast328', '0500000328', 'guide328@mail.com', '1980-11-24', '2015-11-25', 428.00, 13, 2.80, 'Address 328', 'Guide note 328', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (329, 'GuideFirst329', 'GuideLast329', '0500000329', 'guide329@mail.com', '1980-11-25', '2015-11-26', 429.00, 14, 2.90, 'Address 329', 'Guide note 329', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (330, 'GuideFirst330', 'GuideLast330', '0500000330', 'guide330@mail.com', '1980-11-26', '2015-11-27', 430.00, 15, 3.00, 'Address 330', 'Guide note 330', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (331, 'GuideFirst331', 'GuideLast331', '0500000331', 'guide331@mail.com', '1980-11-27', '2015-11-28', 431.00, 16, 3.10, 'Address 331', 'Guide note 331', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (332, 'GuideFirst332', 'GuideLast332', '0500000332', 'guide332@mail.com', '1980-11-28', '2015-11-29', 432.00, 17, 3.20, 'Address 332', 'Guide note 332', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (333, 'GuideFirst333', 'GuideLast333', '0500000333', 'guide333@mail.com', '1980-11-29', '2015-11-30', 433.00, 18, 3.30, 'Address 333', 'Guide note 333', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (334, 'GuideFirst334', 'GuideLast334', '0500000334', 'guide334@mail.com', '1980-11-30', '2015-12-01', 434.00, 19, 3.40, 'Address 334', 'Guide note 334', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (335, 'GuideFirst335', 'GuideLast335', '0500000335', 'guide335@mail.com', '1980-12-01', '2015-12-02', 435.00, 20, 3.50, 'Address 335', 'Guide note 335', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (336, 'GuideFirst336', 'GuideLast336', '0500000336', 'guide336@mail.com', '1980-12-02', '2015-12-03', 436.00, 0, 3.60, 'Address 336', 'Guide note 336', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (337, 'GuideFirst337', 'GuideLast337', '0500000337', 'guide337@mail.com', '1980-12-03', '2015-12-04', 437.00, 1, 3.70, 'Address 337', 'Guide note 337', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (338, 'GuideFirst338', 'GuideLast338', '0500000338', 'guide338@mail.com', '1980-12-04', '2015-12-05', 438.00, 2, 3.80, 'Address 338', 'Guide note 338', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (339, 'GuideFirst339', 'GuideLast339', '0500000339', 'guide339@mail.com', '1980-12-05', '2015-12-06', 439.00, 3, 3.90, 'Address 339', 'Guide note 339', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (340, 'GuideFirst340', 'GuideLast340', '0500000340', 'guide340@mail.com', '1980-12-06', '2015-12-07', 440.00, 4, 4.00, 'Address 340', 'Guide note 340', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (341, 'GuideFirst341', 'GuideLast341', '0500000341', 'guide341@mail.com', '1980-12-07', '2015-12-08', 441.00, 5, 4.10, 'Address 341', 'Guide note 341', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (342, 'GuideFirst342', 'GuideLast342', '0500000342', 'guide342@mail.com', '1980-12-08', '2015-12-09', 442.00, 6, 4.20, 'Address 342', 'Guide note 342', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (343, 'GuideFirst343', 'GuideLast343', '0500000343', 'guide343@mail.com', '1980-12-09', '2015-12-10', 443.00, 7, 4.30, 'Address 343', 'Guide note 343', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (344, 'GuideFirst344', 'GuideLast344', '0500000344', 'guide344@mail.com', '1980-12-10', '2015-12-11', 444.00, 8, 4.40, 'Address 344', 'Guide note 344', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (345, 'GuideFirst345', 'GuideLast345', '0500000345', 'guide345@mail.com', '1980-12-11', '2015-12-12', 445.00, 9, 4.50, 'Address 345', 'Guide note 345', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (346, 'GuideFirst346', 'GuideLast346', '0500000346', 'guide346@mail.com', '1980-12-12', '2015-12-13', 446.00, 10, 4.60, 'Address 346', 'Guide note 346', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (347, 'GuideFirst347', 'GuideLast347', '0500000347', 'guide347@mail.com', '1980-12-13', '2015-12-14', 447.00, 11, 4.70, 'Address 347', 'Guide note 347', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (348, 'GuideFirst348', 'GuideLast348', '0500000348', 'guide348@mail.com', '1980-12-14', '2015-12-15', 448.00, 12, 4.80, 'Address 348', 'Guide note 348', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (350, 'GuideFirst350', 'GuideLast350', '0500000350', 'guide350@mail.com', '1980-12-16', '2015-12-17', 450.00, 14, 0.00, 'Address 350', 'Guide note 350', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (351, 'GuideFirst351', 'GuideLast351', '0500000351', 'guide351@mail.com', '1980-12-17', '2015-12-18', 451.00, 15, 0.10, 'Address 351', 'Guide note 351', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (352, 'GuideFirst352', 'GuideLast352', '0500000352', 'guide352@mail.com', '1980-12-18', '2015-12-19', 452.00, 16, 0.20, 'Address 352', 'Guide note 352', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (353, 'GuideFirst353', 'GuideLast353', '0500000353', 'guide353@mail.com', '1980-12-19', '2015-12-20', 453.00, 17, 0.30, 'Address 353', 'Guide note 353', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (354, 'GuideFirst354', 'GuideLast354', '0500000354', 'guide354@mail.com', '1980-12-20', '2015-12-21', 454.00, 18, 0.40, 'Address 354', 'Guide note 354', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (355, 'GuideFirst355', 'GuideLast355', '0500000355', 'guide355@mail.com', '1980-12-21', '2015-12-22', 455.00, 19, 0.50, 'Address 355', 'Guide note 355', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (356, 'GuideFirst356', 'GuideLast356', '0500000356', 'guide356@mail.com', '1980-12-22', '2015-12-23', 456.00, 20, 0.60, 'Address 356', 'Guide note 356', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (357, 'GuideFirst357', 'GuideLast357', '0500000357', 'guide357@mail.com', '1980-12-23', '2015-12-24', 457.00, 0, 0.70, 'Address 357', 'Guide note 357', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (358, 'GuideFirst358', 'GuideLast358', '0500000358', 'guide358@mail.com', '1980-12-24', '2015-12-25', 458.00, 1, 0.80, 'Address 358', 'Guide note 358', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (359, 'GuideFirst359', 'GuideLast359', '0500000359', 'guide359@mail.com', '1980-12-25', '2015-12-26', 459.00, 2, 0.90, 'Address 359', 'Guide note 359', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (360, 'GuideFirst360', 'GuideLast360', '0500000360', 'guide360@mail.com', '1980-12-26', '2015-12-27', 460.00, 3, 1.00, 'Address 360', 'Guide note 360', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (361, 'GuideFirst361', 'GuideLast361', '0500000361', 'guide361@mail.com', '1980-12-27', '2015-12-28', 461.00, 4, 1.10, 'Address 361', 'Guide note 361', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (362, 'GuideFirst362', 'GuideLast362', '0500000362', 'guide362@mail.com', '1980-12-28', '2015-12-29', 462.00, 5, 1.20, 'Address 362', 'Guide note 362', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (363, 'GuideFirst363', 'GuideLast363', '0500000363', 'guide363@mail.com', '1980-12-29', '2015-12-30', 463.00, 6, 1.30, 'Address 363', 'Guide note 363', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (364, 'GuideFirst364', 'GuideLast364', '0500000364', 'guide364@mail.com', '1980-12-30', '2015-12-31', 464.00, 7, 1.40, 'Address 364', 'Guide note 364', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (365, 'GuideFirst365', 'GuideLast365', '0500000365', 'guide365@mail.com', '1980-12-31', '2016-01-01', 465.00, 8, 1.50, 'Address 365', 'Guide note 365', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (366, 'GuideFirst366', 'GuideLast366', '0500000366', 'guide366@mail.com', '1981-01-01', '2016-01-02', 466.00, 9, 1.60, 'Address 366', 'Guide note 366', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (367, 'GuideFirst367', 'GuideLast367', '0500000367', 'guide367@mail.com', '1981-01-02', '2016-01-03', 467.00, 10, 1.70, 'Address 367', 'Guide note 367', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (368, 'GuideFirst368', 'GuideLast368', '0500000368', 'guide368@mail.com', '1981-01-03', '2016-01-04', 468.00, 11, 1.80, 'Address 368', 'Guide note 368', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (369, 'GuideFirst369', 'GuideLast369', '0500000369', 'guide369@mail.com', '1981-01-04', '2016-01-05', 469.00, 12, 1.90, 'Address 369', 'Guide note 369', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (370, 'GuideFirst370', 'GuideLast370', '0500000370', 'guide370@mail.com', '1981-01-05', '2016-01-06', 470.00, 13, 2.00, 'Address 370', 'Guide note 370', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (371, 'GuideFirst371', 'GuideLast371', '0500000371', 'guide371@mail.com', '1981-01-06', '2016-01-07', 471.00, 14, 2.10, 'Address 371', 'Guide note 371', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (372, 'GuideFirst372', 'GuideLast372', '0500000372', 'guide372@mail.com', '1981-01-07', '2016-01-08', 472.00, 15, 2.20, 'Address 372', 'Guide note 372', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (373, 'GuideFirst373', 'GuideLast373', '0500000373', 'guide373@mail.com', '1981-01-08', '2016-01-09', 473.00, 16, 2.30, 'Address 373', 'Guide note 373', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (374, 'GuideFirst374', 'GuideLast374', '0500000374', 'guide374@mail.com', '1981-01-09', '2016-01-10', 474.00, 17, 2.40, 'Address 374', 'Guide note 374', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (375, 'GuideFirst375', 'GuideLast375', '0500000375', 'guide375@mail.com', '1981-01-10', '2016-01-11', 475.00, 18, 2.50, 'Address 375', 'Guide note 375', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (376, 'GuideFirst376', 'GuideLast376', '0500000376', 'guide376@mail.com', '1981-01-11', '2016-01-12', 476.00, 19, 2.60, 'Address 376', 'Guide note 376', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (377, 'GuideFirst377', 'GuideLast377', '0500000377', 'guide377@mail.com', '1981-01-12', '2016-01-13', 477.00, 20, 2.70, 'Address 377', 'Guide note 377', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (378, 'GuideFirst378', 'GuideLast378', '0500000378', 'guide378@mail.com', '1981-01-13', '2016-01-14', 478.00, 0, 2.80, 'Address 378', 'Guide note 378', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (379, 'GuideFirst379', 'GuideLast379', '0500000379', 'guide379@mail.com', '1981-01-14', '2016-01-15', 479.00, 1, 2.90, 'Address 379', 'Guide note 379', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (380, 'GuideFirst380', 'GuideLast380', '0500000380', 'guide380@mail.com', '1981-01-15', '2016-01-16', 480.00, 2, 3.00, 'Address 380', 'Guide note 380', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (381, 'GuideFirst381', 'GuideLast381', '0500000381', 'guide381@mail.com', '1981-01-16', '2016-01-17', 481.00, 3, 3.10, 'Address 381', 'Guide note 381', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (382, 'GuideFirst382', 'GuideLast382', '0500000382', 'guide382@mail.com', '1981-01-17', '2016-01-18', 482.00, 4, 3.20, 'Address 382', 'Guide note 382', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (383, 'GuideFirst383', 'GuideLast383', '0500000383', 'guide383@mail.com', '1981-01-18', '2016-01-19', 483.00, 5, 3.30, 'Address 383', 'Guide note 383', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (384, 'GuideFirst384', 'GuideLast384', '0500000384', 'guide384@mail.com', '1981-01-19', '2016-01-20', 484.00, 6, 3.40, 'Address 384', 'Guide note 384', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (385, 'GuideFirst385', 'GuideLast385', '0500000385', 'guide385@mail.com', '1981-01-20', '2016-01-21', 485.00, 7, 3.50, 'Address 385', 'Guide note 385', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (386, 'GuideFirst386', 'GuideLast386', '0500000386', 'guide386@mail.com', '1981-01-21', '2016-01-22', 486.00, 8, 3.60, 'Address 386', 'Guide note 386', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (387, 'GuideFirst387', 'GuideLast387', '0500000387', 'guide387@mail.com', '1981-01-22', '2016-01-23', 487.00, 9, 3.70, 'Address 387', 'Guide note 387', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (388, 'GuideFirst388', 'GuideLast388', '0500000388', 'guide388@mail.com', '1981-01-23', '2016-01-24', 488.00, 10, 3.80, 'Address 388', 'Guide note 388', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (389, 'GuideFirst389', 'GuideLast389', '0500000389', 'guide389@mail.com', '1981-01-24', '2016-01-25', 489.00, 11, 3.90, 'Address 389', 'Guide note 389', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (390, 'GuideFirst390', 'GuideLast390', '0500000390', 'guide390@mail.com', '1981-01-25', '2016-01-26', 490.00, 12, 4.00, 'Address 390', 'Guide note 390', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (391, 'GuideFirst391', 'GuideLast391', '0500000391', 'guide391@mail.com', '1981-01-26', '2016-01-27', 491.00, 13, 4.10, 'Address 391', 'Guide note 391', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (392, 'GuideFirst392', 'GuideLast392', '0500000392', 'guide392@mail.com', '1981-01-27', '2016-01-28', 492.00, 14, 4.20, 'Address 392', 'Guide note 392', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (393, 'GuideFirst393', 'GuideLast393', '0500000393', 'guide393@mail.com', '1981-01-28', '2016-01-29', 493.00, 15, 4.30, 'Address 393', 'Guide note 393', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (394, 'GuideFirst394', 'GuideLast394', '0500000394', 'guide394@mail.com', '1981-01-29', '2016-01-30', 494.00, 16, 4.40, 'Address 394', 'Guide note 394', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (395, 'GuideFirst395', 'GuideLast395', '0500000395', 'guide395@mail.com', '1981-01-30', '2016-01-31', 495.00, 17, 4.50, 'Address 395', 'Guide note 395', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (396, 'GuideFirst396', 'GuideLast396', '0500000396', 'guide396@mail.com', '1981-01-31', '2016-02-01', 496.00, 18, 4.60, 'Address 396', 'Guide note 396', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (397, 'GuideFirst397', 'GuideLast397', '0500000397', 'guide397@mail.com', '1981-02-01', '2016-02-02', 497.00, 19, 4.70, 'Address 397', 'Guide note 397', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (398, 'GuideFirst398', 'GuideLast398', '0500000398', 'guide398@mail.com', '1981-02-02', '2016-02-03', 498.00, 20, 4.80, 'Address 398', 'Guide note 398', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (399, 'GuideFirst399', 'GuideLast399', '0500000399', 'guide399@mail.com', '1981-02-03', '2016-02-04', 499.00, 0, 4.90, 'Address 399', 'Guide note 399', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (400, 'GuideFirst400', 'GuideLast400', '0500000400', 'guide400@mail.com', '1981-02-04', '2016-02-05', 300.00, 1, 0.00, 'Address 400', 'Guide note 400', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (401, 'GuideFirst401', 'GuideLast401', '0500000401', 'guide401@mail.com', '1981-02-05', '2016-02-06', 301.00, 2, 0.10, 'Address 401', 'Guide note 401', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (402, 'GuideFirst402', 'GuideLast402', '0500000402', 'guide402@mail.com', '1981-02-06', '2016-02-07', 302.00, 3, 0.20, 'Address 402', 'Guide note 402', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (403, 'GuideFirst403', 'GuideLast403', '0500000403', 'guide403@mail.com', '1981-02-07', '2016-02-08', 303.00, 4, 0.30, 'Address 403', 'Guide note 403', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (404, 'GuideFirst404', 'GuideLast404', '0500000404', 'guide404@mail.com', '1981-02-08', '2016-02-09', 304.00, 5, 0.40, 'Address 404', 'Guide note 404', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (405, 'GuideFirst405', 'GuideLast405', '0500000405', 'guide405@mail.com', '1981-02-09', '2016-02-10', 305.00, 6, 0.50, 'Address 405', 'Guide note 405', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (406, 'GuideFirst406', 'GuideLast406', '0500000406', 'guide406@mail.com', '1981-02-10', '2016-02-11', 306.00, 7, 0.60, 'Address 406', 'Guide note 406', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (407, 'GuideFirst407', 'GuideLast407', '0500000407', 'guide407@mail.com', '1981-02-11', '2016-02-12', 307.00, 8, 0.70, 'Address 407', 'Guide note 407', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (408, 'GuideFirst408', 'GuideLast408', '0500000408', 'guide408@mail.com', '1981-02-12', '2016-02-13', 308.00, 9, 0.80, 'Address 408', 'Guide note 408', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (409, 'GuideFirst409', 'GuideLast409', '0500000409', 'guide409@mail.com', '1981-02-13', '2016-02-14', 309.00, 10, 0.90, 'Address 409', 'Guide note 409', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (410, 'GuideFirst410', 'GuideLast410', '0500000410', 'guide410@mail.com', '1981-02-14', '2016-02-15', 310.00, 11, 1.00, 'Address 410', 'Guide note 410', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (411, 'GuideFirst411', 'GuideLast411', '0500000411', 'guide411@mail.com', '1981-02-15', '2016-02-16', 311.00, 12, 1.10, 'Address 411', 'Guide note 411', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (412, 'GuideFirst412', 'GuideLast412', '0500000412', 'guide412@mail.com', '1981-02-16', '2016-02-17', 312.00, 13, 1.20, 'Address 412', 'Guide note 412', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (413, 'GuideFirst413', 'GuideLast413', '0500000413', 'guide413@mail.com', '1981-02-17', '2016-02-18', 313.00, 14, 1.30, 'Address 413', 'Guide note 413', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (414, 'GuideFirst414', 'GuideLast414', '0500000414', 'guide414@mail.com', '1981-02-18', '2016-02-19', 314.00, 15, 1.40, 'Address 414', 'Guide note 414', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (415, 'GuideFirst415', 'GuideLast415', '0500000415', 'guide415@mail.com', '1981-02-19', '2016-02-20', 315.00, 16, 1.50, 'Address 415', 'Guide note 415', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (416, 'GuideFirst416', 'GuideLast416', '0500000416', 'guide416@mail.com', '1981-02-20', '2016-02-21', 316.00, 17, 1.60, 'Address 416', 'Guide note 416', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (417, 'GuideFirst417', 'GuideLast417', '0500000417', 'guide417@mail.com', '1981-02-21', '2016-02-22', 317.00, 18, 1.70, 'Address 417', 'Guide note 417', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (418, 'GuideFirst418', 'GuideLast418', '0500000418', 'guide418@mail.com', '1981-02-22', '2016-02-23', 318.00, 19, 1.80, 'Address 418', 'Guide note 418', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (419, 'GuideFirst419', 'GuideLast419', '0500000419', 'guide419@mail.com', '1981-02-23', '2016-02-24', 319.00, 20, 1.90, 'Address 419', 'Guide note 419', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (420, 'GuideFirst420', 'GuideLast420', '0500000420', 'guide420@mail.com', '1981-02-24', '2016-02-25', 320.00, 0, 2.00, 'Address 420', 'Guide note 420', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (421, 'GuideFirst421', 'GuideLast421', '0500000421', 'guide421@mail.com', '1981-02-25', '2016-02-26', 321.00, 1, 2.10, 'Address 421', 'Guide note 421', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (422, 'GuideFirst422', 'GuideLast422', '0500000422', 'guide422@mail.com', '1981-02-26', '2016-02-27', 322.00, 2, 2.20, 'Address 422', 'Guide note 422', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (423, 'GuideFirst423', 'GuideLast423', '0500000423', 'guide423@mail.com', '1981-02-27', '2016-02-28', 323.00, 3, 2.30, 'Address 423', 'Guide note 423', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (424, 'GuideFirst424', 'GuideLast424', '0500000424', 'guide424@mail.com', '1981-02-28', '2016-02-29', 324.00, 4, 2.40, 'Address 424', 'Guide note 424', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (425, 'GuideFirst425', 'GuideLast425', '0500000425', 'guide425@mail.com', '1981-03-01', '2016-03-01', 325.00, 5, 2.50, 'Address 425', 'Guide note 425', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (426, 'GuideFirst426', 'GuideLast426', '0500000426', 'guide426@mail.com', '1981-03-02', '2016-03-02', 326.00, 6, 2.60, 'Address 426', 'Guide note 426', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (427, 'GuideFirst427', 'GuideLast427', '0500000427', 'guide427@mail.com', '1981-03-03', '2016-03-03', 327.00, 7, 2.70, 'Address 427', 'Guide note 427', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (428, 'GuideFirst428', 'GuideLast428', '0500000428', 'guide428@mail.com', '1981-03-04', '2016-03-04', 328.00, 8, 2.80, 'Address 428', 'Guide note 428', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (429, 'GuideFirst429', 'GuideLast429', '0500000429', 'guide429@mail.com', '1981-03-05', '2016-03-05', 329.00, 9, 2.90, 'Address 429', 'Guide note 429', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (430, 'GuideFirst430', 'GuideLast430', '0500000430', 'guide430@mail.com', '1981-03-06', '2016-03-06', 330.00, 10, 3.00, 'Address 430', 'Guide note 430', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (431, 'GuideFirst431', 'GuideLast431', '0500000431', 'guide431@mail.com', '1981-03-07', '2016-03-07', 331.00, 11, 3.10, 'Address 431', 'Guide note 431', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (432, 'GuideFirst432', 'GuideLast432', '0500000432', 'guide432@mail.com', '1981-03-08', '2016-03-08', 332.00, 12, 3.20, 'Address 432', 'Guide note 432', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (433, 'GuideFirst433', 'GuideLast433', '0500000433', 'guide433@mail.com', '1981-03-09', '2016-03-09', 333.00, 13, 3.30, 'Address 433', 'Guide note 433', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (434, 'GuideFirst434', 'GuideLast434', '0500000434', 'guide434@mail.com', '1981-03-10', '2016-03-10', 334.00, 14, 3.40, 'Address 434', 'Guide note 434', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (435, 'GuideFirst435', 'GuideLast435', '0500000435', 'guide435@mail.com', '1981-03-11', '2016-03-11', 335.00, 15, 3.50, 'Address 435', 'Guide note 435', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (436, 'GuideFirst436', 'GuideLast436', '0500000436', 'guide436@mail.com', '1981-03-12', '2016-03-12', 336.00, 16, 3.60, 'Address 436', 'Guide note 436', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (437, 'GuideFirst437', 'GuideLast437', '0500000437', 'guide437@mail.com', '1981-03-13', '2016-03-13', 337.00, 17, 3.70, 'Address 437', 'Guide note 437', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (438, 'GuideFirst438', 'GuideLast438', '0500000438', 'guide438@mail.com', '1981-03-14', '2016-03-14', 338.00, 18, 3.80, 'Address 438', 'Guide note 438', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (439, 'GuideFirst439', 'GuideLast439', '0500000439', 'guide439@mail.com', '1981-03-15', '2016-03-15', 339.00, 19, 3.90, 'Address 439', 'Guide note 439', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (440, 'GuideFirst440', 'GuideLast440', '0500000440', 'guide440@mail.com', '1981-03-16', '2016-03-16', 340.00, 20, 4.00, 'Address 440', 'Guide note 440', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (441, 'GuideFirst441', 'GuideLast441', '0500000441', 'guide441@mail.com', '1981-03-17', '2016-03-17', 341.00, 0, 4.10, 'Address 441', 'Guide note 441', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (442, 'GuideFirst442', 'GuideLast442', '0500000442', 'guide442@mail.com', '1981-03-18', '2016-03-18', 342.00, 1, 4.20, 'Address 442', 'Guide note 442', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (443, 'GuideFirst443', 'GuideLast443', '0500000443', 'guide443@mail.com', '1981-03-19', '2016-03-19', 343.00, 2, 4.30, 'Address 443', 'Guide note 443', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (444, 'GuideFirst444', 'GuideLast444', '0500000444', 'guide444@mail.com', '1981-03-20', '2016-03-20', 344.00, 3, 4.40, 'Address 444', 'Guide note 444', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (445, 'GuideFirst445', 'GuideLast445', '0500000445', 'guide445@mail.com', '1981-03-21', '2016-03-21', 345.00, 4, 4.50, 'Address 445', 'Guide note 445', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (446, 'GuideFirst446', 'GuideLast446', '0500000446', 'guide446@mail.com', '1981-03-22', '2016-03-22', 346.00, 5, 4.60, 'Address 446', 'Guide note 446', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (447, 'GuideFirst447', 'GuideLast447', '0500000447', 'guide447@mail.com', '1981-03-23', '2016-03-23', 347.00, 6, 4.70, 'Address 447', 'Guide note 447', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (448, 'GuideFirst448', 'GuideLast448', '0500000448', 'guide448@mail.com', '1981-03-24', '2016-03-24', 348.00, 7, 4.80, 'Address 448', 'Guide note 448', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (450, 'GuideFirst450', 'GuideLast450', '0500000450', 'guide450@mail.com', '1981-03-26', '2016-03-26', 350.00, 9, 0.00, 'Address 450', 'Guide note 450', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (451, 'GuideFirst451', 'GuideLast451', '0500000451', 'guide451@mail.com', '1981-03-27', '2016-03-27', 351.00, 10, 0.10, 'Address 451', 'Guide note 451', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (452, 'GuideFirst452', 'GuideLast452', '0500000452', 'guide452@mail.com', '1981-03-28', '2016-03-28', 352.00, 11, 0.20, 'Address 452', 'Guide note 452', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (453, 'GuideFirst453', 'GuideLast453', '0500000453', 'guide453@mail.com', '1981-03-29', '2016-03-29', 353.00, 12, 0.30, 'Address 453', 'Guide note 453', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (454, 'GuideFirst454', 'GuideLast454', '0500000454', 'guide454@mail.com', '1981-03-30', '2016-03-30', 354.00, 13, 0.40, 'Address 454', 'Guide note 454', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (455, 'GuideFirst455', 'GuideLast455', '0500000455', 'guide455@mail.com', '1981-03-31', '2016-03-31', 355.00, 14, 0.50, 'Address 455', 'Guide note 455', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (456, 'GuideFirst456', 'GuideLast456', '0500000456', 'guide456@mail.com', '1981-04-01', '2016-04-01', 356.00, 15, 0.60, 'Address 456', 'Guide note 456', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (457, 'GuideFirst457', 'GuideLast457', '0500000457', 'guide457@mail.com', '1981-04-02', '2016-04-02', 357.00, 16, 0.70, 'Address 457', 'Guide note 457', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (458, 'GuideFirst458', 'GuideLast458', '0500000458', 'guide458@mail.com', '1981-04-03', '2016-04-03', 358.00, 17, 0.80, 'Address 458', 'Guide note 458', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (459, 'GuideFirst459', 'GuideLast459', '0500000459', 'guide459@mail.com', '1981-04-04', '2016-04-04', 359.00, 18, 0.90, 'Address 459', 'Guide note 459', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (460, 'GuideFirst460', 'GuideLast460', '0500000460', 'guide460@mail.com', '1981-04-05', '2016-04-05', 360.00, 19, 1.00, 'Address 460', 'Guide note 460', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (461, 'GuideFirst461', 'GuideLast461', '0500000461', 'guide461@mail.com', '1981-04-06', '2016-04-06', 361.00, 20, 1.10, 'Address 461', 'Guide note 461', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (462, 'GuideFirst462', 'GuideLast462', '0500000462', 'guide462@mail.com', '1981-04-07', '2016-04-07', 362.00, 0, 1.20, 'Address 462', 'Guide note 462', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (463, 'GuideFirst463', 'GuideLast463', '0500000463', 'guide463@mail.com', '1981-04-08', '2016-04-08', 363.00, 1, 1.30, 'Address 463', 'Guide note 463', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (464, 'GuideFirst464', 'GuideLast464', '0500000464', 'guide464@mail.com', '1981-04-09', '2016-04-09', 364.00, 2, 1.40, 'Address 464', 'Guide note 464', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (465, 'GuideFirst465', 'GuideLast465', '0500000465', 'guide465@mail.com', '1981-04-10', '2016-04-10', 365.00, 3, 1.50, 'Address 465', 'Guide note 465', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (466, 'GuideFirst466', 'GuideLast466', '0500000466', 'guide466@mail.com', '1981-04-11', '2016-04-11', 366.00, 4, 1.60, 'Address 466', 'Guide note 466', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (467, 'GuideFirst467', 'GuideLast467', '0500000467', 'guide467@mail.com', '1981-04-12', '2016-04-12', 367.00, 5, 1.70, 'Address 467', 'Guide note 467', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (468, 'GuideFirst468', 'GuideLast468', '0500000468', 'guide468@mail.com', '1981-04-13', '2016-04-13', 368.00, 6, 1.80, 'Address 468', 'Guide note 468', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (469, 'GuideFirst469', 'GuideLast469', '0500000469', 'guide469@mail.com', '1981-04-14', '2016-04-14', 369.00, 7, 1.90, 'Address 469', 'Guide note 469', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (470, 'GuideFirst470', 'GuideLast470', '0500000470', 'guide470@mail.com', '1981-04-15', '2016-04-15', 370.00, 8, 2.00, 'Address 470', 'Guide note 470', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (471, 'GuideFirst471', 'GuideLast471', '0500000471', 'guide471@mail.com', '1981-04-16', '2016-04-16', 371.00, 9, 2.10, 'Address 471', 'Guide note 471', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (472, 'GuideFirst472', 'GuideLast472', '0500000472', 'guide472@mail.com', '1981-04-17', '2016-04-17', 372.00, 10, 2.20, 'Address 472', 'Guide note 472', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (473, 'GuideFirst473', 'GuideLast473', '0500000473', 'guide473@mail.com', '1981-04-18', '2016-04-18', 373.00, 11, 2.30, 'Address 473', 'Guide note 473', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (474, 'GuideFirst474', 'GuideLast474', '0500000474', 'guide474@mail.com', '1981-04-19', '2016-04-19', 374.00, 12, 2.40, 'Address 474', 'Guide note 474', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (475, 'GuideFirst475', 'GuideLast475', '0500000475', 'guide475@mail.com', '1981-04-20', '2016-04-20', 375.00, 13, 2.50, 'Address 475', 'Guide note 475', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (476, 'GuideFirst476', 'GuideLast476', '0500000476', 'guide476@mail.com', '1981-04-21', '2016-04-21', 376.00, 14, 2.60, 'Address 476', 'Guide note 476', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (477, 'GuideFirst477', 'GuideLast477', '0500000477', 'guide477@mail.com', '1981-04-22', '2016-04-22', 377.00, 15, 2.70, 'Address 477', 'Guide note 477', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (478, 'GuideFirst478', 'GuideLast478', '0500000478', 'guide478@mail.com', '1981-04-23', '2016-04-23', 378.00, 16, 2.80, 'Address 478', 'Guide note 478', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (479, 'GuideFirst479', 'GuideLast479', '0500000479', 'guide479@mail.com', '1981-04-24', '2016-04-24', 379.00, 17, 2.90, 'Address 479', 'Guide note 479', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (480, 'GuideFirst480', 'GuideLast480', '0500000480', 'guide480@mail.com', '1981-04-25', '2016-04-25', 380.00, 18, 3.00, 'Address 480', 'Guide note 480', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (481, 'GuideFirst481', 'GuideLast481', '0500000481', 'guide481@mail.com', '1981-04-26', '2016-04-26', 381.00, 19, 3.10, 'Address 481', 'Guide note 481', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (482, 'GuideFirst482', 'GuideLast482', '0500000482', 'guide482@mail.com', '1981-04-27', '2016-04-27', 382.00, 20, 3.20, 'Address 482', 'Guide note 482', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (483, 'GuideFirst483', 'GuideLast483', '0500000483', 'guide483@mail.com', '1981-04-28', '2016-04-28', 383.00, 0, 3.30, 'Address 483', 'Guide note 483', 'Junior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (484, 'GuideFirst484', 'GuideLast484', '0500000484', 'guide484@mail.com', '1981-04-29', '2016-04-29', 384.00, 1, 3.40, 'Address 484', 'Guide note 484', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (485, 'GuideFirst485', 'GuideLast485', '0500000485', 'guide485@mail.com', '1981-04-30', '2016-04-30', 385.00, 2, 3.50, 'Address 485', 'Guide note 485', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (486, 'GuideFirst486', 'GuideLast486', '0500000486', 'guide486@mail.com', '1981-05-01', '2016-05-01', 386.00, 3, 3.60, 'Address 486', 'Guide note 486', 'General Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (487, 'GuideFirst487', 'GuideLast487', '0500000487', 'guide487@mail.com', '1981-05-02', '2016-05-02', 387.00, 4, 3.70, 'Address 487', 'Guide note 487', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (488, 'GuideFirst488', 'GuideLast488', '0500000488', 'guide488@mail.com', '1981-05-03', '2016-05-03', 388.00, 5, 3.80, 'Address 488', 'Guide note 488', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (489, 'GuideFirst489', 'GuideLast489', '0500000489', 'guide489@mail.com', '1981-05-04', '2016-05-04', 389.00, 6, 3.90, 'Address 489', 'Guide note 489', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (490, 'GuideFirst490', 'GuideLast490', '0500000490', 'guide490@mail.com', '1981-05-05', '2016-05-05', 390.00, 7, 4.00, 'Address 490', 'Guide note 490', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (491, 'GuideFirst491', 'GuideLast491', '0500000491', 'guide491@mail.com', '1981-05-06', '2016-05-06', 391.00, 8, 4.10, 'Address 491', 'Guide note 491', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (492, 'GuideFirst492', 'GuideLast492', '0500000492', 'guide492@mail.com', '1981-05-07', '2016-05-07', 392.00, 9, 4.20, 'Address 492', 'Guide note 492', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (493, 'GuideFirst493', 'GuideLast493', '0500000493', 'guide493@mail.com', '1981-05-08', '2016-05-08', 393.00, 10, 4.30, 'Address 493', 'Guide note 493', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (494, 'GuideFirst494', 'GuideLast494', '0500000494', 'guide494@mail.com', '1981-05-09', '2016-05-09', 394.00, 11, 4.40, 'Address 494', 'Guide note 494', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (495, 'GuideFirst495', 'GuideLast495', '0500000495', 'guide495@mail.com', '1981-05-10', '2016-05-10', 395.00, 12, 4.50, 'Address 495', 'Guide note 495', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (496, 'GuideFirst496', 'GuideLast496', '0500000496', 'guide496@mail.com', '1981-05-11', '2016-05-11', 396.00, 13, 4.60, 'Address 496', 'Guide note 496', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (497, 'GuideFirst497', 'GuideLast497', '0500000497', 'guide497@mail.com', '1981-05-12', '2016-05-12', 397.00, 14, 4.70, 'Address 497', 'Guide note 497', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (498, 'GuideFirst498', 'GuideLast498', '0500000498', 'guide498@mail.com', '1981-05-13', '2016-05-13', 398.00, 15, 4.80, 'Address 498', 'Guide note 498', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (500, 'GuideFirst500', 'GuideLast500', '0500000500', 'guide500@mail.com', '1981-05-15', '2016-05-15', 400.00, 17, 0.00, 'Address 500', 'Guide note 500', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (49, 'GuideFirst49', 'GuideLast49', '0500000049', 'guide49@mail.com', '1980-02-19', '2015-02-19', 383.90, 7, 4.90, 'Address 49', 'Guide note 49', 'Professional Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (99, 'GuideFirst99', 'GuideLast99', '0500000099', 'guide99@mail.com', '1980-04-09', '2015-04-10', 438.90, 15, 4.90, 'Address 99', 'Guide note 99', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (199, 'GuideFirst199', 'GuideLast199', '0500000199', 'guide199@mail.com', '1980-07-18', '2015-07-19', 548.90, 10, 4.90, 'Address 199', 'Guide note 199', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (249, 'GuideFirst249', 'GuideLast249', '0500000249', 'guide249@mail.com', '1980-09-06', '2015-09-07', 383.90, 18, 4.90, 'Address 249', 'Guide note 249', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (349, 'GuideFirst349', 'GuideLast349', '0500000349', 'guide349@mail.com', '1980-12-15', '2015-12-16', 493.90, 13, 4.90, 'Address 349', 'Guide note 349', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (449, 'GuideFirst449', 'GuideLast449', '0500000449', 'guide449@mail.com', '1981-03-25', '2016-03-25', 383.90, 8, 4.90, 'Address 449', 'Guide note 449', 'Senior Tour Guide');
+INSERT INTO public.guide (guideid, firstname, lastname, phone, email, birthdate, joindate, dailyrate, experienceyears, rating, address, notes, expertise) VALUES (499, 'GuideFirst499', 'GuideLast499', '0500000499', 'guide499@mail.com', '1981-05-14', '2016-05-14', 438.90, 16, 4.90, 'Address 499', 'Guide note 499', 'Senior Tour Guide');
 
 
 --
--- TOC entry 3554 (class 0 OID 32989)
+-- TOC entry 3564 (class 0 OID 32989)
 -- Dependencies: 223
 -- Data for Name: guidedtour; Type: TABLE DATA; Schema: public; Owner: Gilat
 --
@@ -2368,23 +2432,528 @@ INSERT INTO public.guidedtour (tourid, startdate, enddate, starttime, endtime, m
 
 
 --
--- TOC entry 3561 (class 0 OID 49171)
+-- TOC entry 3571 (class 0 OID 49171)
 -- Dependencies: 230
 -- Data for Name: located_in; Type: TABLE DATA; Schema: public; Owner: Gilat
 --
 
+INSERT INTO public.located_in (routeid, locationid) VALUES (251, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (106, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (285, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (120, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (264, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (497, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (452, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (496, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (455, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (209, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (276, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (151, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (384, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (253, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (399, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (119, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (270, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (437, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (268, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (310, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (214, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (397, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (101, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (339, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (20, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (486, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (330, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (82, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (25, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (359, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (213, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (26, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (137, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (265, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (405, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (379, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (292, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (168, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (136, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (218, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (196, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (373, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (238, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (27, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (230, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (414, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (449, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (149, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (93, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (307, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (382, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (335, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (191, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (295, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (11, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (228, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (135, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (252, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (39, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (489, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (131, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (178, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (471, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (255, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (357, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (241, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (465, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (325, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (17, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (142, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (66, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (479, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (160, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (89, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (284, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (33, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (442, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (109, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (57, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (239, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (288, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (31, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (34, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (296, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (12, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (282, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (428, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (321, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (10, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (324, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (18, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (146, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (139, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (143, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (424, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (98, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (381, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (193, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (408, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (466, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (243, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (167, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (250, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (64, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (478, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (145, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (458, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (198, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (104, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (413, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (163, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (102, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (315, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (71, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (2, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (343, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (72, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (234, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (186, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (177, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (346, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (480, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (337, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (280, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (297, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (459, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (419, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (314, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (444, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (391, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (400, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (274, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (473, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (320, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (426, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (412, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (47, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (211, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (46, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (83, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (304, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (15, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (361, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (125, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (77, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (140, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (474, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (153, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (73, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (182, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (56, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (40, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (355, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (277, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (261, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (123, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (348, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (332, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (468, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (333, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (484, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (189, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (404, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (233, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (485, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (376, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (226, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (500, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (13, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (91, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (433, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (303, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (293, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (365, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (287, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (165, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (21, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (152, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (475, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (401, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (462, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (281, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (5, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (301, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (461, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (499, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (181, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (340, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (498, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (367, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (392, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (298, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (429, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (432, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (254, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (112, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (96, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (396, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (107, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (493, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (319, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (221, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (435, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (258, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (398, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (108, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (19, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (215, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (65, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (52, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (366, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (317, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (440, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (37, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (85, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (421, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (32, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (358, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (164, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (326, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (78, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (278, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (289, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (133, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (279, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (100, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (443, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (492, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (416, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (232, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (427, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (158, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (172, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (113, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (377, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (184, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (24, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (403, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (170, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (494, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (55, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (374, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (68, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (244, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (456, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (128, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (38, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (300, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (353, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (256, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (216, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (202, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (266, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (195, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (129, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (8, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (483, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (305, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (80, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (318, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (312, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (179, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (470, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (110, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (370, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (175, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (99, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (48, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (28, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (313, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (262, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (94, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (362, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (204, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (162, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (30, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (356, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (299, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (95, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (122, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (62, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (329, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (454, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (180, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (390, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (127, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (439, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (117, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (438, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (185, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (487, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (309, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (349, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (363, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (341, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (286, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (409, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (446, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (155, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (434, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (417, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (389, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (97, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (205, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (197, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (447, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (187, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (114, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (351, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (156, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (386, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (302, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (269, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (249, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (194, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (126, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (430, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (316, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (336, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (132, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (378, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (369, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (457, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (67, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (464, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (352, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (395, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (224, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (477, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (50, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (51, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (406, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (76, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (460, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (69, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (334, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (203, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (441, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (385, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (393, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (219, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (81, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (273, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (79, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (450, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (42, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (481, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (90, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (134, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (59, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (192, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (338, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (271, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (350, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (116, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (235, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (394, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (387, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (248, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (84, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (207, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (74, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (418, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (6, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (463, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (246, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (488, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (29, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (159, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (354, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (267, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (41, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (141, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (467, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (402, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (171, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (227, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (380, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (247, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (347, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (311, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (410, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (242, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (138, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (190, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (16, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (54, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (342, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (103, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (115, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (236, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (148, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (208, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (323, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (322, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (368, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (294, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (36, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (174, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (451, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (407, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (4, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (257, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (200, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (53, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (222, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (275, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (92, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (23, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (44, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (371, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (58, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (1, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (290, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (206, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (111, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (364, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (237, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (372, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (86, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (49, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (22, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (360, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (70, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (45, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (225, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (199, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (495, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (60, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (422, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (327, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (105, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (469, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (75, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (124, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (229, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (245, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (425, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (415, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (43, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (220, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (482, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (259, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (166, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (291, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (423, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (431, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (3, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (201, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (61, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (176, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (87, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (388, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (169, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (14, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (344, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (476, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (472, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (147, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (121, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (210, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (161, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (157, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (154, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (35, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (173, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (375, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (188, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (448, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (491, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (306, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (345, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (436, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (308, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (150, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (420, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (490, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (331, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (63, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (183, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (9, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (445, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (411, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (260, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (118, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (88, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (272, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (130, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (240, 5);
+INSERT INTO public.located_in (routeid, locationid) VALUES (223, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (283, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (231, 1);
+INSERT INTO public.located_in (routeid, locationid) VALUES (217, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (383, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (212, 2);
+INSERT INTO public.located_in (routeid, locationid) VALUES (328, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (263, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (144, 4);
+INSERT INTO public.located_in (routeid, locationid) VALUES (453, 3);
+INSERT INTO public.located_in (routeid, locationid) VALUES (7, 2);
 
 
 --
--- TOC entry 3560 (class 0 OID 49164)
+-- TOC entry 3570 (class 0 OID 49164)
 -- Dependencies: 229
 -- Data for Name: location; Type: TABLE DATA; Schema: public; Owner: Gilat
 --
 
+INSERT INTO public.location (locationid, locationname, category) VALUES (1, 'Jerusalem', 'Historical');
+INSERT INTO public.location (locationid, locationname, category) VALUES (2, 'Tel Aviv', 'Urban');
+INSERT INTO public.location (locationid, locationname, category) VALUES (3, 'Dead Sea', 'Nature');
+INSERT INTO public.location (locationid, locationname, category) VALUES (4, 'Galilee', 'Nature');
+INSERT INTO public.location (locationid, locationname, category) VALUES (5, 'Negev Desert', 'Desert');
 
 
 --
--- TOC entry 3559 (class 0 OID 33073)
+-- TOC entry 3569 (class 0 OID 33073)
 -- Dependencies: 228
 -- Data for Name: payment; Type: TABLE DATA; Schema: public; Owner: Gilat
 --
@@ -22892,7 +23461,7 @@ INSERT INTO public.payment (paymentid, paymentdate, amount, notes, paymentmethod
 
 
 --
--- TOC entry 3558 (class 0 OID 33066)
+-- TOC entry 3568 (class 0 OID 33066)
 -- Dependencies: 227
 -- Data for Name: paymentstatus; Type: TABLE DATA; Schema: public; Owner: Gilat
 --
@@ -23400,7 +23969,7 @@ INSERT INTO public.paymentstatus (paymentstatusid, statusname) VALUES (500, 'Pay
 
 
 --
--- TOC entry 3557 (class 0 OID 33038)
+-- TOC entry 3567 (class 0 OID 33038)
 -- Dependencies: 226
 -- Data for Name: registration; Type: TABLE DATA; Schema: public; Owner: Gilat
 --
@@ -43408,7 +43977,7 @@ INSERT INTO public.registration (registrationid, registrationdate, amounttopay, 
 
 
 --
--- TOC entry 3556 (class 0 OID 33031)
+-- TOC entry 3566 (class 0 OID 33031)
 -- Dependencies: 225
 -- Data for Name: registrationstatus; Type: TABLE DATA; Schema: public; Owner: Gilat
 --
@@ -43916,7 +44485,7 @@ INSERT INTO public.registrationstatus (registrationstatusid, statusname) VALUES 
 
 
 --
--- TOC entry 3552 (class 0 OID 32965)
+-- TOC entry 3562 (class 0 OID 32965)
 -- Dependencies: 221
 -- Data for Name: route; Type: TABLE DATA; Schema: public; Owner: Gilat
 --
@@ -44424,7 +44993,7 @@ INSERT INTO public.route (routeid, name, estimatedlength, estimatedduration, des
 
 
 --
--- TOC entry 3553 (class 0 OID 32982)
+-- TOC entry 3563 (class 0 OID 32982)
 -- Dependencies: 222
 -- Data for Name: tourstatus; Type: TABLE DATA; Schema: public; Owner: Gilat
 --
@@ -44932,7 +45501,7 @@ INSERT INTO public.tourstatus (tourstatusid, statusname) VALUES (500, 'Tour Stat
 
 
 --
--- TOC entry 3370 (class 2606 OID 33030)
+-- TOC entry 3378 (class 2606 OID 33030)
 -- Name: customer customer_email_key; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -44941,7 +45510,7 @@ ALTER TABLE ONLY public.customer
 
 
 --
--- TOC entry 3372 (class 2606 OID 33028)
+-- TOC entry 3380 (class 2606 OID 33028)
 -- Name: customer customer_pkey; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -44950,7 +45519,7 @@ ALTER TABLE ONLY public.customer
 
 
 --
--- TOC entry 3361 (class 2606 OID 32964)
+-- TOC entry 3369 (class 2606 OID 32964)
 -- Name: difficultylevel difficultylevel_pkey; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -44959,7 +45528,7 @@ ALTER TABLE ONLY public.difficultylevel
 
 
 --
--- TOC entry 3357 (class 2606 OID 32957)
+-- TOC entry 3365 (class 2606 OID 32957)
 -- Name: guide guide_email_key; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -44968,7 +45537,7 @@ ALTER TABLE ONLY public.guide
 
 
 --
--- TOC entry 3359 (class 2606 OID 32955)
+-- TOC entry 3367 (class 2606 OID 32955)
 -- Name: guide guide_pkey; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -44977,7 +45546,7 @@ ALTER TABLE ONLY public.guide
 
 
 --
--- TOC entry 3367 (class 2606 OID 33004)
+-- TOC entry 3375 (class 2606 OID 33004)
 -- Name: guidedtour guidedtour_pkey; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -44986,7 +45555,7 @@ ALTER TABLE ONLY public.guidedtour
 
 
 --
--- TOC entry 3388 (class 2606 OID 49177)
+-- TOC entry 3396 (class 2606 OID 49177)
 -- Name: located_in located_in_pkey; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -44995,7 +45564,7 @@ ALTER TABLE ONLY public.located_in
 
 
 --
--- TOC entry 3386 (class 2606 OID 49170)
+-- TOC entry 3394 (class 2606 OID 49170)
 -- Name: location location_pkey; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45004,7 +45573,7 @@ ALTER TABLE ONLY public.location
 
 
 --
--- TOC entry 3384 (class 2606 OID 33085)
+-- TOC entry 3392 (class 2606 OID 33085)
 -- Name: payment payment_pkey; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45013,7 +45582,7 @@ ALTER TABLE ONLY public.payment
 
 
 --
--- TOC entry 3381 (class 2606 OID 33072)
+-- TOC entry 3389 (class 2606 OID 33072)
 -- Name: paymentstatus paymentstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45022,7 +45591,7 @@ ALTER TABLE ONLY public.paymentstatus
 
 
 --
--- TOC entry 3379 (class 2606 OID 33050)
+-- TOC entry 3387 (class 2606 OID 33050)
 -- Name: registration registration_pkey; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45031,7 +45600,7 @@ ALTER TABLE ONLY public.registration
 
 
 --
--- TOC entry 3376 (class 2606 OID 33037)
+-- TOC entry 3384 (class 2606 OID 33037)
 -- Name: registrationstatus registrationstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45040,7 +45609,7 @@ ALTER TABLE ONLY public.registrationstatus
 
 
 --
--- TOC entry 3363 (class 2606 OID 32976)
+-- TOC entry 3371 (class 2606 OID 32976)
 -- Name: route route_pkey; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45049,7 +45618,7 @@ ALTER TABLE ONLY public.route
 
 
 --
--- TOC entry 3365 (class 2606 OID 32988)
+-- TOC entry 3373 (class 2606 OID 32988)
 -- Name: tourstatus tourstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45058,7 +45627,7 @@ ALTER TABLE ONLY public.tourstatus
 
 
 --
--- TOC entry 3374 (class 2606 OID 40962)
+-- TOC entry 3382 (class 2606 OID 40962)
 -- Name: customer uni_cust_email; Type: CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45067,7 +45636,7 @@ ALTER TABLE ONLY public.customer
 
 
 --
--- TOC entry 3368 (class 1259 OID 40966)
+-- TOC entry 3376 (class 1259 OID 40966)
 -- Name: idx_guidedtour_routeid; Type: INDEX; Schema: public; Owner: Gilat
 --
 
@@ -45075,7 +45644,7 @@ CREATE INDEX idx_guidedtour_routeid ON public.guidedtour USING btree (routeid);
 
 
 --
--- TOC entry 3382 (class 1259 OID 40964)
+-- TOC entry 3390 (class 1259 OID 40964)
 -- Name: idx_payment_paymentdate; Type: INDEX; Schema: public; Owner: Gilat
 --
 
@@ -45083,7 +45652,7 @@ CREATE INDEX idx_payment_paymentdate ON public.payment USING btree (paymentdate)
 
 
 --
--- TOC entry 3377 (class 1259 OID 40965)
+-- TOC entry 3385 (class 1259 OID 40965)
 -- Name: idx_registration_tourid; Type: INDEX; Schema: public; Owner: Gilat
 --
 
@@ -45091,7 +45660,7 @@ CREATE INDEX idx_registration_tourid ON public.registration USING btree (tourid)
 
 
 --
--- TOC entry 3390 (class 2606 OID 33005)
+-- TOC entry 3398 (class 2606 OID 33005)
 -- Name: guidedtour guidedtour_guideid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45100,7 +45669,7 @@ ALTER TABLE ONLY public.guidedtour
 
 
 --
--- TOC entry 3391 (class 2606 OID 33010)
+-- TOC entry 3399 (class 2606 OID 33010)
 -- Name: guidedtour guidedtour_routeid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45109,7 +45678,7 @@ ALTER TABLE ONLY public.guidedtour
 
 
 --
--- TOC entry 3392 (class 2606 OID 33015)
+-- TOC entry 3400 (class 2606 OID 33015)
 -- Name: guidedtour guidedtour_tourstatusid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45118,7 +45687,7 @@ ALTER TABLE ONLY public.guidedtour
 
 
 --
--- TOC entry 3398 (class 2606 OID 49183)
+-- TOC entry 3406 (class 2606 OID 49183)
 -- Name: located_in located_in_locationid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45127,7 +45696,7 @@ ALTER TABLE ONLY public.located_in
 
 
 --
--- TOC entry 3399 (class 2606 OID 49178)
+-- TOC entry 3407 (class 2606 OID 49178)
 -- Name: located_in located_in_routeid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45136,7 +45705,7 @@ ALTER TABLE ONLY public.located_in
 
 
 --
--- TOC entry 3396 (class 2606 OID 33091)
+-- TOC entry 3404 (class 2606 OID 33091)
 -- Name: payment payment_paymentstatusid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45145,7 +45714,7 @@ ALTER TABLE ONLY public.payment
 
 
 --
--- TOC entry 3397 (class 2606 OID 33086)
+-- TOC entry 3405 (class 2606 OID 33086)
 -- Name: payment payment_registrationid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45154,7 +45723,7 @@ ALTER TABLE ONLY public.payment
 
 
 --
--- TOC entry 3393 (class 2606 OID 33051)
+-- TOC entry 3401 (class 2606 OID 33051)
 -- Name: registration registration_customerid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45163,7 +45732,7 @@ ALTER TABLE ONLY public.registration
 
 
 --
--- TOC entry 3394 (class 2606 OID 33061)
+-- TOC entry 3402 (class 2606 OID 33061)
 -- Name: registration registration_registrationstatusid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45172,7 +45741,7 @@ ALTER TABLE ONLY public.registration
 
 
 --
--- TOC entry 3395 (class 2606 OID 33056)
+-- TOC entry 3403 (class 2606 OID 33056)
 -- Name: registration registration_tourid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45181,7 +45750,7 @@ ALTER TABLE ONLY public.registration
 
 
 --
--- TOC entry 3389 (class 2606 OID 32977)
+-- TOC entry 3397 (class 2606 OID 32977)
 -- Name: route route_difficultyid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: Gilat
 --
 
@@ -45189,11 +45758,11 @@ ALTER TABLE ONLY public.route
     ADD CONSTRAINT route_difficultyid_fkey FOREIGN KEY (difficultyid) REFERENCES public.difficultylevel(difficultyid);
 
 
--- Completed on 2026-06-01 17:14:06 UTC
+-- Completed on 2026-06-06 20:03:47 UTC
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict hZQYA2qGOyaZGsEIfx6FEtHZKqp1cyhjyUUycIa6oW7ApYscU6HLbTYVDtci50D
+\unrestrict syFv9Z46V6hGcPhbKJD0gPncAiAPOTHrJrQX17bMPyhVtuJSIEMXyplznPTZACU
 
