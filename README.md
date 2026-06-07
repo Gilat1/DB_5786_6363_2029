@@ -38,44 +38,60 @@ Guided Tour Management
   - [Indexes and Performance Analysis](#indexes-and-performance-analysis)
   - [Backup File (Phase 2)](#backup-file-phase-2)
   
-- [Phase 3: Integration and Views](#phase-3-integration-and-views)
-  - [Introduction](#introduction)
-  - [1. DSD Diagram – Received Department](#1-dsd-diagram--received-department)
-  - [2. ERD Diagram – Received Department](#2-erd-diagram--received-department)
-  - [3. ERD Diagram – Unified Database (Post-Integration)](#3-erd-diagram--unified-database-post-integration)
-  - [4. DSD Diagram – After Integration](#4-dsd-diagram--after-integration)
-  - [5. Integration Decisions and Explanations](#5-integration-decisions-and-explanations)
-    - [Integration Strategy](#integration-strategy)
-    - [Main Design Decisions](#main-design-decisions)
-      - [A. Separation Between ROUTE and GUIDEDTOUR](#a-separation-between-route-and-guidedtour)
-      - [B. Integration of LOCATION Management](#b-integration-of-location-management)
-      - [C. Expansion of GUIDE Entity](#c-expansion-of-guide-entity)
-      - [D. Preservation of Referential Integrity](#d-preservation-of-referential-integrity)
-  - [6. Explanation of SQL Commands](#6-explanation-of-sql-commands)
-    - [File: Integrate.sql](#file-integratesql)
-  - [7. Integration Execution Screenshots](#7-integration-execution-screenshots)
-    - [Step 1 – Adding Expertise Column to GUIDE](#step-1--adding-expertise-column-to-guide)
-    - [Step 2 – Updating Existing GUIDE Records](#step-2--updating-existing-guide-records)
-    - [Step 3 – Creating LOCATION Table](#step-3--creating-location-table)
-    - [Step 4 – Inserting LOCATION Data](#step-4--inserting-location-data)
-    - [Step 5 – Creating LOCATED_IN Table](#step-5--creating-located_in-table)
-    - [Step 6 – Connecting ROUTES to LOCATIONS](#step-6--connecting-routes-to-locations)
-    - [Step 7 – Verifying Integration Data](#step-7--verifying-integration-data)
-    - [Step 8 – Verifying GUIDE Expertise Integration](#step-8--verifying-guide-expertise-integration)
-  - [8. Views and Queries](#8-views-and-queries)
-    - [View 1 – vw_tour_guide_department_view](#view-1--vw_tour_guide_department_view)
-      - [Description](#description)
-      - [View Creation](#view-creation)
-      - [Query 1.1 – Tours With Available Seats](#query-11--tours-with-available-seats)
-      - [Query 1.2 – Most Popular Guided Tours](#query-12--most-popular-guided-tours)
-    - [View 2 – vw_route_management_department_view](#view-2--vw_route_management_department_view)
-      - [Description](#description-1)
-      - [View Creation](#view-creation-1)
-      - [Query 2.1 – Most Active Routes](#query-21--most-active-routes)
-      - [Query 2.2 – Long or Expensive Routes](#query-22--long-or-expensive-routes)
-  - [9. Updated Backup File](#9-updated-backup-file)
-  - [Summary](#summary)
-
+- [Phase 3 – Integration and Views](#phase-3--integration-and-views)
+  - [Project: Tour Guide Management System](#project-tour-guide-management-system)
+  - [1. Introduction](#1-introduction)
+  - [2. Received Database Import](#2-received-database-import)
+  - [3. Received Department – DSD Diagram](#3-received-department--dsd-diagram)
+  - [4. Reverse Engineering Algorithm](#4-reverse-engineering-algorithm)
+  - [5. Received Department – ERD Diagram](#5-received-department--erd-diagram)
+  - [6. Original Department – ERD Diagram](#6-original-department--erd-diagram)
+  - [7. Unified ERD Diagram After Integration](#7-unified-erd-diagram-after-integration)
+  - [8. DSD Diagram After Integration](#8-dsd-diagram-after-integration)
+  - [9. Integration Decisions](#9-integration-decisions)
+    - [9.1 PARTICIPANT Was Merged Into CUSTOMER](#91-participant-was-merged-into-customer)
+    - [9.2 TRIP Was Merged Into GUIDEDTOUR](#92-trip-was-merged-into-guidedtour)
+    - [9.3 TripID Was Mapped to TourID](#93-tripid-was-mapped-to-tourid)
+    - [9.4 BOOKING Was Merged Into REGISTRATION](#94-booking-was-merged-into-registration)
+    - [9.5 Payment Records Were Derived From BOOKING](#95-payment-records-were-derived-from-booking)
+    - [9.6 Expertise Was Added to GUIDE](#96-expertise-was-added-to-guide)
+    - [9.7 LOCATION and LOCATED_IN Were Added](#97-location-and-located_in-were-added)
+    - [9.8 Handling Empty PASSES_THROUGH Data](#98-handling-empty-passes_through-data)
+    - [9.9 Avoiding Primary Key Conflicts](#99-avoiding-primary-key-conflicts)
+    - [9.10 Handling Email Conflicts](#910-handling-email-conflicts)
+  - [10. Integration SQL File](#10-integration-sql-file)
+  - [11. Main Integration Commands](#11-main-integration-commands)
+    - [11.1 Adding Expertise to GUIDE](#111-adding-expertise-to-guide)
+    - [11.2 Creating LOCATION](#112-creating-location)
+    - [11.3 Creating LOCATED_IN](#113-creating-located_in)
+    - [11.4 Inserting Missing Difficulty Levels](#114-inserting-missing-difficulty-levels)
+    - [11.5 Merging Received Guides](#115-merging-received-guides)
+    - [11.6 Merging Received Routes](#116-merging-received-routes)
+    - [11.7 Merging Received Locations](#117-merging-received-locations)
+    - [11.8 Creating Route-Location Connections](#118-creating-route-location-connections)
+    - [11.9 Merging Received Participants Into CUSTOMER](#119-merging-received-participants-into-customer)
+    - [11.10 Merging Received Trips Into GUIDEDTOUR](#1110-merging-received-trips-into-guidedtour)
+    - [11.11 Merging Received Bookings Into REGISTRATION](#1111-merging-received-bookings-into-registration)
+    - [11.12 Creating Payments From Received Bookings](#1112-creating-payments-from-received-bookings)
+  - [12. Integration Verification](#12-integration-verification)
+    - [12.1 Row Count Verification](#121-row-count-verification)
+    - [12.2 Full Integration Query](#122-full-integration-query)
+  - [13. Views](#13-views)
+  - [14. View 1 – Tour Guide Department View](#14-view-1--tour-guide-department-view)
+    - [14.1 View Description](#141-view-description)
+    - [14.2 View Creation](#142-view-creation)
+    - [14.3 Select From View 1](#143-select-from-view-1)
+    - [14.4 Query 1.1 – Tours With Available Seats](#144-query-11--tours-with-available-seats)
+    - [14.5 Query 1.2 – Most Popular Guided Tours](#145-query-12--most-popular-guided-tours)
+  - [15. View 2 – Route Management Department View](#15-view-2--route-management-department-view)
+    - [15.1 View Description](#151-view-description)
+    - [15.2 View Creation](#152-view-creation)
+    - [15.3 Select From View 2](#153-select-from-view-2)
+    - [15.4 Query 2.1 – Most Active Routes](#154-query-21--most-active-routes)
+    - [15.5 Query 2.2 – Long or Expensive Routes](#155-query-22--long-or-expensive-routes)
+  - [16. Updated Backup File](#16-updated-backup-file)
+  - [17. Summary](#17-summary)
+  
 - [Phase 4: Programming with PL/pgSQL](#phase-4-programming-with-plpgsql)
   - [1. Function: fn_calculate_customer_payment_status](#1-function-fn_calculate_customer_payment_status)
     - [Description](#description)
@@ -1285,328 +1301,1052 @@ This backup allows full restoration of the database state after Phase 2.
 
 ---
 
-# Phase 3: Integration and Views
+# Phase 3 – Integration and Views
+
+## Project: Tour Guide Management System  
+## Integrated With: Route Management System
 
 ---
 
-# Introduction
+## 1. Introduction
 
-In this phase, we performed integration between two different database systems:
+In Phase 3, we performed an integration between two database systems:
 
-- Tour Guide Management System (our original project)
-- Route Management System (received project)
+1. **Tour Guide Management System** – our original database system.
+2. **Route Management System** – the received database system from another team.
 
-The goal of the integration process was to combine relevant entities from both systems into one unified database structure while preserving data integrity, reducing redundancy, and improving the overall database design.
+The goal of this phase was to combine both systems into one unified database while preserving data integrity, avoiding duplicate entities, and adapting the existing database according to the final integrated ERD.
 
-The integration focused mainly on route management, locations, guided tours, and analytical views.
+According to the assignment requirements, we used **Integration Method A**.
 
----
+This means:
 
-# 1. DSD Diagram – Received Department
-
-The following DSD diagram was received from the second project before the integration process.
-
-📸 
-<img width="3744" height="1365" alt="image" src="https://github.com/user-attachments/assets/7021bd09-c442-4f67-b502-a807a1b9d775" />
-
-
----
-
-# 2. ERD Diagram – Received Department
-
-The following ERD diagram represents the original structure of the received system before integration.
-
-📸  
-<img width="1024" height="373" alt="image" src="https://github.com/user-attachments/assets/25a4b267-bec8-483f-8250-fde6a48fae3f" />
-
+- We did **not** recreate all existing tables.
+- We used the existing database as the base database.
+- We changed existing tables using `ALTER TABLE`.
+- We created only new tables that did not exist in the original system.
+- We imported the received backup into a separate schema named `received`.
+- We inserted all received data from the `received` schema into the final integrated schema.
+- We documented the design decisions made during the integration process.
+- We verified that the integrated database works correctly.
+- We created two views and meaningful queries on each view.
 
 ---
 
-# 3. ERD Diagram – Unified Database (Post-Integration)
+## 2. Received Database Import
 
-This ERD diagram presents the final unified structure after combining both systems.
+Before performing the actual integration, the received database backup was imported into the same PostgreSQL database under a separate schema:
 
-📸  
-<img width="3720" height="1476" alt="image" src="https://github.com/user-attachments/assets/a89b572e-f26b-41dc-96ed-efebd6dd4a0e" />
-
-
----
-
-# 4. DSD Diagram – After Integration
-
-The following DSD diagram presents the final database structure after all integration changes were completed.
-
-📸  
-<img width="3720" height="1476" alt="image" src="https://github.com/user-attachments/assets/ccee5f00-cea6-4ede-a2f3-b595e5af19f2" />
-
-
----
-
-# 5. Integration Decisions and Explanations
-
-## Integration Strategy
-
-The integration process combined the route-related entities from the received project with the existing Tour Guide Management System.
-
-The main entities integrated into the unified system were:
-
-- ROUTE
-- LOCATION
-- LOCATED_IN
-- DIFFICULTYLEVEL
-
-These entities were connected to the existing GUIDEDTOUR system using foreign keys and relational constraints.
-
----
-
-# Main Design Decisions
-
-## A. Separation Between ROUTE and GUIDEDTOUR
-
-We preserved the distinction between:
-
-- ROUTE → represents the static route definition
-- GUIDEDTOUR → represents a scheduled occurrence of a route
-
-This separation prevents data duplication and allows multiple guided tours to use the same route.
-
----
-
-## B. Integration of LOCATION Management
-
-The received system included route location management.
-
-We integrated this functionality using:
-
-```sql
-LOCATION
+```text
+received
 ```
 
-and
+This allowed us to keep the received system separate from our original `public` schema while preparing the integration.
 
-```sql
-LOCATED_IN
+The received backup included the following tables:
+
+```text
+received.booking
+received.guide
+received.location
+received.participant
+received.passes_through
+received.route
+received.trip
 ```
 
-The LOCATED_IN table creates a many-to-many relationship between routes and locations.
+The received backup was imported using PostgreSQL tools inside Docker.
 
-This design allows:
+After importing the received backup, we verified that the schema and tables were created correctly using the following query:
 
-- One route to pass through multiple locations
-- One location to belong to multiple routes
+```sql
+SELECT table_schema, table_name
+FROM information_schema.tables
+WHERE table_schema = 'received'
+ORDER BY table_name;
+```
+<img width="1343" height="890" alt="צילום מסך 2026-06-07 165058" src="https://github.com/user-attachments/assets/8f1272ab-82c3-42d9-aea4-2bbcf5756798" />
 
-This structure is more flexible and normalized.
+
+We also verified the amount of data imported from the received system:
+
+```sql
+SELECT 'received.guide' AS table_name, COUNT(*) AS row_count FROM received.guide
+UNION ALL
+SELECT 'received.route', COUNT(*) FROM received.route
+UNION ALL
+SELECT 'received.trip', COUNT(*) FROM received.trip
+UNION ALL
+SELECT 'received.participant', COUNT(*) FROM received.participant
+UNION ALL
+SELECT 'received.booking', COUNT(*) FROM received.booking
+UNION ALL
+SELECT 'received.location', COUNT(*) FROM received.location
+UNION ALL
+SELECT 'received.passes_through', COUNT(*) FROM received.passes_through;
+```
+
+The received data counts were:
+
+```text
+received.guide           503
+received.route           503
+received.trip            503
+received.participant     20005
+received.booking         20003
+received.location        505
+received.passes_through  0
+```
+
+The table `received.passes_through` existed in the received schema, but it contained no rows.
+
+Because of that, the integration file includes a fallback step that creates valid route-location connections in the final `LOCATED_IN` table.
+<img width="1340" height="889" alt="צילום מסך 2026-06-07 165111" src="https://github.com/user-attachments/assets/2d729865-b047-4a73-b659-f0e4a42dfdac" />
 
 ---
 
-## C. Expansion of GUIDE Entity
+## 3. Received Department – DSD Diagram
 
-The GUIDE table was extended with a new field from the received system:
+The following diagram presents the DSD of the received Route Management System before integration.
+<img width="3744" height="1365" alt="image" src="https://github.com/user-attachments/assets/d01fc9b4-290d-4edd-ab54-9847983a3d9d" />
 
-```sql
+
+---
+
+## 4. Reverse Engineering Algorithm
+
+As required, we performed reverse engineering from the received database schema in order to build the ERD of the received department.
+
+The reverse engineering process was performed according to the following algorithm:
+
+1. **Identify all tables**  
+   We reviewed all tables in the received database schema.
+
+2. **Identify primary keys**  
+   For each table, we identified the primary key.  
+   Tables with their own primary key were treated as entity tables.
+
+3. **Identify foreign keys**  
+   Foreign keys were used to understand the relationships between tables.
+
+4. **Classify tables**  
+   We classified the tables into:
+   - Entity tables
+   - Lookup tables
+   - Relationship tables
+
+5. **Detect many-to-many relationships**  
+   Tables that contained mainly foreign keys and a composite primary key were classified as junction tables.
+
+6. **Convert tables into ERD entities**  
+   Main tables were converted into entities in the ERD.
+
+7. **Convert columns into attributes**  
+   Regular columns were converted into attributes of the relevant entity.
+
+8. **Convert foreign keys into relationships**  
+   Each foreign key was translated into a relationship between entities.
+
+9. **Determine cardinality**  
+   Cardinality was determined according to the foreign key structure:
+   - One-to-many when one table references another table.
+   - Many-to-many when a junction table connects two tables.
+
+10. **Build the ERD in ERDPlus**  
+    After completing the analysis, we created the ERD of the received system using ERDPlus.
+
+---
+
+## 5. Received Department – ERD Diagram
+
+The following ERD represents the received Route Management System after performing reverse engineering from the received DSD.
+<img width="1024" height="373" alt="image" src="https://github.com/user-attachments/assets/4e0f6d0e-6e81-4355-9784-ee0faeba318a" />
+
+
+---
+
+## 6. Original Department – ERD Diagram
+
+The following ERD represents our original Tour Guide Management System before integration.
+<img width="4704" height="1908" alt="image" src="https://github.com/user-attachments/assets/6f165fdc-d2c1-465e-ae1d-1bbc108e82dd" />
+
+
+---
+
+## 7. Unified ERD Diagram After Integration
+
+After comparing both ERDs, we created one unified ERD that combines both systems.
+
+The unified ERD includes entities from our original system and relevant entities from the received Route Management System.
+
+The final integrated ERD includes the following main entities:
+
+- `CUSTOMER`
+- `GUIDE`
+- `GUIDEDTOUR`
+- `ROUTE`
+- `LOCATION`
+- `LOCATED_IN`
+- `REGISTRATION`
+- `PAYMENT`
+- `DIFFICULTYLEVEL`
+- `TOURSTATUS`
+- `REGISTRATIONSTATUS`
+- `PAYMENTSTATUS`
+
+<img width="3720" height="1476" alt="image" src="https://github.com/user-attachments/assets/f62b0adc-0312-45b7-b81d-91726ada82f0" />
+
+
+---
+
+## 8. DSD Diagram After Integration
+
+After designing the unified ERD, we updated the database schema accordingly.
+
+The following DSD represents the final integrated database structure after applying the integration commands.
+<img width="3720" height="1476" alt="image" src="https://github.com/user-attachments/assets/2fbf0c72-5f7f-45cc-a016-263d5ee4e323" />
+
+
+---
+
+## 9. Integration Decisions
+
+During the integration process, we compared both systems and made several design decisions.
+
+---
+
+### 9.1 PARTICIPANT Was Merged Into CUSTOMER
+
+The received system included an entity named:
+
+```text
+PARTICIPANT
+```
+
+In our original system, the equivalent entity was:
+
+```text
+CUSTOMER
+```
+
+Both entities represent the same business concept: a person who registers for a guided tour.
+
+Therefore, we decided not to create a separate `PARTICIPANT` table in the integrated schema.
+
+Instead, received participant data was inserted into the existing `CUSTOMER` table.
+
+Final mapping:
+
+```text
+PARTICIPANT → CUSTOMER
+```
+
+---
+
+### 9.2 TRIP Was Merged Into GUIDEDTOUR
+
+The received system used a table named:
+
+```text
+TRIP
+```
+
+Our original system used:
+
+```text
+GUIDEDTOUR
+```
+
+Both represent scheduled guided tours.
+
+Therefore, the received `TRIP` records were inserted into the existing `GUIDEDTOUR` table.
+
+Final mapping:
+
+```text
+TRIP → GUIDEDTOUR
+```
+
+---
+
+### 9.3 TripID Was Mapped to TourID
+
+The received system used:
+
+```text
+TripID
+```
+
+Our original system used:
+
+```text
+TourID
+```
+
+Both fields represent the identifier of a guided tour.
+
+Therefore, in the final integrated schema we chose the name used in our original system:
+
+```text
+TourID
+```
+
+Final mapping:
+
+```text
+TripID → TourID
+```
+
+---
+
+### 9.4 BOOKING Was Merged Into REGISTRATION
+
+The received system included a table named:
+
+```text
+BOOKING
+```
+
+Our original system included a table named:
+
+```text
+REGISTRATION
+```
+
+Both tables represent the action of a customer or participant registering for a tour.
+
+Therefore, received booking records were inserted into the existing `REGISTRATION` table.
+
+Final mapping:
+
+```text
+BOOKING → REGISTRATION
+```
+
+---
+
+### 9.5 Payment Records Were Derived From BOOKING
+
+The received Route Management System did not include a separate payment table in the same structure as our original system.
+
+Our original system included:
+
+```text
+PAYMENT
+```
+
+Therefore, payment records were created from the received booking data.
+
+Each received booking was used to create a matching payment record in the final `PAYMENT` table.
+
+Final mapping:
+
+```text
+BOOKING → PAYMENT
+```
+
+---
+
+### 9.6 Expertise Was Added to GUIDE
+
+The received system included guide expertise information.
+
+Our original `GUIDE` table did not include this field.
+
+Therefore, we added the following attribute to the existing `GUIDE` table:
+
+```text
 Expertise
 ```
 
-This field improves the business capabilities of the system and allows advanced guide classification.
+This was done using `ALTER TABLE`, without recreating the table.
 
 ---
 
-## D. Preservation of Referential Integrity
+### 9.7 LOCATION and LOCATED_IN Were Added
 
-All integration changes were implemented using FOREIGN KEY constraints in order to preserve consistency and prevent invalid references between tables.
+The received system included route-location management.
 
----
+Our original system did not include location management.
 
-# 6. Explanation of SQL Commands
+Therefore, we added two new tables:
 
-## File: Integrate.sql
+```text
+LOCATION
+LOCATED_IN
+```
 
-The file `Integrate.sql` contains all integration-related schema modifications.
+`LOCATION` stores information about locations.
 
-Main operations included:
+`LOCATED_IN` is a junction table that connects routes and locations.
 
-- Adding Expertise field into GUIDE
-- Creating LOCATION table
-- Creating LOCATED_IN relationship table
-- Inserting default LOCATION data
-- Connecting ROUTE and LOCATION entities
-- Updating GUIDE expertise values
-- Creating foreign key constraints
+This design allows:
 
-All commands in the file are documented with SQL comments explaining their purpose.
+- One route to be connected to several locations.
+- One location to be connected to several routes.
 
 ---
 
-# 7. Integration Execution Screenshots
+### 9.8 Handling Empty PASSES_THROUGH Data
 
-## Step 1 – Adding Expertise Column to GUIDE
+The received backup included a table named:
+
+```text
+passes_through
+```
+
+However, this table contained zero rows.
+
+Since the final integrated schema requires a relationship between routes and locations, we added a fallback integration step.
+
+If `received.passes_through` is empty, the integration script creates deterministic route-location connections between received routes and received locations.
+
+This ensures that the final `LOCATED_IN` table contains valid data and supports the integrated views.
+
+---
+
+### 9.9 Avoiding Primary Key Conflicts
+
+The original database already contained records with IDs such as `1–20`.
+
+To avoid primary key conflicts, records from the received system were inserted using shifted IDs.
+
+The received IDs were shifted by:
+
+```text
++100000
+```
+
+For example:
+
+```text
+received.guide.guideid + 100000 → GUIDE.GuideID
+received.route.routeid + 100000 → ROUTE.RouteID
+received.trip.tripid + 100000 → GUIDEDTOUR.TourID
+received.participant.participantid + 100000 → CUSTOMER.CustomerID
+received.booking.bookingid + 100000 → REGISTRATION.RegistrationID
+received.location.locationid + 100000 → LOCATION.LocationID
+```
+
+Payment IDs were shifted by:
+
+```text
++200000
+```
+
+For example:
+
+```text
+received.booking.bookingid + 200000 → PAYMENT.PaymentID
+```
+
+This preserved data integrity and prevented duplicate primary key errors.
+
+---
+
+### 9.10 Handling Email Conflicts
+
+The `CUSTOMER.Email` field is unique in the original schema.
+
+Because the received participant data could contain duplicate or conflicting emails, the integration script generates safe emails for received participants.
+
+Example:
+
+```text
+received_participant_1001@example.com
+```
+
+This prevents `UNIQUE` constraint errors during integration.
+
+The same idea was used for received guides.
+
+Example:
+
+```text
+received_guide_1001@example.com
+```
+
+---
+
+## 10. Integration SQL File
+
+The integration commands are stored in:
+
+```text
+Integrate.sql
+```
+
+The file does not recreate all existing original tables.
+
+Instead, it modifies the existing database according to the final integrated ERD.
+
+The file includes:
+
+- Adding the `Expertise` column to `GUIDE`
+- Creating `LOCATION`
+- Creating `LOCATED_IN`
+- Inserting missing difficulty levels from the received system
+- Inserting all received guides into `GUIDE`
+- Inserting all received routes into `ROUTE`
+- Inserting all received locations into `LOCATION`
+- Creating route-location connections in `LOCATED_IN`
+- Merging all received participants into `CUSTOMER`
+- Merging all received trips into `GUIDEDTOUR`
+- Merging all received bookings into `REGISTRATION`
+- Creating payment records from received bookings
+- Running verification queries
+
+---
+
+## 11. Main Integration Commands
+
+### 11.1 Adding Expertise to GUIDE
 
 ```sql
 ALTER TABLE GUIDE
 ADD COLUMN IF NOT EXISTS Expertise VARCHAR(100);
 ```
+<img width="1351" height="888" alt="צילום מסך 2026-06-07 165243" src="https://github.com/user-attachments/assets/76575282-89cd-4754-892d-bce0fda9774b" />
 
-📸  
-<img width="1325" height="885" alt="צילום מסך 2026-06-06 224832" src="https://github.com/user-attachments/assets/b035c37f-7334-4222-99a2-da273c7a8ace" />
-
----
-
-## Step 2 – Updating Existing GUIDE Records
-
-```sql
-UPDATE GUIDE
-SET Expertise =
-    CASE
-        WHEN ExperienceYears >= 8 THEN 'Senior Tour Guide'
-        WHEN ExperienceYears >= 4 THEN 'Professional Tour Guide'
-        WHEN ExperienceYears >= 1 THEN 'General Tour Guide'
-        ELSE 'Junior Tour Guide'
-    END
-WHERE Expertise IS NULL;
-```
-
-📸  
-<img width="1329" height="837" alt="צילום מסך 2026-06-06 224616" src="https://github.com/user-attachments/assets/31b1ca75-640c-4c6d-bfa8-1a24c55b7dd5" />
 
 ---
 
-## Step 3 – Creating LOCATION Table
+### 11.2 Creating LOCATION
 
 ```sql
 CREATE TABLE IF NOT EXISTS LOCATION
+(
+    LocationID INT NOT NULL,
+    LocationName VARCHAR(100) NOT NULL,
+    Category VARCHAR(50),
+    PRIMARY KEY (LocationID)
+);
 ```
+<img width="1353" height="881" alt="צילום מסך 2026-06-07 165252" src="https://github.com/user-attachments/assets/094a8146-24d7-4c0d-98f3-ef2d530faf04" />
 
-📸  
-<img width="1324" height="892" alt="צילום מסך 2026-06-06 224640" src="https://github.com/user-attachments/assets/c6ddff85-8487-4ad6-922d-ddc822eca31f" />
 
 ---
 
-## Step 4 – Inserting LOCATION Data
-
-```sql
-INSERT INTO LOCATION
-```
-
-📸  
-<img width="1334" height="889" alt="צילום מסך 2026-06-06 224655" src="https://github.com/user-attachments/assets/a2b9ca56-c5ed-4a70-9dd0-154d361c7c4c" />
-
----
-
-## Step 5 – Creating LOCATED_IN Table
+### 11.3 Creating LOCATED_IN
 
 ```sql
 CREATE TABLE IF NOT EXISTS LOCATED_IN
+(
+    RouteID INT NOT NULL,
+    LocationID INT NOT NULL,
+    PRIMARY KEY (RouteID, LocationID),
+    FOREIGN KEY (RouteID) REFERENCES ROUTE(RouteID),
+    FOREIGN KEY (LocationID) REFERENCES LOCATION(LocationID)
+);
 ```
+<img width="1379" height="892" alt="צילום מסך 2026-06-07 165303" src="https://github.com/user-attachments/assets/9502124f-6831-4d8a-9ec1-2ac250c173ff" />
 
-📸  
-<img width="1339" height="885" alt="צילום מסך 2026-06-06 224710" src="https://github.com/user-attachments/assets/38f347cf-96e5-49d7-93f4-1775b48a8405" />
 
 ---
 
-## Step 6 – Connecting ROUTES to LOCATIONS
+### 11.4 Inserting Missing Difficulty Levels
+
+```sql
+INSERT INTO DIFFICULTYLEVEL (DifficultyID, DifficultyName)
+SELECT
+    COALESCE((SELECT MAX(DifficultyID) FROM DIFFICULTYLEVEL), 0)
+    + ROW_NUMBER() OVER (ORDER BY d.difficulty) AS DifficultyID,
+    d.difficulty AS DifficultyName
+FROM (
+    SELECT DISTINCT difficulty
+    FROM received.route
+) d
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM DIFFICULTYLEVEL dl
+    WHERE LOWER(dl.DifficultyName) = LOWER(d.difficulty)
+);
+```
+<img width="1341" height="895" alt="image" src="https://github.com/user-attachments/assets/28491287-775d-4ac1-ac3a-9dc15756ecd2" />
+
+
+---
+
+### 11.5 Merging Received Guides
+
+```sql
+INSERT INTO GUIDE
+(
+    GuideID,
+    FirstName,
+    LastName,
+    Phone,
+    Email,
+    BirthDate,
+    JoinDate,
+    DailyRate,
+    ExperienceYears,
+    Rating,
+    Address,
+    Notes,
+    Expertise
+)
+SELECT
+    rg.guideid + 100000 AS GuideID,
+    rg.firstname AS FirstName,
+    rg.lastname AS LastName,
+    rg.phone AS Phone,
+    'received_guide_' || rg.guideid || '@example.com' AS Email,
+    NULL AS BirthDate,
+    NULL AS JoinDate,
+    NULL AS DailyRate,
+    NULL AS ExperienceYears,
+    NULL AS Rating,
+    NULL AS Address,
+    'Received from Route Management System' AS Notes,
+    rg.expertise AS Expertise
+FROM received.guide rg
+ON CONFLICT (GuideID) DO NOTHING;
+```
+<img width="1327" height="880" alt="image" src="https://github.com/user-attachments/assets/c34d542d-e3d6-462f-86ac-eaa5ae3911c4" />
+
+
+---
+
+### 11.6 Merging Received Routes
+
+```sql
+INSERT INTO ROUTE
+(
+    RouteID,
+    Name,
+    EstimatedLength,
+    EstimatedDuration,
+    Description,
+    DifficultyID
+)
+SELECT
+    rr.routeid + 100000 AS RouteID,
+    rr.routename AS Name,
+    NULL AS EstimatedLength,
+    rr.duration AS EstimatedDuration,
+    'Received from Route Management System' AS Description,
+    dl.DifficultyID AS DifficultyID
+FROM received.route rr
+JOIN DIFFICULTYLEVEL dl
+    ON LOWER(dl.DifficultyName) = LOWER(rr.difficulty)
+ON CONFLICT (RouteID) DO NOTHING;
+```
+<img width="1334" height="892" alt="image" src="https://github.com/user-attachments/assets/4d0e7254-cd3d-4892-8585-d0c015c53b24" />
+
+
+---
+
+### 11.7 Merging Received Locations
+
+```sql
+INSERT INTO LOCATION
+(
+    LocationID,
+    LocationName,
+    Category
+)
+SELECT
+    rl.locationid + 100000 AS LocationID,
+    rl.locationname AS LocationName,
+    rl.category AS Category
+FROM received.location rl
+ON CONFLICT (LocationID) DO NOTHING;
+```
+<img width="1323" height="898" alt="image" src="https://github.com/user-attachments/assets/bc973563-fe72-4564-b419-77a265ab6d12" />
+
+
+---
+
+### 11.8 Creating Route-Location Connections
 
 ```sql
 INSERT INTO LOCATED_IN
+(
+    RouteID,
+    LocationID
+)
+SELECT
+    rpt.routeid + 100000 AS RouteID,
+    rpt.locationid + 100000 AS LocationID
+FROM received.passes_through rpt
+ON CONFLICT (RouteID, LocationID) DO NOTHING;
 ```
 
-📸  
-<img width="1347" height="884" alt="צילום מסך 2026-06-06 224724" src="https://github.com/user-attachments/assets/a6b94897-b74f-44fb-ade0-52b1fb7071d4" />
+Since `received.passes_through` was empty, the script also includes a fallback step:
+
+```sql
+INSERT INTO LOCATED_IN
+(
+    RouteID,
+    LocationID
+)
+SELECT
+    r.routeid + 100000 AS RouteID,
+    l.locationid + 100000 AS LocationID
+FROM (
+    SELECT routeid, ROW_NUMBER() OVER (ORDER BY routeid) AS rn
+    FROM received.route
+) r
+JOIN (
+    SELECT locationid, ROW_NUMBER() OVER (ORDER BY locationid) AS rn
+    FROM received.location
+) l
+    ON r.rn = l.rn
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM LOCATED_IN
+)
+ON CONFLICT (RouteID, LocationID) DO NOTHING;
+```
+<img width="1322" height="887" alt="image" src="https://github.com/user-attachments/assets/92c2fd06-eac4-4ca9-841e-85dfb48cf980" />
+
+
 
 ---
 
-## Step 7 – Verifying Integration Data
-
-The following query verifies that routes and locations were connected successfully.
+### 11.9 Merging Received Participants Into CUSTOMER
 
 ```sql
+INSERT INTO CUSTOMER
+(
+    CustomerID,
+    FullName,
+    Phone,
+    Email,
+    JoinDate
+)
 SELECT
-    r.RouteID,
-    r.Name AS RouteName,
-    l.LocationID,
-    l.LocationName,
-    l.Category
-FROM ROUTE r
-JOIN LOCATED_IN li ON r.RouteID = li.RouteID
-JOIN LOCATION l ON li.LocationID = l.LocationID
-ORDER BY r.RouteID
-LIMIT 20;
+    rp.participantid + 100000 AS CustomerID,
+    rp.fullname AS FullName,
+    rp.phone AS Phone,
+    'received_participant_' || rp.participantid || '@example.com' AS Email,
+    NULL AS JoinDate
+FROM received.participant rp
+ON CONFLICT (CustomerID) DO NOTHING;
 ```
+<img width="1335" height="903" alt="image" src="https://github.com/user-attachments/assets/7145626b-657e-42dc-b32c-25883ba4755c" />
 
-📸  
-<img width="1347" height="911" alt="צילום מסך 2026-06-06 224803" src="https://github.com/user-attachments/assets/14e8cb07-a596-4e1f-b746-b5ac3183ba5d" />
 
 ---
 
-## Step 8 – Verifying GUIDE Expertise Integration
+### 11.10 Merging Received Trips Into GUIDEDTOUR
 
-The following query verifies that the new Expertise field was successfully updated.
+```sql
+INSERT INTO GUIDEDTOUR
+(
+    TourID,
+    StartDate,
+    EndDate,
+    StartTime,
+    EndTime,
+    MeetingPoint,
+    Price,
+    MaxParticipants,
+    Notes,
+    TourStatusID,
+    GuideID,
+    RouteID
+)
+SELECT
+    rt.tripid + 100000 AS TourID,
+    rt.departuredate AS StartDate,
+    NULL AS EndDate,
+    NULL AS StartTime,
+    NULL AS EndTime,
+    'Received system meeting point' AS MeetingPoint,
+    rt.price AS Price,
+    rt.maxcapacity AS MaxParticipants,
+    'Received trip merged into GUIDEDTOUR' AS Notes,
+    1 AS TourStatusID,
+    rt.guideid + 100000 AS GuideID,
+    rt.routeid + 100000 AS RouteID
+FROM received.trip rt
+ON CONFLICT (TourID) DO NOTHING;
+```
+<img width="1330" height="878" alt="image" src="https://github.com/user-attachments/assets/5d94a7a3-fbe0-4444-83ed-5810f6fd8783" />
+
+
+---
+
+### 11.11 Merging Received Bookings Into REGISTRATION
+
+```sql
+INSERT INTO REGISTRATION
+(
+    RegistrationID,
+    RegistrationDate,
+    AmountToPay,
+    Notes,
+    TourID,
+    RegistrationStatusID,
+    CustomerID
+)
+SELECT
+    rb.bookingid + 100000 AS RegistrationID,
+    rb.bookingdate AS RegistrationDate,
+    rt.price AS AmountToPay,
+    'Received booking status: ' || rb.status AS Notes,
+    rb.tripid + 100000 AS TourID,
+    CASE
+        WHEN LOWER(rb.status) = 'cancelled' THEN 4
+        WHEN LOWER(rb.status) = 'refunded' THEN 5
+        WHEN LOWER(rb.status) = 'pending' THEN 7
+        ELSE 2
+    END AS RegistrationStatusID,
+    rb.participantid + 100000 AS CustomerID
+FROM received.booking rb
+JOIN received.trip rt
+    ON rb.tripid = rt.tripid
+ON CONFLICT (RegistrationID) DO NOTHING;
+```
+<img width="1351" height="887" alt="image" src="https://github.com/user-attachments/assets/542ce4aa-de16-4dbb-add1-fbbfa609a0cd" />
+
+
+---
+
+### 11.12 Creating Payments From Received Bookings
+
+```sql
+INSERT INTO PAYMENT
+(
+    PaymentID,
+    PaymentDate,
+    Amount,
+    Notes,
+    PaymentMethod,
+    ReferenceNumber,
+    RegistrationID,
+    PaymentStatusID
+)
+SELECT
+    rb.bookingid + 200000 AS PaymentID,
+    rb.bookingdate AS PaymentDate,
+    rt.price AS Amount,
+    'Payment derived from received booking status: ' || rb.status AS Notes,
+    'Unknown' AS PaymentMethod,
+    'RCV-' || rb.bookingid AS ReferenceNumber,
+    rb.bookingid + 100000 AS RegistrationID,
+    CASE
+        WHEN LOWER(rb.status) = 'paid' THEN 3
+        WHEN LOWER(rb.status) = 'refunded' THEN 4
+        WHEN LOWER(rb.status) = 'cancelled' THEN 5
+        ELSE 1
+    END AS PaymentStatusID
+FROM received.booking rb
+JOIN received.trip rt
+    ON rb.tripid = rt.tripid
+ON CONFLICT (PaymentID) DO NOTHING;
+```
+<img width="1333" height="889" alt="image" src="https://github.com/user-attachments/assets/4568b4b5-cb59-47bb-ba60-3459551a5353" />
+
+
+---
+
+## 12. Integration Verification
+
+After running `Integrate.sql`, we verified that the database contains data from both systems.
+
+---
+
+### 12.1 Row Count Verification
+
+```sql
+SELECT 'CUSTOMER' AS table_name, COUNT(*) AS row_count FROM CUSTOMER
+UNION ALL
+SELECT 'GUIDE', COUNT(*) FROM GUIDE
+UNION ALL
+SELECT 'ROUTE', COUNT(*) FROM ROUTE
+UNION ALL
+SELECT 'GUIDEDTOUR', COUNT(*) FROM GUIDEDTOUR
+UNION ALL
+SELECT 'REGISTRATION', COUNT(*) FROM REGISTRATION
+UNION ALL
+SELECT 'PAYMENT', COUNT(*) FROM PAYMENT
+UNION ALL
+SELECT 'LOCATION', COUNT(*) FROM LOCATION
+UNION ALL
+SELECT 'LOCATED_IN', COUNT(*) FROM LOCATED_IN
+ORDER BY table_name;
+```
+
+Expected result after a clean integration run:
+
+```text
+CUSTOMER       20025
+GUIDE          523
+GUIDEDTOUR     523
+LOCATION       505
+LOCATED_IN     503
+PAYMENT        20023
+REGISTRATION   20023
+ROUTE          523
+```
+<img width="1339" height="886" alt="image" src="https://github.com/user-attachments/assets/4993d935-e8ce-4f2c-94c6-35a915a2535c" />
+
+
+---
+
+### 12.2 Full Integration Query
 
 ```sql
 SELECT
+    c.CustomerID,
+    c.FullName AS CustomerName,
     gt.TourID,
     gt.StartDate,
     r.Name AS RouteName,
     l.LocationName,
+    g.GuideID,
     g.FirstName AS GuideFirstName,
     g.LastName AS GuideLastName,
-    g.Expertise
-FROM GUIDEDTOUR gt
-JOIN ROUTE r ON gt.RouteID = r.RouteID
-JOIN LOCATED_IN li ON r.RouteID = li.RouteID
-JOIN LOCATION l ON li.LocationID = l.LocationID
-JOIN GUIDE g ON gt.GuideID = g.GuideID
-ORDER BY gt.TourID
-LIMIT 20;
+    g.Expertise,
+    p.Amount,
+    p.PaymentMethod
+FROM CUSTOMER c
+JOIN REGISTRATION reg
+    ON c.CustomerID = reg.CustomerID
+JOIN GUIDEDTOUR gt
+    ON reg.TourID = gt.TourID
+JOIN ROUTE r
+    ON gt.RouteID = r.RouteID
+LEFT JOIN LOCATED_IN li
+    ON r.RouteID = li.RouteID
+LEFT JOIN LOCATION l
+    ON li.LocationID = l.LocationID
+JOIN GUIDE g
+    ON gt.GuideID = g.GuideID
+LEFT JOIN PAYMENT p
+    ON reg.RegistrationID = p.RegistrationID
+ORDER BY c.CustomerID, gt.TourID
+LIMIT 100;
 ```
 
-📸  
-<img width="1338" height="893" alt="צילום מסך 2026-06-06 224818" src="https://github.com/user-attachments/assets/6c5feedd-eed7-4a85-a1c6-a192fe55b800" />
+This query proves the full integrated flow:
+
+```text
+CUSTOMER → REGISTRATION → GUIDEDTOUR → ROUTE → LOCATED_IN → LOCATION
+```
+
+It also proves the connection between:
+
+```text
+GUIDEDTOUR → GUIDE
+REGISTRATION → PAYMENT
+```
+<img width="1332" height="894" alt="image" src="https://github.com/user-attachments/assets/b746facc-1b80-4217-beec-b5544188d15b" />
 
 ---
 
-# 8. Views and Queries
+## 13. Views
 
-The integration phase included creating analytical views that combine information from both systems.
+The views are stored in:
 
-Each view combines data from multiple tables and supports business analysis and operational management.
+```text
+Views.sql
+```
 
-The implementation follows the assignment requirements:
+The file contains two views:
 
-- Two views were created
-- One view represents our original department
-- One view represents the received department
-- Each view combines multiple tables
-- Two meaningful queries were written for each view
+1. `vw_tour_guide_department_view`  
+   View from the original Tour Guide Management System point of view.
+
+2. `vw_route_management_department_view`  
+   View from the received Route Management System point of view.
+
+Each view combines several tables and supports meaningful queries.
 
 ---
 
-# View 1 – vw_tour_guide_department_view
+## 14. View 1 – Tour Guide Department View
 
-## Description
+### 14.1 View Description
 
-This view represents the original Tour Guide Management System point of view.
+The first view represents the point of view of our original department: the Tour Guide Management System.
 
 The view combines:
 
-- GUIDEDTOUR
-- GUIDE
-- ROUTE
-- LOCATION
-- DIFFICULTYLEVEL
-- REGISTRATION
+- `GUIDEDTOUR`
+- `GUIDE`
+- `ROUTE`
+- `DIFFICULTYLEVEL`
+- `LOCATION`
+- `LOCATED_IN`
+- `REGISTRATION`
 
-The purpose of the view is to provide operational and business information about guided tours.
-
----
-
-## View Creation
-
-📸  
-<img width="1346" height="899" alt="צילום מסך 2026-06-06 225125" src="https://github.com/user-attachments/assets/25173a00-44f8-40ef-baf6-fc3c8d66dd17" />
+The purpose of this view is to provide operational information about guided tours, guides, routes, locations, and number of registrations.
 
 ---
 
-## Query 1.1 – Tours With Available Seats
+### 14.2 View Creation
+
+```sql
+CREATE OR REPLACE VIEW vw_tour_guide_department_view AS
+SELECT
+    gt.TourID,
+    gt.StartDate,
+    gt.EndDate,
+    gt.StartTime,
+    gt.EndTime,
+    gt.MeetingPoint,
+    gt.Price,
+    gt.MaxParticipants,
+    gt.Notes AS TourNotes,
+    g.GuideID,
+    g.FirstName AS GuideFirstName,
+    g.LastName AS GuideLastName,
+    g.Phone AS GuidePhone,
+    g.Email AS GuideEmail,
+    r.RouteID,
+    r.Name AS RouteName,
+    dl.DifficultyName,
+    l.LocationName,
+    COUNT(reg.RegistrationID) AS NumberOfRegistrations
+FROM GUIDEDTOUR gt
+JOIN GUIDE g ON gt.GuideID = g.GuideID
+JOIN ROUTE r ON gt.RouteID = r.RouteID
+JOIN DIFFICULTYLEVEL dl ON r.DifficultyID = dl.DifficultyID
+LEFT JOIN LOCATED_IN li ON r.RouteID = li.RouteID
+LEFT JOIN LOCATION l ON li.LocationID = l.LocationID
+LEFT JOIN REGISTRATION reg ON gt.TourID = reg.TourID
+GROUP BY
+    gt.TourID,
+    gt.StartDate,
+    gt.EndDate,
+    gt.StartTime,
+    gt.EndTime,
+    gt.MeetingPoint,
+    gt.Price,
+    gt.MaxParticipants,
+    gt.Notes,
+    g.GuideID,
+    g.FirstName,
+    g.LastName,
+    g.Phone,
+    g.Email,
+    r.RouteID,
+    r.Name,
+    dl.DifficultyName,
+    l.LocationName;
+```
+<img width="1344" height="893" alt="image" src="https://github.com/user-attachments/assets/6f769f3c-cb4d-4f51-8bf6-3538ee41c192" />
+
+
+---
+
+### 14.3 Select From View 1
+
+```sql
+SELECT *
+FROM vw_tour_guide_department_view
+LIMIT 10;
+```
+<img width="1338" height="892" alt="image" src="https://github.com/user-attachments/assets/0216baef-4ff3-4f69-ab82-34732bc07b4c" />
+
+
+---
+
+### 14.4 Query 1.1 – Tours With Available Seats
 
 ```sql
 SELECT
@@ -1624,16 +2364,18 @@ WHERE NumberOfRegistrations < MaxParticipants
 ORDER BY AvailableSeats DESC;
 ```
 
-### Explanation
+#### Explanation
 
 This query displays tours that still have available seats for additional customers.
 
-📸  
-<img width="1331" height="844" alt="צילום מסך 2026-06-06 225141" src="https://github.com/user-attachments/assets/9bf6c6a7-05da-4b4a-b8af-8d97476f29b0" />
+It is useful for the Tour Guide Management department because it helps identify which tours can still accept new registrations.
+
+<img width="1343" height="815" alt="image" src="https://github.com/user-attachments/assets/972f440b-1c52-40ce-b34b-0699d0e4e648" />
+
 
 ---
 
-## Query 1.2 – Most Popular Guided Tours
+### 14.5 Query 1.2 – Most Popular Guided Tours
 
 ```sql
 SELECT
@@ -1649,41 +2391,84 @@ WHERE NumberOfRegistrations > 0
 ORDER BY NumberOfRegistrations DESC, StartDate;
 ```
 
-### Explanation
+#### Explanation
 
-This query displays the most popular tours according to the number of registrations.
+This query displays the most popular guided tours according to the number of registrations.
 
-📸  
-<img width="1333" height="890" alt="צילום מסך 2026-06-06 225158" src="https://github.com/user-attachments/assets/8243f544-6309-45c8-bd62-84025f5fbbb9" />
+It helps the department understand customer demand and identify active tours.
+<img width="1345" height="885" alt="image" src="https://github.com/user-attachments/assets/bf84686c-5a3d-4e2b-8360-73998514e3b8" />
+
 
 ---
 
-# View 2 – vw_route_management_department_view
+## 15. View 2 – Route Management Department View
 
-## Description
+### 15.1 View Description
 
-This view represents the received Route Management System point of view.
+The second view represents the point of view of the received department: the Route Management System.
 
 The view combines:
 
-- ROUTE
-- DIFFICULTYLEVEL
-- LOCATION
-- LOCATED_IN
-- GUIDEDTOUR
+- `ROUTE`
+- `DIFFICULTYLEVEL`
+- `LOCATION`
+- `LOCATED_IN`
+- `GUIDEDTOUR`
 
-The purpose of the view is to support route analysis and operational planning.
-
----
-
-## View Creation
-
-📸  
-<img width="1332" height="905" alt="צילום מסך 2026-06-06 225214" src="https://github.com/user-attachments/assets/05c52402-e89c-4b69-8150-995044dbedff" />
+The purpose of this view is to support route analysis, route planning, and operational decision-making.
 
 ---
 
-## Query 2.1 – Most Active Routes
+### 15.2 View Creation
+
+```sql
+CREATE OR REPLACE VIEW vw_route_management_department_view AS
+SELECT
+    r.RouteID,
+    r.Name AS RouteName,
+    r.Description AS RouteDescription,
+    r.EstimatedLength,
+    r.EstimatedDuration,
+    dl.DifficultyName,
+    l.LocationID,
+    l.LocationName,
+    l.Category AS LocationCategory,
+    COUNT(gt.TourID) AS NumberOfGuidedTours,
+    AVG(gt.Price) AS AverageTourPrice
+FROM ROUTE r
+JOIN DIFFICULTYLEVEL dl ON r.DifficultyID = dl.DifficultyID
+LEFT JOIN LOCATED_IN li ON r.RouteID = li.RouteID
+LEFT JOIN LOCATION l ON li.LocationID = l.LocationID
+LEFT JOIN GUIDEDTOUR gt ON r.RouteID = gt.RouteID
+GROUP BY
+    r.RouteID,
+    r.Name,
+    r.Description,
+    r.EstimatedLength,
+    r.EstimatedDuration,
+    dl.DifficultyName,
+    l.LocationID,
+    l.LocationName,
+    l.Category;
+```
+<img width="1329" height="890" alt="image" src="https://github.com/user-attachments/assets/a006728f-e020-4bb1-a829-a277b1bbb704" />
+
+
+---
+
+### 15.3 Select From View 2
+
+```sql
+SELECT *
+FROM vw_route_management_department_view
+LIMIT 10;
+```
+<img width="1334" height="898" alt="image" src="https://github.com/user-attachments/assets/1cb031ca-4da9-4520-acad-a7a0397b2820" />
+
+
+---
+
+### 15.4 Query 2.1 – Most Active Routes
 
 ```sql
 SELECT
@@ -1697,16 +2482,17 @@ WHERE NumberOfGuidedTours > 0
 ORDER BY NumberOfGuidedTours DESC, RouteName;
 ```
 
-### Explanation
+#### Explanation
 
 This query displays the routes with the highest number of guided tours.
 
-📸  
-<img width="1333" height="878" alt="צילום מסך 2026-06-06 225229" src="https://github.com/user-attachments/assets/2a067bf4-b5c9-4a38-b099-1fdfc42d4626" />
+It is useful for the Route Management department because it helps identify the most active and important routes.
+<img width="1349" height="881" alt="image" src="https://github.com/user-attachments/assets/031acf60-a294-472f-b48a-e5a6eab99484" />
+
 
 ---
 
-## Query 2.2 – Long or Expensive Routes
+### 15.5 Query 2.2 – Long or Expensive Routes
 
 ```sql
 SELECT
@@ -1723,47 +2509,60 @@ WHERE EstimatedLength >= 5
 ORDER BY EstimatedLength DESC, AverageTourPrice DESC;
 ```
 
-### Explanation
+#### Explanation
 
-This query displays long or expensive routes for operational and pricing analysis.
+This query displays routes that are either long or have a high average tour price.
 
-📸  
-<img width="1345" height="903" alt="צילום מסך 2026-06-06 225242" src="https://github.com/user-attachments/assets/9f417b0a-9b73-45c7-bb95-504c126a7179" />
+It helps the Route Management department identify routes that may require more planning, resources, or pricing attention.
+<img width="1331" height="911" alt="image" src="https://github.com/user-attachments/assets/159704e3-0291-4328-8825-7dff1cdab3e1" />
 
 ---
 
-# 9. Updated Backup File
+## 16. Updated Backup File
 
-A full backup of the database after completing Phase 3 is included.
+After completing the integration, an updated backup file was created:
 
-📸  
-<img width="1339" height="954" alt="image" src="https://github.com/user-attachments/assets/79f92f40-5563-4b35-acc0-94b18babcbcc" />
+```text
+backup3
+```
 
 The backup contains:
 
-- All tables
-- Integrated schema
+- Original tables
+- Integrated tables
+- Updated schema
 - Foreign keys
 - Constraints
 - Views
-- Updated data
+- Data from both systems
+<img width="1335" height="874" alt="image" src="https://github.com/user-attachments/assets/2ba7bf49-bd4c-44b0-bf58-56a4da77544b" />
 
 ---
 
-# Summary
+## 17. Summary
 
-In this phase, the following tasks were completed:
+In Phase 3, we successfully integrated the Tour Guide Management System with the received Route Management System.
 
-- Integration between two database systems
-- Construction of unified ERD and DSD diagrams
-- Integration of route and location management
-- Addition of foreign key constraints
-- Creation of analytical views
-- Writing meaningful SQL queries based on the integrated data
-- Creation of an updated backup file
+The integration included:
 
-The integration process improved the scalability, normalization, and analytical capabilities of the system while preserving referential integrity and reducing data redundancy.
+- Importing the received backup into a separate schema named `received`
+- Reverse engineering of the received database
+- Creating an ERD for the received system
+- Designing a unified ERD
+- Updating the database schema according to the unified ERD
+- Adding the `Expertise` attribute to `GUIDE`
+- Adding `LOCATION` and `LOCATED_IN`
+- Merging `PARTICIPANT` into `CUSTOMER`
+- Merging `TRIP` into `GUIDEDTOUR`
+- Merging `BOOKING` into `REGISTRATION`
+- Creating `PAYMENT` records from received bookings
+- Preserving referential integrity
+- Avoiding primary key conflicts by shifting received IDs
+- Creating two views
+- Writing two meaningful queries for each view
+- Creating an updated backup file named `backup3`
 
+The final database is a unified integrated database that contains data from both systems and supports both the original Tour Guide department and the received Route Management department.
 ---
 
 # Phase 4: Programming with PL/pgSQL
