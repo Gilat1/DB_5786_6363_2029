@@ -37,13 +37,47 @@ services:
     networks:
       - trip_network
 
+  # -------------------------
+  # Backend (Node.js API)
+  # -------------------------
+  backend:
+    build: ./phase5/backend
+    container_name: TourGuide_Backend
+    restart: always
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME_SECRET}
+      DB_USER: ${DB_USER_SECRET}
+      DB_PASSWORD: ${DB_PASSWORD_SECRET}
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    networks:
+      - trip_network
+
+  # -------------------------
+  # Frontend (React)
+  # -------------------------
+  frontend:
+    build: ./phase5/frontend
+    container_name: TourGuide_Frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - trip_network
+
 # -------------------------
 # Volumes
 # -------------------------
 volumes:
   postgres_data:
   pgadmin_data:
-
 
 networks:
   trip_network:

@@ -57,22 +57,50 @@ GROUP BY
     dl.DifficultyName,
     l.LocationName;
 
--- Query 1.1
+
 SELECT *
 FROM vw_tour_guide_department_view
 LIMIT 10;
 
--- Query 1.2
+-- ============================================================
+-- Query 1.1:
+-- Shows tours that still have available seats.
+-- This query is useful for the original tour guide department
+-- because it helps identify tours that can still accept customers.
+-- ============================================================
+
 SELECT
     TourID,
     RouteName,
+    LocationName,
     GuideFirstName,
     GuideLastName,
+    StartDate,
+    MaxParticipants,
+    NumberOfRegistrations,
+    (MaxParticipants - NumberOfRegistrations) AS AvailableSeats
+FROM vw_tour_guide_department_view
+WHERE NumberOfRegistrations < MaxParticipants
+ORDER BY AvailableSeats DESC;
+
+
+-- ============================================================
+-- Query 1.2:
+-- Shows the most popular guided tours by number of registrations.
+-- This query helps the original department understand demand.
+-- ============================================================
+
+SELECT
+    TourID,
+    RouteName,
+    DifficultyName,
+    LocationName,
     StartDate,
     Price,
     NumberOfRegistrations
 FROM vw_tour_guide_department_view
-ORDER BY NumberOfRegistrations DESC;
+WHERE NumberOfRegistrations > 0
+ORDER BY NumberOfRegistrations DESC, StartDate;
 
 
 -- ============================================================
@@ -111,17 +139,44 @@ GROUP BY
     l.LocationName,
     l.Category;
 
--- Query 2.1
 SELECT *
 FROM vw_route_management_department_view
 LIMIT 10;
 
--- Query 2.2
+-- ============================================================
+-- Query 2.1:
+-- Shows the most used routes according to the number of guided tours.
+-- This query is useful for the received route management department
+-- because it helps identify important and active routes.
+-- ============================================================
+
 SELECT
+    RouteID,
     RouteName,
-    DifficultyName,
     LocationName,
-    NumberOfGuidedTours,
-    ROUND(AverageTourPrice, 2) AS AverageTourPrice
+    DifficultyName,
+    NumberOfGuidedTours
 FROM vw_route_management_department_view
-ORDER BY NumberOfGuidedTours DESC;
+WHERE NumberOfGuidedTours > 0
+ORDER BY NumberOfGuidedTours DESC, RouteName;
+
+
+-- ============================================================
+-- Query 2.2:
+-- Shows long or expensive routes.
+-- This query helps the route management department analyze routes
+-- that may require more planning, resources, or pricing attention.
+-- ============================================================
+
+SELECT
+    RouteID,
+    RouteName,
+    LocationName,
+    DifficultyName,
+    EstimatedLength,
+    EstimatedDuration,
+    ROUND(AverageTourPrice::numeric, 2) AS AverageTourPrice
+FROM vw_route_management_department_view
+WHERE EstimatedLength >= 5
+   OR AverageTourPrice >= 150
+ORDER BY EstimatedLength DESC, AverageTourPrice DESC;
