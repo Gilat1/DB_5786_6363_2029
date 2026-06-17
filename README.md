@@ -124,6 +124,58 @@ Guided Tour Management
     - [Purpose](#purpose)
   - [Summary](#summary-1)
 
+- [Stage 5 – Full Stack Web Application & Database Integration](#stage-5--full-stack-web-application--database-integration)
+  - [Overview](#overview)
+  - [Technologies Used](#technologies-used)
+    - [Frontend](#frontend)
+    - [Backend](#backend)
+    - [Database](#database)
+  - [Main System Features](#main-system-features)
+    - [Dashboard](#dashboard)
+      - [Features](#features)
+    - [Guides Management](#guides-management)
+      - [Features](#features-1)
+      - [Create Guide](#create-guide)
+    - [Routes Management](#routes-management)
+      - [Features](#features-2)
+      - [Create Route](#create-route)
+    - [Tours Management](#tours-management)
+      - [Features](#features-3)
+      - [Create Tour](#create-tour)
+    - [Customers Management](#customers-management)
+      - [Features](#features-4)
+      - [Create Customer](#create-customer)
+    - [Registrations Management](#registrations-management)
+      - [Features](#features-5)
+      - [Create Registration](#create-registration)
+    - [Payments Management](#payments-management)
+      - [Features](#features-6)
+      - [Record Payment](#record-payment)
+      - [Trigger Integration](#trigger-integration)
+    - [Locations Management](#locations-management)
+      - [Features](#features-7)
+      - [Create Location](#create-location)
+    - [Analytics Module](#analytics-module)
+      - [Features](#features-8)
+      - [Query 1 – High-Earning Guides](#query-1--high-earning-guides)
+      - [Query 2 – Monthly Revenue Analysis](#query-2--monthly-revenue-analysis)
+      - [Query 3 – VIP Customer Loyalty](#query-3--vip-customer-loyalty)
+      - [Query 4 – Elite Guides](#query-4--elite-guides)
+      - [Query 5 – Popular Routes](#query-5--popular-routes)
+    - [Programs Module](#programs-module)
+      - [Included Objects](#included-objects)
+      - [Function 1 – fn_calculate_customer_payment_status](#function-1)
+      - [Function 2 – fn_get_route_tour_details_by_difficulty](#function-2)
+      - [Procedure 1 – pr_assign_optimal_guide_to_tour](#procedure-1)
+      - [Procedure 2 – pr_apply_discount_to_tour_participants](#procedure-2)
+      - [Active Triggers](#active-triggers)
+        - [Trigger 1 – trg_update_registration_payment_status](#trigger-1)
+        - [Trigger 2 – trg_audit_tour_changes](#trigger-2)
+  - [Database Integration](#database-integration)
+    - [Supported Operations](#supported-operations)
+    - [Advanced Features](#advanced-features)
+  - [Conclusion](#conclusion)
+
 ---
 
 ##  Introduction
@@ -3101,3 +3153,637 @@ This phase includes:
 The programs demonstrate advanced PL/pgSQL features such as cursors, refcursors, DML operations, conditionals, loops, exception handling, records, and triggers.
 
 The screenshots above prove that each program executed successfully and performed its intended database operation.
+---
+
+# Stage 5 – Full Stack Web Application & Database Integration
+
+## Overview
+
+Stage 5 presents the complete implementation of the Tour Guide Management System as a full-stack web application connected directly to the PostgreSQL database developed throughout the previous stages.
+
+The system provides a modern administrative interface for managing guides, routes, tours, customers, registrations, payments, locations, analytical queries, functions, procedures, and triggers.
+
+Unlike previous stages that focused primarily on database design and SQL development, this stage demonstrates the integration of all database components into a real-world management application.
+
+---
+
+# Technologies Used
+
+## Frontend
+
+- React
+- TypeScript
+- Tailwind CSS
+- Shadcn UI
+- Lucide Icons
+
+## Backend
+
+- Node.js
+- Express.js
+
+## Database
+
+- PostgreSQL
+- PL/pgSQL
+- Views
+- Functions
+- Procedures
+- Triggers
+
+---
+
+# Main System Features
+
+---
+
+# Dashboard
+
+The Dashboard serves as the central hub of the system and provides administrators with quick access to all modules and system statistics.
+
+## Features
+
+- Overview of system activity
+- Quick navigation to all modules
+- Live database connection indicator
+- Upcoming tours section
+- Shortcuts for analytics and programs
+- Responsive dark-gold interface
+
+<img width="956" height="445" alt="stage5_dashboard_overview1" src="https://github.com/user-attachments/assets/e535586b-b5a8-4320-8507-5fe6488d8b14" />
+
+<img width="956" height="450" alt="stage5_dashboard_overview2" src="https://github.com/user-attachments/assets/48b73275-0d1a-4e9d-a736-d7c932379690" />
+
+<img width="183" height="441" alt="stage5_sidebar_navigation" src="https://github.com/user-attachments/assets/84b0ca56-b520-459c-a350-02d02d8729c1" />
+
+---
+
+# Guides Management
+
+The Guides module manages all tour guides stored in the system.
+
+## Features
+
+- View all guides
+- Create guides
+- Edit guide information
+- Delete guides
+- Manage expertise levels
+- Manage guide ratings
+
+## Database Objects Used
+
+- GUIDE
+
+<img width="958" height="445" alt="צילום מסך 2026-06-17 130802" src="https://github.com/user-attachments/assets/9e14b028-7dec-442e-95ef-0678bdbdcbe0" />
+
+---
+
+## Create Guide
+
+Administrators can add new guides through the interface.
+
+### Features
+
+- Guide information
+- Expertise level
+- Contact details
+- Rating information
+
+<img width="955" height="448" alt="צילום מסך 2026-06-17 130815" src="https://github.com/user-attachments/assets/c613f7ff-795b-487b-883f-8d6dbd0ae3c6" />
+
+---
+
+# Routes Management
+
+The Routes module manages available tour routes and difficulty levels.
+
+## Features
+
+- View routes
+- Create routes
+- Edit routes
+- Delete routes
+- Assign difficulty levels
+
+## Database Objects Used
+
+- ROUTE
+- DIFFICULTYLEVEL
+
+<img width="951" height="448" alt="צילום מסך 2026-06-17 130824" src="https://github.com/user-attachments/assets/de7dae20-c4be-41bf-baa0-d649c58908fb" />
+
+---
+
+## Create Route
+
+Administrators can add new routes.
+
+### Features
+
+- Route information
+- Difficulty level
+- Route description
+
+<img width="958" height="446" alt="צילום מסך 2026-06-17 130832" src="https://github.com/user-attachments/assets/c5d82985-ff08-4295-bbaf-5889c7347726" />
+
+---
+
+# Tours Management
+
+The Tours module manages scheduled guided tours.
+
+## Features
+
+- View tours
+- Create tours
+- Update tours
+- Delete tours
+- Assign routes
+- Assign guides
+
+## Database Objects Used
+
+- GUIDEDTOUR
+- GUIDE
+- ROUTE
+
+<img width="956" height="446" alt="צילום מסך 2026-06-17 130841" src="https://github.com/user-attachments/assets/d1a67917-3f57-4a6a-93f3-328e07233751" />
+
+---
+
+## Create Tour
+
+Administrators can schedule new tours.
+
+### Features
+
+- Route selection
+- Guide assignment
+- Tour date
+- Capacity management
+
+<img width="956" height="450" alt="צילום מסך 2026-06-17 130853" src="https://github.com/user-attachments/assets/1933c6d5-0d8d-47ed-b6d1-d83fb209751a" />
+
+---
+
+# Customers Management
+
+The Customers module manages customer information.
+
+## Features
+
+- View customers
+- Create customers
+- Update customer information
+- Delete customers
+
+## Database Objects Used
+
+- CUSTOMER
+
+<img width="956" height="449" alt="צילום מסך 2026-06-17 130902" src="https://github.com/user-attachments/assets/d90a13dc-9ab0-43ac-999d-7b882da264d1" />
+
+---
+
+## Create Customer
+
+Administrators can register new customers.
+
+### Features
+
+- Customer details
+- Contact information
+
+<img width="959" height="448" alt="צילום מסך 2026-06-17 130909" src="https://github.com/user-attachments/assets/5414b531-8cbc-463c-81cf-c2b28de27f39" />
+
+---
+
+# Registrations Management
+
+The Registrations module allows administrators to manage customer registrations for guided tours.
+
+## Features
+
+- View all registrations
+- Create registrations
+- Update registrations
+- Delete registrations
+- Connect customers to tours
+- Assign registration statuses
+
+## Database Objects Used
+
+- CUSTOMER
+- GUIDEDTOUR
+- REGISTRATION
+- REGISTRATIONSTATUS
+
+<img width="956" height="448" alt="צילום מסך 2026-06-17 130918" src="https://github.com/user-attachments/assets/5b07a330-afda-4cac-8502-efd2c63d33bc" />
+
+---
+
+## Create Registration
+
+Administrators can register customers for available tours.
+
+### Features
+
+- Customer selection
+- Tour selection
+- Payment amount
+- Registration status
+- Notes
+
+## Database Objects Used
+
+- REGISTRATION
+- CUSTOMER
+- GUIDEDTOUR
+
+<img width="958" height="443" alt="צילום מסך 2026-06-17 130926" src="https://github.com/user-attachments/assets/c116eea5-a9be-4f79-892b-8810ef9dfa3d" />
+
+---
+
+# Payments Management
+
+The Payments module demonstrates the integration between application logic and database triggers.
+
+## Features
+
+- View payments
+- Record payments
+- Delete payments
+- Monitor payment status
+- Trigger automatic registration updates
+
+## Database Objects Used
+
+- PAYMENT
+- REGISTRATION
+
+<img width="956" height="449" alt="צילום מסך 2026-06-17 130935" src="https://github.com/user-attachments/assets/2d3cd7c1-df3f-41b5-83fa-a516ed13ea5e" />
+
+---
+
+## Record Payment
+
+A new payment can be recorded directly through the interface.
+
+### Features
+
+- Registration selection
+- Amount entry
+- Payment status selection
+
+## Database Objects Used
+
+- PAYMENT
+
+<img width="958" height="449" alt="צילום מסך 2026-06-17 130943" src="https://github.com/user-attachments/assets/14e99378-a0db-461f-ad4d-020c835af950" />
+
+---
+
+## Trigger Integration
+
+When a payment is inserted or updated, the trigger below is executed automatically:
+
+```sql
+trg_update_registration_payment_status
+```
+
+This trigger updates the registration status according to the payment status.
+
+### Demonstrated Concepts
+
+- AFTER INSERT Trigger
+- AFTER UPDATE Trigger
+- Automatic database actions
+- Business rule enforcement
+
+<img width="756" height="104" alt="image" src="https://github.com/user-attachments/assets/b1378561-b9fc-42c9-b8b7-9eafe3af02f2" />
+
+---
+
+# Locations Management
+
+The Locations module manages geographical locations associated with routes.
+
+## Features
+
+- Create locations
+- Update locations
+- Delete locations
+- Search locations
+
+## Database Objects Used
+
+- LOCATION
+
+<img width="959" height="445" alt="צילום מסך 2026-06-17 130950" src="https://github.com/user-attachments/assets/b7ae3694-3c7a-4712-bdb6-ec8662b33839" />
+
+---
+
+## Create Location
+
+Administrators can add new locations.
+
+### Features
+
+- Location name
+- Category
+- Description
+
+## Database Objects Used
+
+- LOCATION
+
+<img width="958" height="445" alt="צילום מסך 2026-06-17 130959" src="https://github.com/user-attachments/assets/0b2de5f4-3797-413c-afeb-dac3f13db50d" />
+
+---
+
+# Analytics Module
+
+The Analytics module executes advanced SQL queries developed during Stage 2.
+
+All queries are executed directly against the PostgreSQL database.
+
+## Features
+
+- Dynamic query execution
+- Real-time results
+- Parameterized queries
+- Database reporting
+
+<img width="956" height="441" alt="צילום מסך 2026-06-17 131011" src="https://github.com/user-attachments/assets/41a76d11-5886-4f7a-8972-afbeb676c253" />
+
+---
+
+## Query 1 – High-Earning Guides
+
+Identifies guides who generated the highest revenue during a selected month.
+
+### Database Concepts
+
+- JOIN
+- GROUP BY
+- Aggregation Functions
+
+### Database Objects Used
+
+- GUIDE
+- GUIDEDTOUR
+- PAYMENT
+- REGISTRATION
+
+<img width="953" height="448" alt="image" src="https://github.com/user-attachments/assets/498cb37e-59ea-4da2-b79b-ddd348109bd6" />
+
+---
+
+## Query 2 – Monthly Revenue Analysis
+
+Calculates total revenue and transaction volume for a selected year.
+
+### Database Concepts
+
+- Aggregation
+- Date Functions
+- Reporting
+
+<img width="955" height="442" alt="image" src="https://github.com/user-attachments/assets/54c9810f-0cb8-4b15-a491-28f3984719e6" />
+
+---
+
+## Query 3 – VIP Customer Loyalty
+
+Identifies customers whose spending exceeds ₪2,000 during the last year.
+
+### Database Concepts
+
+- Aggregation
+- Filtering
+- Customer Segmentation
+
+<img width="956" height="440" alt="image" src="https://github.com/user-attachments/assets/a80860a6-c55e-4b66-8e3e-706a7f415f6c" />
+
+---
+
+## Query 4 – Elite Guides
+
+Identifies guides who meet performance requirements.
+
+### Database Concepts
+
+- Subqueries
+- AVG
+- HAVING
+
+<img width="956" height="445" alt="image" src="https://github.com/user-attachments/assets/fb595889-268d-4a68-87cf-c863d536009e" />
+
+---
+
+## Query 5 – Popular Routes
+
+Displays routes used in multiple guided tours and ranks them according to popularity.
+
+### Database Concepts
+
+- Ranking
+- Aggregation
+- JOIN Operations
+
+<img width="957" height="443" alt="image" src="https://github.com/user-attachments/assets/c96b1fa3-3581-48d5-8993-8a34ced1b766" />
+
+---
+
+# Programs Module
+
+The Programs module demonstrates all PL/pgSQL objects implemented during Stage 4.
+
+## Included Objects
+
+- Functions
+- Refcursor Functions
+- Procedures
+- Triggers
+
+<img width="959" height="449" alt="image" src="https://github.com/user-attachments/assets/aed0b166-2d5a-4410-87fc-6cfd97a39ac9" />
+
+---
+
+# Function 1
+
+## fn_calculate_customer_payment_status
+
+Calculates the complete financial status of a customer.
+
+### Input
+
+```text
+Customer ID
+```
+
+### Output
+
+- Total Cost
+- Total Paid
+- Remaining Debt
+- Payment Classification
+
+<img width="956" height="451" alt="image" src="https://github.com/user-attachments/assets/dea020bb-b769-4973-be2f-edd51827b5fc" />
+
+---
+
+# Function 2
+
+## fn_get_route_tour_details_by_difficulty
+
+Returns guided tour details according to difficulty level using a refcursor.
+
+### Input
+
+```text
+Difficulty Name
+```
+
+### Output
+
+- Route Information
+- Guide Information
+- Tour Details
+- Summary Statistics
+
+<img width="953" height="442" alt="image" src="https://github.com/user-attachments/assets/3b43580e-ad5a-4e9f-9afd-3f9b9dcf7f76" />
+
+---
+
+# Procedure 1
+
+## pr_assign_optimal_guide_to_tour
+
+Automatically assigns the most suitable guide to a tour.
+
+### Selection Criteria
+
+- Expertise
+- Rating
+- Availability
+
+<img width="953" height="443" alt="image" src="https://github.com/user-attachments/assets/53f7dade-d8b1-4c87-b964-a7863ec951c9" />
+
+---
+
+# Procedure 2
+
+## pr_apply_discount_to_tour_participants
+
+Applies a discount to all registrations associated with a selected tour.
+
+### Input
+
+```text
+Tour ID
+Discount Percentage
+```
+
+<img width="956" height="445" alt="image" src="https://github.com/user-attachments/assets/e397b674-ebb5-4683-9cc4-6d3661cf9748" />
+
+---
+
+# Active Triggers
+
+## Trigger 1
+
+### trg_update_registration_payment_status
+
+Automatically updates registration status whenever a payment is inserted or modified.
+
+### Events
+
+```text
+AFTER INSERT
+AFTER UPDATE
+```
+
+### Table
+
+```text
+PAYMENT
+```
+
+<img width="377" height="144" alt="image" src="https://github.com/user-attachments/assets/5c00e5c4-fecb-447c-b33c-9e0187586c3b" />
+
+---
+
+## Trigger 2
+
+### trg_audit_tour_changes
+
+Logs all modifications performed on guided tours.
+
+### Events
+
+```text
+AFTER INSERT
+AFTER UPDATE
+AFTER DELETE
+```
+
+### Table
+
+```text
+GUIDEDTOUR
+```
+
+### Audit Information
+
+- Previous values
+- New values
+- Timestamp
+- Operation type
+
+<img width="364" height="148" alt="image" src="https://github.com/user-attachments/assets/2d04106d-e0e8-40bc-afdc-9f3554c35d3a" />
+
+---
+
+# Database Integration
+
+The application communicates directly with PostgreSQL.
+
+## Supported Operations
+
+- SELECT
+- INSERT
+- UPDATE
+- DELETE
+
+## Advanced Features
+
+- Views
+- Functions
+- Procedures
+- Triggers
+- Transactions
+- Refcursors
+
+---
+
+# Conclusion
+
+Stage 5 successfully integrates all database components developed throughout the project into a complete full-stack web application.
+
+The final system demonstrates:
+
+- Database Design
+- SQL Development
+- Advanced Queries
+- Views
+- Functions
+- Procedures
+- Triggers
+- Full CRUD Operations
+- Backend Integration
+- Frontend Development
+- Real-Time Database Interaction
+
+This stage represents the complete implementation of the Tour Guide Management System and showcases the practical use of PostgreSQL technologies within a production-style application.
