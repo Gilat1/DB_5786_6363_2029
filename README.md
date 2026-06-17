@@ -176,6 +176,14 @@ Guided Tour Management
     - [Advanced Features](#advanced-features)
   - [Conclusion](#conclusion)
 
+  - [How to Run the Project](#how-to-run-the-project)
+    - [Requirements](#requirements)
+    - [Clone the Repository](#clone-the-repository)
+    - [Run the System](#run-the-system)
+    - [Verify Running Containers](#verify-running-containers)
+    - [Access the Application](#access-the-application)
+    - [Stop the System](#stop-the-system)
+    - [Notes](#notes)
 ---
 
 ##  Introduction
@@ -3787,3 +3795,96 @@ The final system demonstrates:
 - Real-Time Database Interaction
 
 This stage represents the complete implementation of the Tour Guide Management System and showcases the practical use of PostgreSQL technologies within a production-style application.
+
+---
+
+# How to Run the Project
+
+## Requirements
+
+Before running the project, make sure the following software is installed:
+
+- Docker Desktop
+- Docker Compose (included with Docker Desktop)
+- Git
+
+---
+
+## Clone the Repository
+
+```bash
+git clone https://github.com/GilatKedem/DB_5786_6363_2029.git
+cd DB_5786_6363_2029
+```
+
+---
+
+## Run the System
+
+Open a terminal in the project's root directory and run:
+
+```bash
+docker-compose up -d
+```
+
+This command automatically starts all required containers:
+
+- PostgreSQL Database
+- Backend Server
+- Frontend Application
+- pgAdmin
+
+---
+
+## Verify Running Containers
+
+To verify that all containers are running successfully:
+
+```bash
+docker ps
+```
+
+You should see the following containers:
+
+- PostgreSQL_DB
+- TourGuide_Backend
+- TourGuide_Frontend
+- pgadminApp
+
+---
+
+## Access the Application
+
+After all containers are running, open the browser and access:
+
+```text
+Frontend:
+http://localhost:5173
+
+Backend API:
+http://localhost:3000
+
+pgAdmin:
+http://localhost:8080
+```
+
+---
+
+## Stop the System
+
+To stop all running containers:
+
+```bash
+docker-compose down
+```
+
+---
+
+## Notes
+
+- The project is fully containerized using Docker.
+- No manual database installation is required.
+- No manual PostgreSQL configuration is required.
+- All services communicate automatically through Docker Compose.
+- The application connects directly to the PostgreSQL database.
+- All CRUD operations, analytics queries, functions, procedures, triggers, and views are available through the graphical user interface.
