@@ -4,8 +4,8 @@
 ## Cover Page
 
 **Submitted by:**  
-Gilat Malka – 213196363  
-Shirel Nkaoua – 209692029  
+Gilat Malka
+Shirel Nkaoua
 
 **System Name:**  
 Tour Guide Management System  
